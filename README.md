@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # TrailBlazer
 
 This template should help get you started developing with Vue 3 in Vite.
@@ -27,3 +28,6 @@ npm run dev
 ```sh
 npm run build
 ```
+=======
+# TrailBlazer_Frontend
+>>>>>>> 2049520cf88f429cd562d6242ee6a03bdde83954
