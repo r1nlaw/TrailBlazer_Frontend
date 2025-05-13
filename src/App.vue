@@ -4,7 +4,7 @@
 
     <div class="main-content">
       <Sidebar />
-      <!--<MainMapAndList /> -->
+      <MainMapAndList />
     </div>
   </div>
 </template>
@@ -12,7 +12,7 @@
 <script setup>
 import Header from './components/Header.vue'
 import Sidebar from './components/Sidebar.vue'
-//import MainMapAndList from './components/MainMapAndList.vue'
+import MainMapAndList from './components/MainMapAndList.vue'
 </script>
 
 <style scoped>
@@ -27,4 +27,11 @@ import Sidebar from './components/Sidebar.vue'
   flex: 1;
   overflow: hidden;
 }
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
 </style>
