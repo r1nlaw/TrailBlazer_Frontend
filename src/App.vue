@@ -1,37 +1,30 @@
 <template>
-  <div class="app">
+  <div class="app-container">
     <Header />
-    <div class="content">
-      <!--<Sidebar /> -->
-      <div class="main">
-       <!-- <MapView /> -->
-      </div>
+
+    <div class="main-content">
+      <Sidebar />
+      <!--<MainMapAndList /> -->
     </div>
   </div>
 </template>
 
 <script setup>
 import Header from './components/Header.vue'
-//import Sidebar from './components/Sidebar.vue'
-//import MapView from './components/MapView.vue'
+import Sidebar from './components/Sidebar.vue'
+//import MainMapAndList from './components/MainMapAndList.vue'
 </script>
 
 <style scoped>
-.app {
+.app-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
 
-.content {
+.main-content {
   display: flex;
   flex: 1;
   overflow: hidden;
-}
-
-.main {
-  flex: 1;
-  position: relative;
-  overflow: auto;
 }
 </style>
