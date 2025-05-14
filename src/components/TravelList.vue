@@ -1,7 +1,18 @@
 <template>
   <div class="travel-list-wrapper">
     <div class="places">
-      <div v-for="place in places" :key="place.id" class="place-card">
+      <div
+        v-for="place in places"
+        :key="place.id"
+        class="place-card"
+        :class="{ selected: selectedPlaces.includes(place.id) }"
+      >
+        <input
+          type="checkbox"
+          :value="place.id"
+          v-model="selectedPlaces"
+          class="checkbox"
+        />
         <img :src="place.image" class="place-image" />
         <div class="place-content">
           <div class="title-row">
@@ -18,7 +29,6 @@
             <span>{{ place.reviews }} отзывов</span>
           </div>
         </div>
-        <input type="radio" name="selected-place" />
       </div>
     </div>
 
@@ -30,6 +40,10 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+
+const selectedPlaces = ref([])
+
 import infoIcon from '@/assets/icons/info.png'
 import starIcon from '@/assets/icons/star.png'
 import reviewIcon from '@/assets/icons/review.png'
@@ -110,12 +124,19 @@ const news = [
   gap: 24px;
   width: 100%;
 }
+.checkbox {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%) scale(1.2);
+}
 
 .places {
   flex: 2;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow: visible;
 }
 
 .place-card {
@@ -125,7 +146,23 @@ const news = [
   border-radius: 16px;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  position: relative;
+  transition: all 0.3s ease;
+  border: 1px solid #2c473a54;
+  box-shadow: none;
+  transform: translateX(0);
+}
+
+.place-card:hover {
+  transform: translateX(10px);
+  box-shadow: 2px 2px 6px #2c473a6b;
+  cursor: pointer;
+}
+
+.place-card.selected {
+  border-color: #2c473a;
+  background-color: #f0f9f5;
+  box-shadow: 0 0 10px rgba(44, 71, 58, 0.3);
 }
 
 .place-image {

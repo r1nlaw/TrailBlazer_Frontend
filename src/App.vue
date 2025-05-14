@@ -30,6 +30,7 @@ import MainMapAndList from './components/MainMapAndList.vue'
 html,
 body,
 #app {
+  font-optical-sizing: auto;
   height: 100%;
   margin: 0;
 }
