@@ -55,7 +55,7 @@
 import { ref } from 'vue'
 
 const selectedPlaces = ref([])
-
+loadLandmark();
 function toggleSelection(id) {
   const index = selectedPlaces.value.indexOf(id)
   if (index === -1) {
@@ -75,112 +75,11 @@ import infoIcon from '@/assets/icons/info.png'
 import starIcon from '@/assets/icons/star.png'
 import reviewIcon from '@/assets/icons/review.png'
 
-import place1 from '@/assets/images/place1.png'
-import place2 from '@/assets/images/place2.png'
-import place3 from '@/assets/images/place3.png'
+// import place1 from '@/assets/images/place1.png'
+// import place2 from '@/assets/images/place2.png'
+// import place3 from '@/assets/images/place3.png'
 
-const places = [
-  {
-    id: 1,
-    title: 'Ласточкино гнездо',
-    image: place1,
-    location: 'г. Ялта',
-    time: 'Ежедневно, с 10:00 до 19:00',
-    price: '200₽',
-    rating: 4.9,
-    reviews: 384,
-  },
-  {
-    id: 2,
-    title: 'Генуэзская крепость',
-    image: place2,
-    location: 'г. Судак',
-    time: 'Ежедневно, с 10:00 до 19:00',
-    price: '200₽',
-    rating: 4.9,
-    reviews: 384,
-  },
-  {
-    id: 3,
-    title: 'Воронцовский дворец',
-    image: place3,
-    location: 'г. Ялта',
-    time: 'Ежедневно, с 10:00 до 19:00',
-    price: '200₽',
-    rating: 4.9,
-    reviews: 384,
-  },
-    {
-    id: 4,
-    title: 'Воронцовский дворец',
-    image: place3,
-    location: 'г. Ялта',
-    time: 'Ежедневно, с 10:00 до 19:00',
-    price: '200₽',
-    rating: 4.9,
-    reviews: 384,
-  },
-  {
-    id: 5,
-    title: 'Генуэзская крепость',
-    image: place2,
-    location: 'г. Судак',
-    time: 'Ежедневно, с 10:00 до 19:00',
-    price: '200₽',
-    rating: 4.9,
-    reviews: 384,
-  },
-   {
-    id: 6,
-    title: 'Ласточкино гнездо',
-    image: place1,
-    location: 'г. Ялта',
-    time: 'Ежедневно, с 10:00 до 19:00',
-    price: '200₽',
-    rating: 4.9,
-    reviews: 384,
-  },
-   {
-    id: 7,
-    title: 'Генуэзская крепость',
-    image: place2,
-    location: 'г. Судак',
-    time: 'Ежедневно, с 10:00 до 19:00',
-    price: '200₽',
-    rating: 4.9,
-    reviews: 384,
-  },
-     {
-    id: 8,
-    title: 'Генуэзская крепость',
-    image: place2,
-    location: 'г. Судак',
-    time: 'Ежедневно, с 10:00 до 19:00',
-    price: '200₽',
-    rating: 4.9,
-    reviews: 384,
-  },
-    {
-    id: 9,
-    title: 'Воронцовский дворец',
-    image: place3,
-    location: 'г. Ялта',
-    time: 'Ежедневно, с 10:00 до 19:00',
-    price: '200₽',
-    rating: 4.9,
-    reviews: 384,
-  },
-    {
-    id: 10,
-    title: 'Воронцовский дворец',
-    image: place3,
-    location: 'г. Ялта',
-    time: 'Ежедневно, с 10:00 до 19:00',
-    price: '200₽',
-    rating: 4.9,
-    reviews: 384,
-  },
-]
+const  places = ref([])
 
 const news = [
   {
@@ -192,6 +91,38 @@ const news = [
     `,
   },
 ]
+
+async function loadLandmark() {
+  const params = new URLSearchParams(window.location.search);
+  let page = params.get('page');
+  if (page===null){
+    page = "1"
+  }
+  const domain = "localhost:8080";
+
+  const url = `http://${domain}/api/landmark?page=${page}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const landmarks = await response.json();
+    if (landmarks && landmarks.length > 0) {
+      landmarks.forEach(element => {
+        places.value.push({id: element.id, title: element.name, location: element.address})
+        });
+      }
+    }
+  catch (error){
+    console.log(error);
+  }
+}
 </script>
 
 <style scoped>
