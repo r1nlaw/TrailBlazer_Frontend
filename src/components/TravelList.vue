@@ -6,14 +6,8 @@
         :key="place.id"
         class="place-card"
         :class="{ selected: selectedPlaces.includes(place.id) }"
+        @click="toggleSelection(place.id)"
       >
-        <input
-          type="checkbox"
-          :value="place.id"
-          v-model="selectedPlaces"
-          class="checkbox"
-        />
-        <img :src="place.image" class="place-image" />
         <div class="place-content">
           <div class="title-row">
             <h3 class="place-title">{{ place.title }}</h3>
@@ -29,6 +23,15 @@
             <span>{{ place.reviews }} отзывов</span>
           </div>
         </div>
+        <div class="img">
+          <img :src="place.image" class="place-image" />
+        </div>
+        <input
+          type="checkbox"
+          class="checkbox"
+          :checked="selectedPlaces.includes(place.id)"
+          @click.stop
+        />
       </div>
     </div>
 
@@ -37,12 +40,36 @@
       <p v-html="item.content"></p>
     </div>
   </div>
+  <button
+      v-if="selectedPlaces.length > 0"
+      class="bottom-action-button"
+      @click="handleSelection"
+    >
+      Построить маршрут.
+  </button>
+
 </template>
+
 
 <script setup>
 import { ref } from 'vue'
 
 const selectedPlaces = ref([])
+
+function toggleSelection(id) {
+  const index = selectedPlaces.value.indexOf(id)
+  if (index === -1) {
+    selectedPlaces.value.push(id)
+  } else {
+    selectedPlaces.value.splice(index, 1)
+  }
+}
+function handleSelection() {
+  console.log('Выбранные ID:', selectedPlaces.value)
+  alert(`Вы выбрали ${selectedPlaces.value.length} место(а): ${selectedPlaces.value.join(', ')}`)
+}
+
+
 
 import infoIcon from '@/assets/icons/info.png'
 import starIcon from '@/assets/icons/star.png'
@@ -83,6 +110,76 @@ const places = [
     rating: 4.9,
     reviews: 384,
   },
+    {
+    id: 4,
+    title: 'Воронцовский дворец',
+    image: place3,
+    location: 'г. Ялта',
+    time: 'Ежедневно, с 10:00 до 19:00',
+    price: '200₽',
+    rating: 4.9,
+    reviews: 384,
+  },
+  {
+    id: 5,
+    title: 'Генуэзская крепость',
+    image: place2,
+    location: 'г. Судак',
+    time: 'Ежедневно, с 10:00 до 19:00',
+    price: '200₽',
+    rating: 4.9,
+    reviews: 384,
+  },
+   {
+    id: 6,
+    title: 'Ласточкино гнездо',
+    image: place1,
+    location: 'г. Ялта',
+    time: 'Ежедневно, с 10:00 до 19:00',
+    price: '200₽',
+    rating: 4.9,
+    reviews: 384,
+  },
+   {
+    id: 7,
+    title: 'Генуэзская крепость',
+    image: place2,
+    location: 'г. Судак',
+    time: 'Ежедневно, с 10:00 до 19:00',
+    price: '200₽',
+    rating: 4.9,
+    reviews: 384,
+  },
+     {
+    id: 8,
+    title: 'Генуэзская крепость',
+    image: place2,
+    location: 'г. Судак',
+    time: 'Ежедневно, с 10:00 до 19:00',
+    price: '200₽',
+    rating: 4.9,
+    reviews: 384,
+  },
+    {
+    id: 9,
+    title: 'Воронцовский дворец',
+    image: place3,
+    location: 'г. Ялта',
+    time: 'Ежедневно, с 10:00 до 19:00',
+    price: '200₽',
+    rating: 4.9,
+    reviews: 384,
+  },
+    {
+    id: 10,
+    title: 'Воронцовский дворец',
+    image: place3,
+    location: 'г. Ялта',
+    time: 'Ежедневно, с 10:00 до 19:00',
+    price: '200₽',
+    rating: 4.9,
+    reviews: 384,
+  },
 ]
 
 const news = [
@@ -91,27 +188,7 @@ const news = [
     title: 'Власти планируют масштабную реконструкцию<br />Генуэзской крепости в Судаке',
     content: `
       <p>Судак, 11 мая — Власти Республики Крым объявили о начале подготовки к масштабной реконструкции
-      Генуэзской крепости в Судаке. Соответствующее решение было принято в рамках государственной
-      программы по сохранению объектов культурного наследия.</p>
 
-      <p>По словам представителей администрации, проект направлен на сохранение исторического облика
-      крепости, улучшение туристической инфраструктуры и повышение уровня безопасности для посетителей.
-      В ближайшее время планируется проведение археологических изысканий, разработка проектно-сметной
-      документации и согласование с Министерством культуры РФ.</p>
-
-      <p>«Генуэзская крепость — один из важнейших памятников архитектуры Средневековья. Мы обязаны
-      сохранить её для будущих поколений», — отметил глава администрации города Судак.</p>
-
-      <p>Работы планируется начать уже в следующем году. Реконструкция будет проходить поэтапно, чтобы
-      не ограничивать доступ туристов к основным смотровым площадкам. Также рассматривается возможность
-      создания мультимедийного музейного центра на территории комплекса.</p>
-
-      <p>Финансирование проекта будет осуществляться за счёт федерального и республиканского бюджетов,
-      а также при поддержке инвесторов. Сумма вложений пока не уточняется.</p>
-
-      <p>Генуэзская крепость — визитная карточка Судака и один из самых посещаемых туристических объектов
-      Крыма. Комплекс включает в себя многочисленные башни, крепостные стены и хозяйственные постройки,
-      построенные в XIII–XV веках.</p>
     `,
   },
 ]
@@ -123,12 +200,6 @@ const news = [
   flex: 1;
   gap: 24px;
   width: 100%;
-}
-.checkbox {
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%) scale(1.2);
 }
 
 .places {
@@ -149,9 +220,8 @@ const news = [
   position: relative;
   transition: all 0.3s ease;
   border: 1px solid #2c473a54;
-  box-shadow: none;
-  transform: translateX(0);
 }
+
 
 .place-card:hover {
   transform: translateX(10px);
@@ -171,7 +241,6 @@ const news = [
   object-fit: cover;
   border-radius: 12px;
 }
-
 .place-content {
   flex: 1;
 }
@@ -222,7 +291,19 @@ const news = [
   color: rgb(146, 146, 146);
 }
 
+.checkbox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+
 .news-card {
+  position: relative;
   flex: 1;
   background: linear-gradient(135deg, #2b4739, #0b4f34);
   border-radius: 16px;
@@ -231,6 +312,7 @@ const news = [
   color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
+  max-height: 650px;
 }
 
 .news-card h3 {
@@ -243,4 +325,23 @@ const news = [
   margin-bottom: 12px;
   line-height: 1.5;
 }
+
+.bottom-action-button {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2c473a;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+}
+
+
 </style>
