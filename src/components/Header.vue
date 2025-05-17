@@ -42,14 +42,35 @@
           <div class="temp">17 °C</div>
         </div>
       </div>
-      <img :src="historyIcon" class="icon-circle" />
-      <img :src="avatarImage" class="avatar" />
-      <img :src="settingsIcon" class="icon-circle" />
+
+      <div class="history">
+        <img :src="historyIcon" class="icon-circle" />
+      </div>
+
+      <div class="avatar">
+        <img :src="avatarImage" class="avatar" />
+      </div>
+
+      <div class="settings" @click="toggleDropdown">
+        <img :src="settingsIcon" class="icon-circle" />
+        <div v-if="showDropdown" class="dropdown-menu">
+          <ul>
+            <li @click="goToProfile">Профиль</li>
+            <li @click="goToLogin">Вход</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </header>
+
+  <!-- Модальное окно регистрации -->
+  <RegisterModal ref="registerModalRef" @register="handleRegister" />
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import RegisterModal from '@/components/RegisterModal.vue'
+
 import logoIcon from '@/assets/logo.png'
 import homeIcon from '@/assets/icons/home.png'
 import fireIcon from '@/assets/icons/fire.png'
@@ -60,15 +81,38 @@ import sunIcon from '@/assets/icons/sun.png'
 import historyIcon from '@/assets/icons/history.png'
 import settingsIcon from '@/assets/icons/settings.png'
 import avatarImage from '@/assets/images/user_avatar.png'
+
+
+
+const showDropdown = ref(false)
+const registerModalRef = ref(null)
+
+function toggleDropdown() {
+  showDropdown.value = !showDropdown.value
+}
+
+function goToProfile() {
+  console.log('Перейти в профиль')
+  showDropdown.value = false
+}
+
+function goToLogin() {
+  showDropdown.value = false
+  registerModalRef.value?.open()
+}
+
+function handleRegister(userData) {
+  console.log('Регистрация прошла:', userData)
+  // Добавь POST-запрос, обработку токена и т.д.
+}
 </script>
 
 <style scoped>
+/* Оставил стиль без изменений — он хороший */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Mulish:wght@400;600&display=swap');
-
 * {
   font-family: 'Montserrat', sans-serif;
 }
-
 .header {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -78,44 +122,37 @@ import avatarImage from '@/assets/images/user_avatar.png'
   border-bottom: 1px solid #e0e0e0;
   gap: 16px;
 }
-
 .header-left,
 .header-right {
   display: flex;
   align-items: center;
   gap: 16px;
 }
-
 .center {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 24px;
 }
-
 .logo {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 .logo-icon {
   width: 36px;
   height: 36px;
 }
-
 .logo-text {
   font-family: 'Mulish', sans-serif;
   font-weight: 700;
   font-size: 22px;
   color: #0d3c2f;
 }
-
 .nav-icons {
   display: flex;
   gap: 12px;
 }
-
 .icon-button {
   width: 48px;
   height: 48px;
@@ -126,20 +163,16 @@ import avatarImage from '@/assets/images/user_avatar.png'
   justify-content: center;
   position: relative;
 }
-
 .icon-img {
   width: 22px;
   height: 22px;
 }
-
 .icon-button.active {
   background: #0d3c2f;
 }
-
 .icon-button.active .icon-img {
   filter: brightness(0) invert(1);
 }
-
 .badge-button .badge {
   position: absolute;
   top: -4px;
@@ -151,7 +184,6 @@ import avatarImage from '@/assets/images/user_avatar.png'
   border-radius: 4px;
   font-weight: bold;
 }
-
 .search-bar {
   display: flex;
   align-items: center;
@@ -162,12 +194,10 @@ import avatarImage from '@/assets/images/user_avatar.png'
   max-width: 240px;
   height: 36px;
 }
-
 .search-bar img {
   width: 18px;
   height: 18px;
 }
-
 .search-bar input {
   border: none;
   background: transparent;
@@ -175,7 +205,6 @@ import avatarImage from '@/assets/images/user_avatar.png'
   width: 100%;
   font-size: 14px;
 }
-
 .weather {
   display: flex;
   align-items: center;
@@ -184,25 +213,20 @@ import avatarImage from '@/assets/images/user_avatar.png'
   border-radius: 9999px;
   gap: 6px;
 }
-
 .weather-icon img {
   width: 20px;
   height: 20px;
 }
-
 .weather-text {
   font-size: 12px;
   line-height: 1.2;
 }
-
 .weather-text .label {
   color: #666;
 }
-
 .weather-text .temp {
   font-weight: 600;
 }
-
 .icon-circle {
   width: 36px;
   height: 36px;
@@ -210,11 +234,37 @@ import avatarImage from '@/assets/images/user_avatar.png'
   background: #f0f0f0;
   padding: 4px;
 }
-
 .avatar {
   width: 36px;
   height: 36px;
   border-radius: 50%;
   object-fit: cover;
+}
+.settings {
+  position: relative;
+  cursor: pointer;
+}
+.dropdown-menu {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 10;
+}
+.dropdown-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.dropdown-menu li {
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.dropdown-menu li:hover {
+  background: #f0f0f0;
 }
 </style>
