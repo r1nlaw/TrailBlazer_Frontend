@@ -1,13 +1,17 @@
 <template>
   <div class="main-layout">
-    <Map />
+    <Map ref="mapRef"/>
     <TravelList />
   </div>
 </template>
 
 <script setup>
+import {ref,provide} from "vue";
 import Map from './Map.vue'
 import TravelList from './TravelList.vue'
+
+const mapRef = ref(null);
+provide('mapRef',mapRef)
 </script>
 
 <style scoped>

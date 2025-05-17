@@ -52,9 +52,10 @@
 
 
 <script setup>
-import { ref } from 'vue'
-
+import { ref,inject } from 'vue';
+import MapComponent from './Map.vue'
 const selectedPlaces = ref([])
+const mapRef = inject('mapRef');
 loadLandmark();
 function toggleSelection(id) {
   const index = selectedPlaces.value.indexOf(id)
@@ -65,8 +66,12 @@ function toggleSelection(id) {
   }
 }
 function handleSelection() {
-  console.log('Выбранные ID:', selectedPlaces.value)
-  alert(`Вы выбрали ${selectedPlaces.value.length} место(а): ${selectedPlaces.value.join(', ')}`)
+  if (mapRef.value && mapRef.value.RouteMaker) {
+    mapRef.value.RouteMaker(selectedPlaces.value);
+    console.log('Выбранные ID:', selectedPlaces.value);
+  } else {
+    console.error('Map component or RouteMaker not available');
+  }
 }
 
 

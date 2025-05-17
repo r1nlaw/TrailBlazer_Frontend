@@ -1,11 +1,11 @@
 <template>
-  <div class="map-container">
+  <div class="map-container" :style="{ height: mapHeight + 'px'}">
     <img v-if="!isMapVisible" src="@/assets/images/map_placeholder.png" alt="Карта" class="map-image" />
     <div v-show="isMapVisible" id="map" style="height: 400px; width: 100%; z-index: 0;"></div>
     <button class="map-button" @click="toggleMap">
       <img src="@/assets/icons/map-pin.png" alt="Pin" />
-      {{ isMapVisible ? 'Скрыть карту' : 'Раскрыть карту' }}
-    </button>
+
+      {{ isMapExpanded ? 'Уменьшить карту' : isMapVisible ? 'Увеличить карту' : 'Раскрыть карту' }}    </button>
   </div>
 </template>
 
@@ -13,14 +13,14 @@
 import { ref, onMounted } from 'vue';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-
-// Состояние для переключения карты
+let markers = null;
 const isMapVisible = ref(true);
+const isMapExpanded = ref(false); 
 const domain = "localhost:8080";
 const geojson = { type: 'FeatureCollection', features: [] };
-let map = null; // Объявляем map как null, чтобы инициализировать позже
-
-// Инициализация карты после рендеринга шаблона
+let map = null; 
+const mapHeight = ref(400); 
+const routeSourceId = 'route';
 onMounted(() => {
   map = new maplibregl.Map({
     container: 'map',
@@ -30,7 +30,6 @@ onMounted(() => {
   });
 
   map.on('load', () => {
-    // Добавление источника для маркеров
     map.addSource('markers', {
       type: 'geojson',
       data: geojson,
@@ -39,7 +38,6 @@ onMounted(() => {
       clusterRadius: 30
     });
 
-    // Слой для кластеров
     map.addLayer({
       id: 'clusters',
       type: 'circle',
@@ -49,11 +47,11 @@ onMounted(() => {
         'circle-color': [
           'step',
           ['get', 'point_count'],
-          '#51bbd6', // до 10 точек
+          '#51bbd6', 
           10,
-          '#f1f075', // до 750 точек
+          '#f1f075', 
           750,
-          '#f28cb1' // больше 750
+          '#f28cb1' 
         ],
         'circle-radius': [
           'step',
@@ -67,7 +65,6 @@ onMounted(() => {
       }
     });
 
-    // Слой для количества точек в кластере
     map.addLayer({
       id: 'cluster-count',
       type: 'symbol',
@@ -83,7 +80,6 @@ onMounted(() => {
       }
     });
 
-    // Слой для отдельных маркеров
     map.addLayer({
       id: 'unclustered-point',
       type: 'circle',
@@ -96,8 +92,23 @@ onMounted(() => {
         'circle-stroke-color': '#fff'
       }
     });
+    map.addSource(routeSourceId, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: []
+      }
+    });
+    map.addLayer({
+      id: 'route-line',
+      type: 'line',
+      source: routeSourceId,
+      paint: {
+        'line-color': '#3b9ddd',
+        'line-width': 6
+      }
+    });
 
-    // Клик по кластерам для приближения
     map.on('click', 'clusters', (e) => {
       const features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
       if (!features.length) return;
@@ -111,7 +122,6 @@ onMounted(() => {
       });
     });
 
-    // Клик по отдельным маркерам для всплывающего окна
     map.on('click', 'unclustered-point', (e) => {
       if (!e.features || !e.features[0]) return;
       const coordinates = e.features[0].geometry.coordinates.slice();
@@ -141,7 +151,6 @@ onMounted(() => {
         .addTo(map);
     });
 
-    // Изменение курсора при наведении на кластеры
     map.on('mouseenter', 'clusters', () => {
       map.getCanvas().style.cursor = 'pointer';
     });
@@ -150,15 +159,15 @@ onMounted(() => {
     });
   });
 
-  // Загрузка маркеров при перемещении карты
   map.on('moveend', () => {
     loadFacilities();
   });
 
-  // Обработка ошибок карты
   map.on('error', (e) => {
     console.error('Map error:', e);
   });
+  
+
 });
 
 async function loadFacilities() {
@@ -195,7 +204,7 @@ async function loadFacilities() {
       if (source) {
         source.setData({
           type: 'FeatureCollection',
-          features: newFeatures // Заменяем данные, чтобы избежать дублирования
+          features: newFeatures 
         });
       } else {
         console.error("Source 'markers' does not exist.");
@@ -207,22 +216,92 @@ async function loadFacilities() {
 }
 
 function toggleMap() {
-  isMapVisible.value = !isMapVisible.value;
+  if (!isMapVisible.value) {
+    isMapVisible.value = true;
+    mapHeight.value = 400;
+    isMapExpanded.value = false;
+  } else if (!isMapExpanded.value) {
+    mapHeight.value = 600; 
+    isMapExpanded.value = true;
+  } else {
+    mapHeight.value = 400; 
+    isMapExpanded.value = false;
+  }
+
   if (isMapVisible.value && map) {
-    map.resize(); // Перерисовка карты при отображении
+    setTimeout(() => {
+      map.resize();
+    }, 0); 
   }
 }
-</script>
+async function getLandmarksByIDs(points){
+  const url = `http://${domain}/api/getLandmarks`;
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(points),
+      headers: { 'Content-Type': 'application/json' }
+    });
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const pointsInfo = await response.json();
+    return pointsInfo
+  } catch (error) {
+    console.error('Fetch error:', error);
+  }
+}
+ 
+async function RouteMaker(points) {
+  if (map.getSource(routeSourceId)) {
+      map.getSource(routeSourceId).setData({
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: []
+      }
+      });
+  }
+
+  let landmarks = await getLandmarksByIDs(points) 
+  getRoute(landmarks)
+ 
+}
+defineExpose({
+  RouteMaker
+})
+function getRoute(coords) {
+    let strCoord = ""
+    for (let i = 0; i < coords.length; i++) {
+      strCoord += `${i===0?"":';'}${coords[i].location.lng},${coords[i].location.lat}`
+      
+    }
+    const url = `https://router.project-osrm.org/route/v1/driving/${strCoord}?overview=full&geometries=geojson`;
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const route = data.routes[0].geometry;
+        map.getSource(routeSourceId).setData({
+          type: 'Feature',
+          geometry: route
+        });
+      })
+      .catch(err => console.error('Ошибка маршрута:', err));
+  }
+  
+</script>
 <style scoped>
 .map-container {
   position: relative;
   width: 100%;
   max-width: 100%;
-  height: 400px;
   min-height: 240px;
   border-radius: 24px;
   overflow: hidden;
+  transition: height 0.3s ease; /* Плавный переход высоты */
 }
 
 .map-image {
@@ -259,7 +338,7 @@ function toggleMap() {
 
 @media (max-width: 768px) {
   .map-container {
-    height: 300px;
+    height: 300px; /* Начальная высота для мобильных */
   }
 
   .map-button {
