@@ -44,13 +44,13 @@ function openMapModal() {
     const modalMap = new maplibregl.Map({
       container: 'map-modal',
       style: 'http://localhost:8100/styles/basic-preview2/style.json',
-      center: [34.09847, 44.94249],
-      zoom: 13
+      center: map.getCenter(),
+      zoom: map.getZoom(),    
     });
 
     modalMap.on('load', () => {
-      // Копируем geojson из основного источника
-      const sourceData = map?.getSource('markers')?._data || geojson;
+
+      const sourceData = map.getSource('markers')?._data || geojson;
 
       modalMap.addSource('markers', {
         type: 'geojson',
@@ -115,6 +115,27 @@ function openMapModal() {
         }
       });
 
+      // ✅ Копируем линию маршрута (если есть)
+      const routeSource = map.getSource('route');
+      if (routeSource && routeSource._data) {
+        modalMap.addSource('route', {
+          type: 'geojson',
+          data: routeSource._data
+        });
+
+        modalMap.addLayer({
+          id: 'route-line',
+          type: 'line',
+          source: 'route',
+          paint: {
+            'line-color': '#3b9ddd',
+            'line-width': 6
+          }
+        });
+      }
+
+      // 👆 Все обработчики (popup, zoom, cursors) остаются как у тебя — копируй по аналогии
+
       modalMap.on('click', 'clusters', (e) => {
         const features = modalMap.queryRenderedFeatures(e.point, { layers: ['clusters'] });
         if (!features.length) return;
@@ -167,6 +188,7 @@ function openMapModal() {
     });
   }, 300);
 }
+
 
 
 onMounted(() => {
