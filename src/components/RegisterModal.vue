@@ -96,7 +96,7 @@ defineExpose({ open, close })
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 1500;
   animation: fadeIn 0.3s ease;
 }
 

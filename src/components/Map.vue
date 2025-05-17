@@ -468,6 +468,7 @@ function getRoute(coords) {
 .map-container {
   position: relative;
   width: 100%;
+  margin-top: 70px;
   max-width: 100%;
   min-height: 240px;
   border-radius: 24px;
@@ -528,7 +529,7 @@ function getRoute(coords) {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1500;
   opacity: 1;
   transition: opacity 0.3s ease;
 }

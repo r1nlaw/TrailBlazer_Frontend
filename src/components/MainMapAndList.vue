@@ -18,6 +18,8 @@ provide('mapRef',mapRef)
 .main-layout {
   display: flex;
   flex-direction: column;
+  margin-left: 17%;
+  overflow-y: auto;
   gap: 24px;
   padding: 32px 24px 24px;
   background: #f5f5f5;

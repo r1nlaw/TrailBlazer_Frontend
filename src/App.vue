@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
-    <Header />
-
+      <Header />
     <div v-if="!isProfilePage" class="main-content">
       <Sidebar />
       <MainMapAndList />
@@ -45,6 +44,7 @@ function handleRegister(userData) {
   flex: 1;
   overflow: hidden;
 }
+
 
 .register-button {
   position: fixed;

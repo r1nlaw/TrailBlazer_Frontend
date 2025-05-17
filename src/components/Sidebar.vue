@@ -86,10 +86,19 @@ onMounted(() => {
 
 <style scoped>
 .sidebar {
+  position: fixed;
+  top: 8%; 
+  left: 0;
+  height: calc(100vh - 70px); 
+  overflow-y: auto; 
   padding: 24px;
   width: 250px;
   font-family: 'Montserrat', sans-serif;
+  background: white;  
+  z-index: 1000; 
+
 }
+
 
 .region {
   display: flex;

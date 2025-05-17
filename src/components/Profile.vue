@@ -53,7 +53,7 @@ const profile = reactive({
 <style scoped>
 .profile {
   max-width: 1000px;
-  margin: 40px auto;
+  margin-top: 100px;
   padding: 30px;
   background: #ffffff;
   border: 1px solid;

@@ -126,10 +126,13 @@ onMounted(() => {
   font-family: 'Montserrat', sans-serif;
 }
 .header {
+  position: fixed;
+  z-index: 1000;
+  width: 97%;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  padding: 12px 24px;
+  padding: 8px 20px;
   background: #fff;
   border-bottom: 1px solid #e0e0e0;
   gap: 16px;
