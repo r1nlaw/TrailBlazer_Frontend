@@ -2,26 +2,29 @@
   <div class="app-container">
     <Header />
 
-    <div class="main-content">
+    <div v-if="!isProfilePage" class="main-content">
       <Sidebar />
       <MainMapAndList />
       <RegisterModal ref="registerModal" @register="handleRegister" />
     </div>
 
-
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 import Header from './components/Header.vue'
 import Sidebar from './components/Sidebar.vue'
 import MainMapAndList from './components/MainMapAndList.vue'
-import RegisterModal from './components/RegisterModal.vue' 
+import RegisterModal from './components/RegisterModal.vue'
 
 const registerModal = ref()
+const route = useRoute()
 
+// Определяем, на странице ли профиля
+const isProfilePage = computed(() => route.path === '/profile')
 
 // Обработка события регистрации
 function handleRegister(userData) {

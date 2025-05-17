@@ -1,74 +1,80 @@
 <template>
-  <header class="header">
-    <!-- Левая часть -->
-    <div class="header-left">
-      <div class="logo">
-        <img :src="logoIcon" alt="Logo" class="logo-icon" />
-        <span class="logo-text">TrailBlazer</span>
+  <transition name="fade-slide">
+    <header v-if="visible" class="header">
+      <!-- Левая часть -->
+      <div class="header-left">
+        <router-link to="/" class="logo" style="text-decoration: none;">
+          <img :src="logoIcon" alt="Logo" class="logo-icon" />
+          <span class="logo-text">TrailBlazer</span>
+        </router-link>
       </div>
-    </div>
 
-    <!-- Центр: навигация и поиск -->
-    <div class="center">
-      <div class="nav-icons">
-        <div class="icon-button active">
-          <img :src="homeIcon" alt="Home" class="icon-img" />
+      <!-- Центр: навигация и поиск -->
+      <div class="center">
+        <div class="nav-icons">
+          <div class="icon-button active">
+            <img :src="homeIcon" alt="Home" class="icon-img" />
+          </div>
+          <div class="icon-button">
+            <img :src="fireIcon" alt="Fire" class="icon-img" />
+          </div>
+          <div class="icon-button">
+            <img :src="chatIcon" alt="Chat" class="icon-img" />
+          </div>
+          <div class="icon-button badge-button">
+            <img :src="calendarIcon" alt="Calendar" class="icon-img" />
+            <span class="badge">NEW</span>
+          </div>
         </div>
-        <div class="icon-button">
-          <img :src="fireIcon" alt="Fire" class="icon-img" />
-        </div>
-        <div class="icon-button">
-          <img :src="chatIcon" alt="Chat" class="icon-img" />
-        </div>
-        <div class="icon-button badge-button">
-          <img :src="calendarIcon" alt="Calendar" class="icon-img" />
-          <span class="badge">NEW</span>
-        </div>
-      </div>
-      <div class="search-bar">
-        <img :src="searchIcon" alt="Search" />
-        <input type="text" placeholder="Найти" />
-      </div>
-    </div>
-
-    <!-- Правая часть -->
-    <div class="header-right">
-      <div class="weather">
-        <div class="weather-icon">
-          <img :src="sunIcon" alt="Sun" />
-        </div>
-        <div class="weather-text">
-          <div class="label">Погода</div>
-          <div class="temp">17 °C</div>
+        <div class="search-bar">
+          <img :src="searchIcon" alt="Search" />
+          <input type="text" placeholder="Найти" />
         </div>
       </div>
 
-      <div class="history">
-        <img :src="historyIcon" class="icon-circle" />
-      </div>
+      <!-- Правая часть -->
+      <div class="header-right">
+        <div class="weather">
+          <div class="weather-icon">
+            <img :src="sunIcon" alt="Sun" />
+          </div>
+          <div class="weather-text">
+            <div class="label">Погода</div>
+            <div class="temp">17 °C</div>
+          </div>
+        </div>
 
-      <div class="avatar">
-        <img :src="avatarImage" class="avatar" />
-      </div>
+        <div class="history">
+          <img :src="historyIcon" class="icon-circle" />
+        </div>
 
-      <div class="settings" @click="toggleDropdown">
-        <img :src="settingsIcon" class="icon-circle" />
-        <div v-if="showDropdown" class="dropdown-menu">
-          <ul>
-            <li @click="goToProfile">Профиль</li>
-            <li @click="goToLogin">Вход</li>
-          </ul>
+        <div class="avatar">
+          <img :src="avatarImage" class="avatar" />
+        </div>
+
+        <div class="settings" @click="toggleDropdown">
+          <img :src="settingsIcon" class="icon-circle" />
+          <div v-if="showDropdown" class="dropdown-menu">
+            <ul>
+              <li @click="goToProfile">Профиль</li>
+              <li @click="goToLogin">Вход</li>
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
-  </header>
+    </header>
+  </transition>
+  
 
   <!-- Модальное окно регистрации -->
   <RegisterModal ref="registerModalRef" @register="handleRegister" />
+
+  <router-view />
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import RegisterModal from '@/components/RegisterModal.vue'
 
 import logoIcon from '@/assets/logo.png'
@@ -82,8 +88,7 @@ import historyIcon from '@/assets/icons/history.png'
 import settingsIcon from '@/assets/icons/settings.png'
 import avatarImage from '@/assets/images/user_avatar.png'
 
-
-
+const router = useRouter()
 const showDropdown = ref(false)
 const registerModalRef = ref(null)
 
@@ -92,8 +97,8 @@ function toggleDropdown() {
 }
 
 function goToProfile() {
-  console.log('Перейти в профиль')
   showDropdown.value = false
+  router.push('/profile')
 }
 
 function goToLogin() {
@@ -105,10 +110,17 @@ function handleRegister(userData) {
   console.log('Регистрация прошла:', userData)
   // Добавь POST-запрос, обработку токена и т.д.
 }
+
+const visible = ref(false)
+
+onMounted(() => {
+  setTimeout(() => {
+    visible.value = true
+  }, 50) 
+})
 </script>
 
 <style scoped>
-/* Оставил стиль без изменений — он хороший */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Mulish:wght@400;600&display=swap');
 * {
   font-family: 'Montserrat', sans-serif;
@@ -267,4 +279,17 @@ function handleRegister(userData) {
 .dropdown-menu li:hover {
   background: #f0f0f0;
 }
+
+.fade-slide-enter-active {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.fade-slide-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
 </style>
