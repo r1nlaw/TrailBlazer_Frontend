@@ -1,60 +1,62 @@
 <template>
-  <aside class="sidebar">
-    <div class="region">
-      <img :src="russiaFlag" alt="Флаг" class="flag" />
-      <span>Республика Крым</span>
-    </div>
+  <transition name="fade-slide">
+      <aside v-if="visible" class="sidebar">
+        <div class="region">
+          <img :src="russiaFlag" alt="Флаг" class="flag" />
+          <span>Республика Крым</span>
+        </div>
 
-    <h2>Маршруты</h2>
-    <div class="routes">
-      <div
-        v-for="(route, index) in routes"
-        :key="index"
-        :class="['route-circle', { active: activeRoute === index }]"
-        @click="activeRoute = index"
-      >
-        <img :src="route" alt="Маршрут" />
-      </div>
-    </div>
+        <h2>Маршруты</h2>
+        <div class="routes">
+          <div
+            v-for="(route, index) in routes"
+            :key="index"
+            :class="['route-circle', { active: activeRoute === index }]"
+            @click="activeRoute = index"
+          >
+            <img :src="route" alt="Маршрут" />
+          </div>
+        </div>
 
-    <h2>Фильтры</h2>
-    <div class="filters">
-      <div class="filter-row">
-        <div class="filter-item filter-gray">
-          <img :src="zamkiIcon" class="filter-icon" />
-          <span>Замки</span>
+        <h2>Фильтры</h2>
+        <div class="filters">
+          <div class="filter-row">
+            <div class="filter-item filter-gray">
+              <img :src="zamkiIcon" class="filter-icon" />
+              <span>Замки</span>
+            </div>
+            <div class="filter-item filter-green">
+              <img :src="religionIcon" class="filter-icon" />
+              <span>Религиозное</span>
+            </div>
+          </div>
+          <div class="filter-row">
+            <div class="filter-item filter-blue">
+              <img :src="museumIcon" class="filter-icon" />
+              <span>Музеи</span>
+            </div>
+            <div class="filter-item filter-gray">
+              <img :src="cryptIcon" class="filter-icon" />
+              <span>Склепы</span>
+            </div>
+          </div>
+          <div class="filter-row">
+            <div class="filter-item filter-pink">
+              <img :src="zooIcon" class="filter-icon" />
+              <span>Зоопарк</span>
+            </div>
+            <div class="filter-item filter-green">
+              <img :src="parkIcon" class="filter-icon" />
+              <span>Парки</span>
+            </div>
+          </div>
         </div>
-        <div class="filter-item filter-green">
-          <img :src="religionIcon" class="filter-icon" />
-          <span>Религиозное</span>
-        </div>
-      </div>
-      <div class="filter-row">
-        <div class="filter-item filter-blue">
-          <img :src="museumIcon" class="filter-icon" />
-          <span>Музеи</span>
-        </div>
-        <div class="filter-item filter-gray">
-          <img :src="cryptIcon" class="filter-icon" />
-          <span>Склепы</span>
-        </div>
-      </div>
-      <div class="filter-row">
-        <div class="filter-item filter-pink">
-          <img :src="zooIcon" class="filter-icon" />
-          <span>Зоопарк</span>
-        </div>
-        <div class="filter-item filter-green">
-          <img :src="parkIcon" class="filter-icon" />
-          <span>Парки</span>
-        </div>
-      </div>
-    </div>
-  </aside>
+      </aside>
+  </transition>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 import russiaFlag from '@/assets/icons/russia_flag.png'
 import zamkiIcon from '@/assets/emoji/zamki.png'
@@ -70,9 +72,16 @@ import route3 from '@/assets/images/route3.png'
 import route4 from '@/assets/images/route4.png'
 import route5 from '@/assets/images/route5.png'
 
-const activeRoute = ref(0)
 
+const activeRoute = ref(0)
 const routes = [route1, route2, route3, route4, route5]
+
+const visible = ref(false)
+onMounted(() => {
+  setTimeout(() => {
+    visible.value = true
+  }, 100) 
+})
 </script>
 
 <style scoped>
@@ -164,4 +173,17 @@ const routes = [route1, route2, route3, route4, route5]
 .filter-pink {
   background: #fddcdc;
 }
+
+.fade-slide-enter-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+.fade-slide-enter-to {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 </style>

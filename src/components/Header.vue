@@ -5,7 +5,7 @@
       <div class="header-left">
         <router-link to="/" class="logo" style="text-decoration: none;">
           <img :src="logoIcon" alt="Logo" class="logo-icon" />
-          <span class="logo-text">TrailBlazer</span>
+          <span class="logo-text">путевод</span>
         </router-link>
       </div>
 
@@ -157,8 +157,8 @@ onMounted(() => {
 }
 .logo-text {
   font-family: 'Mulish', sans-serif;
-  font-weight: 700;
-  font-size: 22px;
+  font-weight: 800;
+  font-size: 27px;
   color: #0d3c2f;
 }
 .nav-icons {

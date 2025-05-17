@@ -2,11 +2,12 @@
   <div class="travel-list-wrapper">
     <div class="places">
       <div
-        v-for="place in places"
+        v-for="(place, index) in places"
         :key="place.id"
         class="place-card"
         :class="{ selected: selectedPlaces.includes(place.id) }"
         @click="toggleSelection(place.id)"
+        :style="{ animationDelay: (index * 100) + 'ms' }"
       >
         <div class="place-content">
           <div class="title-row">
@@ -35,10 +36,18 @@
       </div>
     </div>
 
-    <div v-for="item in news" :key="item.id" class="news-card">
-      <h3 v-html="item.title" />
-      <p v-html="item.content"></p>
-    </div>
+
+  <div
+    v-for="(item, index) in news"
+    :key="item.id"
+    class="news-card"
+    :style="{ animationDelay: (index * 150) + 'ms' }"
+  >
+    <h3 v-html="item.title" />
+    <p v-html="item.content"></p>
+  </div>
+
+
   </div>
   <button
       v-if="selectedPlaces.length > 0"
@@ -56,6 +65,7 @@ import { ref,inject } from 'vue';
 import MapComponent from './Map.vue'
 const selectedPlaces = ref([])
 const mapRef = inject('mapRef');
+
 loadLandmark();
 function toggleSelection(id) {
   const index = selectedPlaces.value.indexOf(id)
@@ -131,6 +141,23 @@ async function loadLandmark() {
 </script>
 
 <style scoped>
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.place-card,
+.news-card {
+  animation: fadeInUp 0.6s ease both;
+}
+
 .travel-list-wrapper {
   display: flex;
   flex: 1;

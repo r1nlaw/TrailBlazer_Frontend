@@ -4,10 +4,23 @@
     <div v-show="isMapVisible" id="map" style="height: 400px; width: 100%; z-index: 0;"></div>
     <button class="map-button" @click="toggleMap">
       <img src="@/assets/icons/map-pin.png" alt="Pin" />
+      {{ isMapExpanded ? 'Уменьшить карту' : isMapVisible ? 'Увеличить карту' : 'Раскрыть карту' }}
+    </button>
 
-      {{ isMapExpanded ? 'Уменьшить карту' : isMapVisible ? 'Увеличить карту' : 'Раскрыть карту' }}    </button>
+    <!-- Модальное окно с анимацией -->
+    <transition name="modal-fade">
+      <div v-if="isMapModalOpen" class="modal-overlay" @click.self="isMapModalOpen = false">
+        <div class="modal-content">
+          <button class="modal-close" @click="isMapModalOpen = false">✕</button>
+          <div id="map-modal" style="height: 100%; width: 100%"></div>
+        </div>
+      </div>
+    </transition>
+
+
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue';
@@ -21,6 +34,141 @@ const geojson = { type: 'FeatureCollection', features: [] };
 let map = null; 
 const mapHeight = ref(400); 
 const routeSourceId = 'route';
+
+const isMapModalOpen = ref(false);
+
+function openMapModal() {
+  isMapModalOpen.value = true;
+
+  setTimeout(() => {
+    const modalMap = new maplibregl.Map({
+      container: 'map-modal',
+      style: 'http://localhost:8100/styles/basic-preview2/style.json',
+      center: [34.09847, 44.94249],
+      zoom: 13
+    });
+
+    modalMap.on('load', () => {
+      // Копируем geojson из основного источника
+      const sourceData = map?.getSource('markers')?._data || geojson;
+
+      modalMap.addSource('markers', {
+        type: 'geojson',
+        data: sourceData,
+        cluster: true,
+        clusterMaxZoom: 11,
+        clusterRadius: 30
+      });
+
+      modalMap.addLayer({
+        id: 'clusters',
+        type: 'circle',
+        source: 'markers',
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': [
+            'step',
+            ['get', 'point_count'],
+            '#51bbd6',
+            10,
+            '#f1f075',
+            750,
+            '#f28cb1'
+          ],
+          'circle-radius': [
+            'step',
+            ['get', 'point_count'],
+            20,
+            100,
+            30,
+            750,
+            40
+          ]
+        }
+      });
+
+      modalMap.addLayer({
+        id: 'cluster-count',
+        type: 'symbol',
+        source: 'markers',
+        filter: ['has', 'point_count'],
+        layout: {
+          'text-field': '{point_count_abbreviated}',
+          'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
+          'text-size': 12
+        },
+        paint: {
+          'text-color': '#ffffff'
+        }
+      });
+
+      modalMap.addLayer({
+        id: 'unclustered-point',
+        type: 'circle',
+        source: 'markers',
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-color': '#029cff',
+          'circle-radius': 15,
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#fff'
+        }
+      });
+
+      modalMap.on('click', 'clusters', (e) => {
+        const features = modalMap.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+        if (!features.length) return;
+        const clusterId = features[0].properties.cluster_id;
+        modalMap.getSource('markers').getClusterExpansionZoom(clusterId, (err, zoom) => {
+          if (err) return;
+          modalMap.easeTo({
+            center: features[0].geometry.coordinates,
+            zoom: zoom
+          });
+        });
+      });
+
+      modalMap.on('click', 'unclustered-point', (e) => {
+        if (!e.features || !e.features[0]) return;
+        const coordinates = e.features[0].geometry.coordinates.slice();
+        const { name, address, url } = e.features[0].properties;
+        const isMobile = window.innerWidth <= 768;
+
+        new maplibregl.Popup({
+          closeOnClick: true,
+          maxWidth: isMobile ? '200px' : '300px',
+          className: isMobile ? 'mobile-popup' : ''
+        })
+          .setLngLat(coordinates)
+          .setHTML(`
+            <div style="font-family: Arial, sans-serif; line-height: 1.4;">
+              <h5 style="margin: 0; color: #587ea3;">
+                <a href="${url ? `http://${domain}${url}` : '#'}" 
+                   style="text-decoration: none; color: inherit;" 
+                   target="_blank">
+                  ${name || 'Без названия'}
+                </a>
+              </h5>
+              <p style="margin: 5px 0 0; font-size: ${isMobile ? '12px' : '14px'}; color: #6c757d;">
+                ${address || 'Адрес не указан'}
+              </p>
+            </div>
+          `)
+          .addTo(modalMap);
+      });
+
+      modalMap.on('mouseenter', 'clusters', () => {
+        modalMap.getCanvas().style.cursor = 'pointer';
+      });
+      modalMap.on('mouseleave', 'clusters', () => {
+        modalMap.getCanvas().style.cursor = '';
+      });
+
+    });
+  }, 300);
+}
+
+
 onMounted(() => {
   map = new maplibregl.Map({
     container: 'map',
@@ -221,19 +369,20 @@ function toggleMap() {
     mapHeight.value = 400;
     isMapExpanded.value = false;
   } else if (!isMapExpanded.value) {
-    mapHeight.value = 600; 
-    isMapExpanded.value = true;
+    // Открываем модалку вместо изменения высоты
+    openMapModal();
   } else {
-    mapHeight.value = 400; 
     isMapExpanded.value = false;
+    mapHeight.value = 400;
   }
 
   if (isMapVisible.value && map) {
     setTimeout(() => {
       map.resize();
-    }, 0); 
+    }, 0);
   }
 }
+
 async function getLandmarksByIDs(points){
   const url = `http://${domain}/api/getLandmarks`;
   try {
@@ -338,7 +487,7 @@ function getRoute(coords) {
 
 @media (max-width: 768px) {
   .map-container {
-    height: 300px; /* Начальная высота для мобильных */
+    height: 300px; 
   }
 
   .map-button {
@@ -346,4 +495,55 @@ function getRoute(coords) {
     font-size: 11px;
   }
 }
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 90vw;
+  height: 90vh;
+  overflow: hidden;
+  position: relative;
+  transform: scale(1);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  z-index: 1001;
+}
+/* Transition classes */
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
 </style>
