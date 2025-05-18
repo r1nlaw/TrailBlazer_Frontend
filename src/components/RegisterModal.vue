@@ -1,5 +1,14 @@
 <template>
   <div v-if="isOpen" class="modal-overlay" @click.self="close">
+    <!-- Ошка-модалка -->
+    <div v-if="errorModal" class="error-modal">
+      <div class="error-box">
+        <h3>Ошибка</h3>
+        <p>{{ errorMessage }}</p>
+        <button @click="errorModal = false" class="primary-btn">Закрыть</button>
+      </div>
+    </div>
+
     <div class="modal-content">
       <h2 v-if="!isRegistering">Вход</h2>
       <h2 v-else>Создание аккаунта</h2>
@@ -17,7 +26,7 @@
 
         <div class="form-group">
           <label for="password">Пароль</label>
-          <input id="password" v-model="password" type="password" required minlength="6" />
+          <input id="password" v-model="password" type="password" />
         </div>
 
         <div class="modal-actions">
@@ -49,10 +58,14 @@ const name = ref('')
 const email = ref('')
 const password = ref('')
 
+const errorModal = ref(false)
+const errorMessage = ref('')
+
 function open() {
   isOpen.value = true
   isRegistering.value = false
 }
+
 function close() {
   isOpen.value = false
   isRegistering.value = false
@@ -65,39 +78,65 @@ function toggleMode() {
   isRegistering.value = !isRegistering.value
 }
 
+function showError(message) {
+  errorMessage.value = message
+  errorModal.value = true
+}
+
 async function handleSubmit() {
-  if (!email.value || !password.value || (isRegistering.value && !name.value)) return
+  if (!email.value || !password.value || (isRegistering.value && !name.value)) {
+    showError('Пожалуйста, заполните все поля формы.')
+    return
+  }
 
   try {
-    const endpoint = isRegistering.value ? 'http://localhost:8080/user/signUp' : 'http://localhost:8080/user/signIn'
+    const endpoint = isRegistering.value
+      ? 'http://localhost:8080/user/signUp'
+      : 'http://localhost:8080/user/signIn'
+
     const payload = isRegistering.value
-      ? { username: name.value, email: email.value, password: password.value }
-      : { email: email.value, password: password.value }
+      ? { username: name.value, email: email.value, password_hash: password.value }
+      : { email: email.value, password_hash: password.value }
 
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
 
     if (!response.ok) {
-      const errorText = await response.text()
-      alert(`Ошибка: ${errorText}`)
+      let message = 'Неизвестная ошибка'
+
+      switch (response.status) {
+        case 400:
+          message = 'Неверно введена электронная почта'
+          break
+        case 401:
+          message = 'Недопустимый никнейм'
+          break
+        case 402:
+          message = 'Имя должно состоять только из латиницы или кириллицы'
+          break
+        case 403:
+          message = 'Пароль должен содержать больше 6 символов'
+          break
+        case 405:
+          message = 'Неверный email или пароль'
+          break
+        default:
+          message = await response.text()
+      }
+
+      showError(`Ошибка: ${message}`)
       return
     }
 
     const data = await response.json()
     console.log('Успешно:', data)
-
-    // Можно сохранить токен или ID, если нужно
-    // localStorage.setItem('token', data.token)
-
     close()
   } catch (error) {
     console.error('Ошибка при отправке запроса:', error)
-    alert('Произошла ошибка при отправке запроса')
+    showError('Не удалось подключиться к серверу. Проверьте соединение.')
   }
 }
 
@@ -217,6 +256,37 @@ input:focus {
 .link-btn:hover {
   text-decoration: underline;
 }
+
+.error-modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.error-box {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.error-box h3 {
+  color: #b00020;
+  margin-bottom: 1rem;
+}
+
+.error-box p {
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
 
 /* Animations */
 @keyframes fadeIn {
