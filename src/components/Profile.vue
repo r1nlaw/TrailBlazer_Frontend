@@ -33,7 +33,7 @@ const visible = ref(false)
 onMounted(() => {
   setTimeout(() => {
     visible.value = true
-  }, 50) // небольшая задержка для срабатывания transition
+  }, 50) 
 })
 
 const profile = reactive({
