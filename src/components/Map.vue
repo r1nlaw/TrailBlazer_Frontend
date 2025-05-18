@@ -150,9 +150,17 @@ function openMapModal() {
 
       modalMap.on('click', 'unclustered-point', (e) => {
         if (!e.features || !e.features[0]) return;
+
         const coordinates = e.features[0].geometry.coordinates.slice();
-        const { name, address, url } = e.features[0].properties;
+        const { name, address, url, image } = e.features[0].properties;
         const isMobile = window.innerWidth <= 768;
+
+        const photoUrl = image || null;
+
+        const photoHtml = photoUrl
+          ? `<img src="${photoUrl}" alt="Фото" 
+                style="width: 100%; height: auto; margin-top: 8px; border-radius: 4px;" />`
+          : '';
 
         new maplibregl.Popup({
           closeOnClick: true,
@@ -163,19 +171,21 @@ function openMapModal() {
           .setHTML(`
             <div style="font-family: Arial, sans-serif; line-height: 1.4;">
               <h5 style="margin: 0; color: #587ea3;">
-                <a href="${url ? `http://${domain}${url}` : '#'}" 
-                   style="text-decoration: none; color: inherit;" 
-                   target="_blank">
+                <a href="${url ? `http://localhost:8080${url}` : '#'}" 
+                  style="text-decoration: none; color: inherit;" 
+                  target="_blank">
                   ${name || 'Без названия'}
                 </a>
               </h5>
               <p style="margin: 5px 0 0; font-size: ${isMobile ? '12px' : '14px'}; color: #6c757d;">
                 ${address || 'Адрес не указан'}
               </p>
+              ${photoHtml}
             </div>
           `)
           .addTo(modalMap);
       });
+
 
       modalMap.on('mouseenter', 'clusters', () => {
         modalMap.getCanvas().style.cursor = 'pointer';
@@ -278,24 +288,18 @@ onMounted(() => {
       }
     });
 
-    map.on('click', 'clusters', (e) => {
-      const features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
-      if (!features.length) return;
-      const clusterId = features[0].properties.cluster_id;
-      map.getSource('markers').getClusterExpansionZoom(clusterId, (err, zoom) => {
-        if (err) return;
-        map.easeTo({
-          center: features[0].geometry.coordinates,
-          zoom: zoom
-        });
-      });
-    });
-
     map.on('click', 'unclustered-point', (e) => {
       if (!e.features || !e.features[0]) return;
       const coordinates = e.features[0].geometry.coordinates.slice();
-      const { name, address, url } = e.features[0].properties;
+      const { name, address, url, image } = e.features[0].properties;
       const isMobile = window.innerWidth <= 768;
+
+      const photoUrl = image || null;
+
+      const photoHtml = photoUrl
+        ? `<img src="${photoUrl}" alt="Фото" 
+              style="width: 100%; height: auto; margin-top: 8px; border-radius: 4px;" />`
+        : '';
 
       new maplibregl.Popup({
         closeOnClick: true,
@@ -307,18 +311,21 @@ onMounted(() => {
           <div style="font-family: Arial, sans-serif; line-height: 1.4;">
             <h5 style="margin: 0; color: #587ea3;">
               <a href="${url ? `http://${domain}${url}` : '#'}" 
-                 style="text-decoration: none; color: inherit;" 
-                 target="_blank">
+                style="text-decoration: none; color: inherit;" 
+                target="_blank">
                 ${name || 'Без названия'}
               </a>
             </h5>
             <p style="margin: 5px 0 0; font-size: ${isMobile ? '12px' : '14px'}; color: #6c757d;">
               ${address || 'Адрес не указан'}
             </p>
+            ${photoHtml}
           </div>
         `)
         .addTo(map);
     });
+
+
 
     map.on('mouseenter', 'clusters', () => {
       map.getCanvas().style.cursor = 'pointer';
@@ -355,19 +362,21 @@ async function loadFacilities() {
 
     const facilities = await response.json();
     if (facilities && facilities.length > 0) {
-      const newFeatures = facilities.map(facility => ({
+    const newFeatures = facilities.map(facility => ({
         type: 'Feature',
         properties: {
           id: facility.id,
           name: facility.name,
           address: facility.Address,
-          url: facility.url || ''
+          url: facility.url || '',
+          image: `http://localhost:8080/images/${facility.image_path}` // <-- добавили это
         },
         geometry: {
           type: 'Point',
-          coordinates: [facility.location.lng,facility.location.lat ]
+          coordinates: [facility.location.lng, facility.location.lat]
         }
       }));
+
 
       const source = map.getSource('markers');
       if (source) {
@@ -463,6 +472,8 @@ function getRoute(coords) {
   }
   
 </script>
+
+
 <style scoped>
 .map-container {
   position: relative;
@@ -472,7 +483,7 @@ function getRoute(coords) {
   min-height: 300px;
   border-radius: 24px;
   overflow: hidden;
-  transition: height 0.3s ease; /* Плавный переход высоты */
+  transition: height 0.3s ease; 
 }
 
 .map-image {

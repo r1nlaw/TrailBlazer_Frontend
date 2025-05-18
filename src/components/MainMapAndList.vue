@@ -24,7 +24,7 @@ provide('mapRef',mapRef)
   padding: 32px 24px 24px;
   background: #f5f5f5;
   min-height: 100vh;
-
+  min-width: 159vh;
   box-sizing: border-box;
 }
 </style>
