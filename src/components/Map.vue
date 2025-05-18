@@ -1,7 +1,7 @@
 <template>
   <div class="map-container" :style="{ height: mapHeight + 'px' }">
     <img v-if="!isMapVisible" src="@/assets/images/map_placeholder.png" alt="Карта" class="map-image" :class="{ blurred: isMapModalOpen }" />
-    <div v-show="isMapVisible" id="map" style="height: 400px; width: 100%; z-index: 0;"></div>
+    <div v-show="isMapVisible" id="map" style="height: 100%; width: 100%; z-index: 0;"></div>
     <button class="map-button" @click="toggleMap">
       <img src="@/assets/icons/map-pin.png" alt="Pin" />
       {{ isMapExpanded ? 'Уменьшить карту' : isMapVisible ? 'Увеличить карту' : 'Раскрыть карту' }}
@@ -101,7 +101,7 @@ onMounted(async () => {
         'circle-radius': [
           'step',
           ['get', 'point_count'],
-          25,  // Уменьшенные размеры
+          35,  // Уменьшенные размеры
           100, 20,
           250, 25
         ]
@@ -165,26 +165,24 @@ onMounted(async () => {
 const showPopup = (feature) => {
   const { geometry, properties } = feature;
   const { name, address, url, image } = properties;
-  
+
+  const popupHTML = `
+    <div class="popup-card">
+      ${image ? `<img src="${image}" alt="${name}" class="popup-card-image" style="max-width: 180px; max-height: 200px; object-fit: contain;" />` : ''}
+      <div class="popup-card-body">
+        <h3 class="popup-card-title">${name || 'Без названия'}</h3>
+        ${address ? `<p class="popup-card-address">${address}</p>` : ''}
+        ${url ? `<a href="${url}" class="popup-card-link" target="_blank">Подробнее</a>` : ''}
+      </div>
+    </div>
+  `;
   new maplibregl.Popup({
     closeOnClick: true,
     className: 'custom-popup',
-    maxWidth: 'none',
-    anchor: 'bottom'
+    maxWidth: '300px'
   })
     .setLngLat(geometry.coordinates)
-    .setHTML(`
-      <div class="popup-container">
-        ${image ? `
-          <img src="${image}" alt="${name}" class="popup-image" />
-        ` : `
-          <div class="popup-text">
-            <div class="popup-title">${name || 'Без названия'}</div>
-            <div class="popup-address">${address || ''}</div>
-          </div>
-        `}
-      </div>
-    `)
+    .setHTML(popupHTML)
     .addTo(map);
 };
 
@@ -248,7 +246,7 @@ const loadFacilities = async () => {
       filter: ['!', ['has', 'point_count']],
       layout: {
         'icon-image': ['coalesce', ['get', 'markerImage'], 'default-marker'],
-        'icon-size': isMobile ? 0.5 : 0.6, // Уменьшенный размер
+        'icon-size': isMobile ? 0.6 : 0.6, // Уменьшенный размер
         'icon-allow-overlap': true,
         'icon-anchor': 'bottom',
         'icon-padding': 10
@@ -324,7 +322,7 @@ const initModalMap = () => {
       filter: ['!', ['has', 'point_count']],
       layout: {
         'icon-image': ['coalesce', ['get', 'markerImage'], 'default-marker'],
-        'icon-size': 0.4,
+        'icon-size': 0.7,
         'icon-allow-overlap': true
       }
     });
@@ -431,6 +429,10 @@ defineExpose({
 
 
 <style scoped>
+
+#map {
+  position: relative;
+}
 .blurred {
   filter: blur(8px);
   transition: filter 0.3s ease;
@@ -533,8 +535,8 @@ defineExpose({
 
 /* Стили для popup */
 :deep(.custom-popup) {
-  width: 50px !important;
-  height: 50px !important;
+  width: 200px !important;
+  height: 200px !important;
   padding: 0 !important;
   margin: 0 !important;
   background: none !important;
@@ -543,8 +545,8 @@ defineExpose({
 }
 
 :deep(.popup-container) {
-  width: 100%;
-  height: 100%;
+  width: 80%;
+  height: 80%;
 
   display: flex;
   align-items: center;
@@ -582,4 +584,39 @@ defineExpose({
 :deep(.maplibregl-popup-tip) {
   display: none !important;
 }
+
+.custom-popup .popup-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 200px;
+  padding: 8px;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.custom-popup .popup-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.custom-popup .popup-title {
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.custom-popup .popup-address {
+  font-size: 12px;
+  text-align: center;
+  color: #666;
+}
+
+
+
 </style>
