@@ -126,7 +126,6 @@ onMounted(() => {
   font-family: 'Montserrat', sans-serif;
 }
 .header {
-  position: fixed;
   z-index: 1000;
   width: 97%;
   display: grid;

@@ -468,9 +468,9 @@ function getRoute(coords) {
 .map-container {
   position: relative;
   width: 100%;
-  margin-top: 70px;
+  margin-top: 0px;
   max-width: 100%;
-  min-height: 240px;
+  min-height: 300px;
   border-radius: 24px;
   overflow: hidden;
   transition: height 0.3s ease; /* Плавный переход высоты */

@@ -1,5 +1,6 @@
 <template>
   <div class="travel-list-wrapper">
+    <!-- Левая колонка: все места -->
     <div class="places">
       <div
         v-for="(place, index) in places"
@@ -36,35 +37,50 @@
       </div>
     </div>
 
+    <!-- Правая колонка: выбранные места -->
+    <div class="selected-places">
+      <h2>Выбранные места</h2>
+      <div class="scroll-area">
+        <div
+          v-for="(place, index) in selectedPlaceObjects"
+          :key="place.id"
+          class="place-card selected"
+          :style="{ animationDelay: (index * 150) + 'ms' }"
+        >
+          <div class="place-content">
+            <div class="title-row">
+              <h3 class="place-title">{{ place.title }}</h3>
+            </div>
+            <p class="location">{{ place.location }}</p>
+          </div>
+          <div class="img">
+            <img :src="place.image" class="place-image" />
+          </div>
+        </div>
+      </div>
 
-  <div
-    v-for="(item, index) in news"
-    :key="item.id"
-    class="news-card"
-    :style="{ animationDelay: (index * 150) + 'ms' }"
-  >
-    <h3 v-html="item.title" />
-    <p v-html="item.content"></p>
+      <!-- КНОПКА внутри корзины -->
+      <button
+        v-if="selectedPlaces.length > 0"
+        class="bottom-action-button in-cart"
+        @click="handleSelection"
+      >
+        Построить маршрут
+      </button>
+    </div>
   </div>
-
-
-  </div>
-  <button
-      v-if="selectedPlaces.length > 0"
-      class="bottom-action-button"
-      @click="handleSelection"
-    >
-      Построить маршрут.
-  </button>
 
 </template>
 
 
+
 <script setup>
-import { ref,inject } from 'vue';
+import { ref, computed, inject } from 'vue';
 import MapComponent from './Map.vue'
-const selectedPlaces = ref([])
+const selectedPlaces = ref([]);
+const places = ref([]);
 const mapRef = inject('mapRef');
+
 
 loadLandmark();
 function toggleSelection(id) {
@@ -75,6 +91,9 @@ function toggleSelection(id) {
     selectedPlaces.value.splice(index, 1)
   }
 }
+const selectedPlaceObjects = computed(() =>
+  places.value.filter(place => selectedPlaces.value.includes(place.id))
+);
 function handleSelection() {
   if (mapRef.value && mapRef.value.RouteMaker) {
     mapRef.value.RouteMaker(selectedPlaces.value);
@@ -94,7 +113,6 @@ import reviewIcon from '@/assets/icons/review.png'
 // import place2 from '@/assets/images/place2.png'
 // import place3 from '@/assets/images/place3.png'
 
-const  places = ref([])
 
 const news = [
   {
@@ -290,10 +308,6 @@ async function loadLandmark() {
 }
 
 .bottom-action-button {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
   background-color: #2c473a;
   color: white;
   padding: 12px 24px;
@@ -302,9 +316,47 @@ async function loadLandmark() {
   font-size: 16px;
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
   transition: opacity 0.3s ease;
+  width: 100%;
+  margin-top: auto;
 }
+
+.bottom-action-button.in-cart {
+  margin-top: 16px;
+}
+
+.selected-places {
+  flex: 0.5;
+  display: flex;
+  flex-direction: column;
+  min-width: 450px;
+  gap: 16px;
+  background: #f6fdf8;
+  border-radius: 16px;
+  padding: 26px;
+  border: 1px solid #2c473a54;
+  max-height: 500px;
+  overflow: hidden;
+}
+
+.scroll-area {
+  flex: 1; /* растягиваем по доступной высоте */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.selected-places .place-card {
+  max-width: 405px; 
+}
+
+.selected-places h2 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  color: #2c473a;
+}
+
 
 
 </style>
