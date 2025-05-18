@@ -348,6 +348,7 @@ onMounted(() => {
 
 async function loadFacilities() {
   const url = `http://${domain}/api/facilities`;
+
   const data = map.getBounds().toArray();
   try {
     const response = await fetch(url, {
@@ -367,9 +368,9 @@ async function loadFacilities() {
         properties: {
           id: facility.id,
           name: facility.name,
-          address: facility.Address,
+          address: facility.address,
           url: facility.url || '',
-          image: `http://localhost:8080/images/${facility.image_path}` // <-- добавили это
+          image: `http://localhost:8080/images/${facility.image_path}` 
         },
         geometry: {
           type: 'Point',
