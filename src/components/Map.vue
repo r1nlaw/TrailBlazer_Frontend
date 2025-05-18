@@ -42,14 +42,23 @@ const loadOptimizedImage = async (url, targetWidth) => {
       const ratio = targetWidth / img.width;
       canvas.width = targetWidth;
       canvas.height = img.height * ratio;
-      
+
       const ctx = canvas.getContext('2d');
+
+      // Обрезка в круг
+      ctx.beginPath();
+      const radius = Math.min(canvas.width, canvas.height) / 2;
+      ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      
+
       canvas.toBlob(blob => {
         resolve(URL.createObjectURL(blob));
       }, 'image/webp', 0.7);
     };
+
     img.onerror = () => resolve(null);
     img.src = url;
   });
