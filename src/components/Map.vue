@@ -115,7 +115,7 @@ function openMapModal() {
         }
       });
 
-      // ✅ Копируем линию маршрута (если есть)
+
       const routeSource = map.getSource('route');
       if (routeSource && routeSource._data) {
         modalMap.addSource('route', {
@@ -134,7 +134,6 @@ function openMapModal() {
         });
       }
 
-      // 👆 Все обработчики (popup, zoom, cursors) остаются как у тебя — копируй по аналогии
 
       modalMap.on('click', 'clusters', (e) => {
         const features = modalMap.queryRenderedFeatures(e.point, { layers: ['clusters'] });

@@ -128,11 +128,11 @@ const news = [
 async function loadLandmark() {
   const params = new URLSearchParams(window.location.search);
   let page = params.get('page');
-  if (page===null){
-    page = "1"
+  if (page === null) {
+    page = "1";
   }
-  const domain = "localhost:8080";
 
+  const domain = "localhost:8080";
   const url = `http://${domain}/api/landmark?page=${page}`;
 
   try {
@@ -148,14 +148,20 @@ async function loadLandmark() {
     const landmarks = await response.json();
     if (landmarks && landmarks.length > 0) {
       landmarks.forEach(element => {
-        places.value.push({id: element.id, title: element.name, location: element.address})
+        places.value.push({
+          id: element.id,
+          title: element.name,
+          location: element.address,
+          image: `http://${domain}/images/${element.image_path}`
         });
-      }
+      });
+      
     }
-  catch (error){
-    console.log(error);
+  } catch (error) {
+    console.log("Ошибка при загрузке достопримечательностей:", error);
   }
 }
+
 </script>
 
 <style scoped>
