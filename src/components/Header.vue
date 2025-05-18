@@ -48,9 +48,9 @@
           <img :src="historyIcon" class="icon-circle" />
         </div>
 
-        <div class="avatar">
+        <router-link to="/profile"class="avatar">
           <img :src="avatarImage" class="avatar" />
-        </div>
+        </router-link>
 
         <div class="settings" @click="toggleDropdown">
           <img :src="settingsIcon" class="icon-circle" />
@@ -131,7 +131,7 @@ onMounted(() => {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  padding: 8px 20px;
+  padding: 15px 20px;
   background: #fff;
   border-bottom: 1px solid #e0e0e0;
   gap: 16px;

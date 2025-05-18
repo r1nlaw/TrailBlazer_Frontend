@@ -49,8 +49,6 @@ const name = ref('')
 const email = ref('')
 const password = ref('')
 
-const emit = defineEmits(['register', 'login'])
-
 function open() {
   isOpen.value = true
   isRegistering.value = false
@@ -67,26 +65,45 @@ function toggleMode() {
   isRegistering.value = !isRegistering.value
 }
 
-function handleSubmit() {
+async function handleSubmit() {
   if (!email.value || !password.value || (isRegistering.value && !name.value)) return
 
-  if (isRegistering.value) {
-    emit('register', {
-      name: name.value,
-      email: email.value,
-      password: password.value,
+  try {
+    const endpoint = isRegistering.value ? 'http://localhost:8080/user/signUp' : 'http://localhost:8080/user/signIn'
+    const payload = isRegistering.value
+      ? { username: name.value, email: email.value, password: password.value }
+      : { email: email.value, password: password.value }
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
     })
-  } else {
-    emit('login', {
-      email: email.value,
-      password: password.value,
-    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      alert(`Ошибка: ${errorText}`)
+      return
+    }
+
+    const data = await response.json()
+    console.log('Успешно:', data)
+
+    // Можно сохранить токен или ID, если нужно
+    // localStorage.setItem('token', data.token)
+
+    close()
+  } catch (error) {
+    console.error('Ошибка при отправке запроса:', error)
+    alert('Произошла ошибка при отправке запроса')
   }
-  close()
 }
 
 defineExpose({ open, close })
 </script>
+
 
 <style scoped>
 .modal-overlay {
