@@ -308,10 +308,10 @@ onMounted(() => {
       })
         .setLngLat(coordinates)
         .setHTML(`
-          <div style="font-family: Arial, sans-serif; line-height: 1.4;">
+          <div style="font-family: 'Montserrat', sans-serif; line-height: 1.4;">
             <h5 style="margin: 0; color: #587ea3;">
               <a href="${url ? `http://${domain}${url}` : '#'}" 
-                style="text-decoration: none; color: inherit;" 
+                style="font-family: 'Montserrat', sans-serif; line-height: 1.4; text-decoration: none; color: inherit;" 
                 target="_blank">
                 ${name || 'Без названия'}
               </a>
