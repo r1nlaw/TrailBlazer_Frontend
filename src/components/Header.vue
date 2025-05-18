@@ -52,15 +52,16 @@
           <img :src="avatarImage" class="avatar" />
         </router-link>
 
-        <div class="settings" @click="toggleDropdown">
+        <div class="settings" @click.stop="toggleDropdown">
           <img :src="settingsIcon" class="icon-circle" />
-          <div v-if="showDropdown" class="dropdown-menu">
+          <div v-if="showDropdown" class="dropdown-menu" ref="dropdownRef">
             <ul>
               <li @click="goToProfile">Профиль</li>
               <li @click="goToLogin">Вход</li>
             </ul>
           </div>
         </div>
+
       </div>
     </header>
   </transition>
@@ -73,7 +74,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import RegisterModal from '@/components/RegisterModal.vue'
 
@@ -90,6 +91,7 @@ import avatarImage from '@/assets/images/user_avatar.png'
 
 const router = useRouter()
 const showDropdown = ref(false)
+const dropdownRef = ref(null)
 const registerModalRef = ref(null)
 
 function toggleDropdown() {
@@ -97,13 +99,21 @@ function toggleDropdown() {
 }
 
 function goToProfile() {
-  showDropdown.value = false
   router.push('/profile')
+  showDropdown.value = false
 }
+
 
 function goToLogin() {
   showDropdown.value = false
   registerModalRef.value?.open()
+}
+
+function handleClickOutside(event) {
+  const dropdownEl = dropdownRef.value
+  if (dropdownEl && !dropdownEl.contains(event.target)) {
+    showDropdown.value = false
+  }
 }
 
 function handleRegister(userData) {
@@ -117,6 +127,10 @@ onMounted(() => {
   setTimeout(() => {
     visible.value = true
   }, 50) 
+  document.addEventListener('click', handleClickOutside)
+})
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
@@ -131,7 +145,7 @@ onMounted(() => {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  padding: 15px 20px;
+  padding: 10px 20px;
   background: #fff;
   border-bottom: 1px solid #e0e0e0;
   gap: 16px;
