@@ -224,13 +224,286 @@ onMounted(() => {
 }
 .sidebar-toggle:active {
   transform: scale(0.95);
+
 }
+
+@media (max-width: 1280px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 380px;
+    left: -590px;
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+
+
+@media (max-width: 1024px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 380px;
+    left: -590px;
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+
+@media (max-width: 912px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 380px;
+    left: -590px;
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+@media (max-width: 853px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 380px;
+    left: -590px;
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+@media (max-width: 820px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 380px;
+    left: -590px;
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+@media (max-width: 768px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 380px;
+    left: -590px;
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+@media (max-width: 540px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 580px;
+    left: -690px;
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+
+
+@media (max-width: 430px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 380px;
+    left: -590px;
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+@media (max-width: 414px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 370px;
+    left: -490px;
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+
+@media (max-width: 412px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 370px;
+    left: -490px;
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+
+@media (max-width: 390px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 370px;
+    left: -490px;
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+@media (max-width: 390px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 320px;
+    left: -380px; /* скрыт по умолчанию */
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+
+
+
 @media (max-width: 375px) {
   .sidebar {
     top: 0;
     height: 100vh;
     width: 320px;
     left: -380px; /* скрыт по умолчанию */
+    transition: left 0.3s ease;
+  }
+  .region{
+    margin-top: 20%;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+
+@media (max-width: 360px) {
+  .sidebar {
+    top: 0;
+    height: 100vh;
+    width: 320px;
+    left: -380px;
     transition: left 0.3s ease;
   }
   .region{
