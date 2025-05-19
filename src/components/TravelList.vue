@@ -38,7 +38,7 @@
     </div>
 
     <!-- Правая колонка: выбранные места -->
-    <div class="selected-places">
+    <div class="selected-places" :class="{ 'mobile-visible': isCartVisible }">
       <h2>Выбранные места</h2>
       <div class="scroll-area">
         <div
@@ -68,19 +68,48 @@
         Построить маршрут
       </button>
     </div>
-  </div>
 
+    <!-- Кнопка для открытия корзины на мобильных устройствах -->
+    <button 
+      v-if="selectedPlaces.length > 0" 
+      class="mobile-cart-button"
+      @click="toggleCart"
+    >
+      <span class="cart-icon">Маршрут</span>
+    </button>
+  </div>
 </template>
 
-
-
 <script setup>
-import { ref, computed, inject } from 'vue';
+import { ref, computed, inject, onMounted, onBeforeUnmount } from 'vue';
 import MapComponent from './Map.vue'
 const selectedPlaces = ref([]);
 const places = ref([]);
 const mapRef = inject('mapRef');
+const isCartVisible = ref(false);
+const isMobile = ref(false);
 
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth <= 375;
+  if (!isMobile.value) {
+    isCartVisible.value = true;
+  } else {
+    isCartVisible.value = false;
+  }
+};
+
+onMounted(() => {
+  checkScreenSize();
+  window.addEventListener('resize', checkScreenSize);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', checkScreenSize);
+});
+
+function toggleCart() {
+  isCartVisible.value = !isCartVisible.value;
+}
 
 loadLandmark();
 function toggleSelection(id) {
@@ -103,16 +132,9 @@ function handleSelection() {
   }
 }
 
-
-
 import infoIcon from '@/assets/icons/info.png'
 import starIcon from '@/assets/icons/star.png'
 import reviewIcon from '@/assets/icons/review.png'
-
-// import place1 from '@/assets/images/place1.png'
-// import place2 from '@/assets/images/place2.png'
-// import place3 from '@/assets/images/place3.png'
-
 
 const news = [
   {
@@ -120,7 +142,6 @@ const news = [
     title: 'Власти планируют масштабную реконструкцию<br />Генуэзской крепости в Судаке',
     content: `
       <p>Судак, 11 мая — Власти Республики Крым объявили о начале подготовки к масштабной реконструкции
-
     `,
   },
 ]
@@ -155,17 +176,14 @@ async function loadLandmark() {
           image: `http://${domain}/images/${element.image_path}`
         });
       });
-      
     }
   } catch (error) {
     console.log("Ошибка при загрузке достопримечательностей:", error);
   }
 }
-
 </script>
 
 <style scoped>
-
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -187,6 +205,7 @@ async function loadLandmark() {
   flex: 1;
   gap: 24px;
   width: 100%;
+  position: relative;
 }
 
 .places {
@@ -208,7 +227,6 @@ async function loadLandmark() {
   transition: all 0.3s ease;
   border: 1px solid #2c473a54;
 }
-
 
 .place-card:hover {
   transform: translateX(10px);
@@ -288,7 +306,6 @@ async function loadLandmark() {
   pointer-events: none;
 }
 
-
 .news-card {
   position: relative;
   flex: 1;
@@ -316,14 +333,26 @@ async function loadLandmark() {
 .bottom-action-button {
   background-color: #2c473a;
   color: white;
-  padding: 12px 24px;
+  padding: 14px 28px;
   border: none;
-  border-radius: 24px;
-  font-size: 16px;
+  border-radius: 28px;
+  font-size: 17px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: opacity 0.3s ease;
+  box-shadow: 0 4px 14px rgba(44, 71, 58, 0.25);
+  transition: all 0.3s ease;
   width: 100%;
+  margin-top: auto;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+.bottom-action-button:hover {
+  background-color: #3a5e4a;
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(44, 71, 58, 0.35);
+}
+
+.bottom-action-button.in-cart {
   margin-top: auto;
 }
 
@@ -346,7 +375,7 @@ async function loadLandmark() {
 }
 
 .scroll-area {
-  flex: 1; /* растягиваем по доступной высоте */
+  flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -363,6 +392,82 @@ async function loadLandmark() {
   color: #2c473a;
 }
 
+/* Стили для мобильной версии */
+.mobile-cart-button {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #2c473a;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
 
-
+@media (max-width: 375px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 350px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 5px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 580px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; /* Добавлено */
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 210px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
 </style>

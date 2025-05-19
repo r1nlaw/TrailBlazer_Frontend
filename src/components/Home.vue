@@ -1,7 +1,7 @@
 <template>
   <div class="home-container">
     <div class="main-content">
-      <Sidebar />
+
       <MainMapAndList />
     </div>
   </div>

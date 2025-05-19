@@ -704,6 +704,20 @@ defineExpose({
   color: #666;
 }
 
+@media (max-width: 375px) {
+  .map-container {
+    position: relative;
+    width: 35%;
+    margin-top: -10px;
+    min-height: 200px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+
+
+}
+
 
 
 </style>
