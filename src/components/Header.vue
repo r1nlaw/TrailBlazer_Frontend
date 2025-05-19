@@ -142,7 +142,7 @@ function goToLogin() {
 }
 
 function goToLandmark(nameTranslate) {
-  router.push(`/landmark/${nameTranslate}`)
+  router.push(`/landmark/${encodeURIComponent(nameTranslate)}`)
   showSearchResults.value = false
   searchQuery.value = ''
   searchResults.value = []
@@ -157,11 +157,12 @@ async function handleSearch() {
 
   try {
     const response = await fetch(`${domain}/api/search?q=${encodeURIComponent(searchQuery.value)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
 
     if (!response.ok) {
       throw new Error('Ошибка при поиске')

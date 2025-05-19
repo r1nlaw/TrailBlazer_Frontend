@@ -5,7 +5,7 @@
     <div v-else>
       <h1>{{ landmark.name }}</h1>
       <img
-        :src="`${domain}/images/${landmark.image_path}`"
+        :src="domain + '/images/' + landmark.image_path"
         :alt="landmark.name"
         class="landmark-image"
         @error="handleImageError"
@@ -14,6 +14,7 @@
       <p><strong>Категория:</strong> {{ landmark.category }}</p>
       <p><strong>Описание:</strong> {{ landmark.description }}</p>
       <p><strong>История:</strong> {{ landmark.history }}</p>
+
       <div class="schedules">
         <h3>Расписание</h3>
         <ul>
@@ -22,6 +23,7 @@
           </li>
         </ul>
       </div>
+
       <div class="prices">
         <h3>Цены</h3>
         <ul>
@@ -30,6 +32,7 @@
           </li>
         </ul>
       </div>
+
       <div class="location">
         <h3>Местоположение</h3>
         <p>Широта: {{ landmark.location.lat }}, Долгота: {{ landmark.location.lng }}</p>
@@ -39,7 +42,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -78,12 +81,11 @@ function formatDate(date) {
 }
 
 function handleImageError(event) {
-  event.target.src = '/placeholder-image.png' // Замените на ваш запасной путь
+  event.target.src = '/placeholder-image.png'
 }
 
-onMounted(() => {
-  fetchLandmark()
-})
+onMounted(fetchLandmark)
+watch(() => route.params.name, fetchLandmark)
 </script>
 
 <style scoped>
