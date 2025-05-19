@@ -1,12 +1,11 @@
 <template>
   <div class="app-container">
-      <Header />
-    <div v-if="!isProfilePage" class="main-content">
-      <Sidebar />
-      <MainMapAndList />
+    <Header />
+    <div class="main-content">
+      <Sidebar v-if="!isProfilePage && !isLandmarkPage"/>
+      <MainMapAndList v-if="!isProfilePage && !isLandmarkPage" />
       <RegisterModal ref="registerModal" @register="handleRegister" />
     </div>
-
   </div>
 </template>
 
@@ -22,10 +21,9 @@ import RegisterModal from './components/RegisterModal.vue'
 const registerModal = ref()
 const route = useRoute()
 
-// Определяем, на странице ли профиля
 const isProfilePage = computed(() => route.path === '/profile')
+const isLandmarkPage = computed(() => /^\/landmark\/[^/]+$/.test(route.path))
 
-// Обработка события регистрации
 function handleRegister(userData) {
   console.log('Зарегистрирован пользователь:', userData)
   // Здесь можно добавить API-запрос
@@ -44,7 +42,6 @@ function handleRegister(userData) {
   flex: 1;
   overflow: hidden;
 }
-
 
 .register-button {
   position: fixed;
