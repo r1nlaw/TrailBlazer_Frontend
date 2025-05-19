@@ -2,7 +2,7 @@
   <transition name="fade-slide">
     <header v-if="visible" class="header">
       <!-- Левая часть -->
-      <div class="header-left">
+      <div class="header-left ">
         <router-link to="/" class="logo" style="text-decoration: none;">
           <img :src="logoIcon" alt="Logo" class="logo-icon" />
           <span class="logo-text">путевод</span>
@@ -10,7 +10,7 @@
       </div>
 
       <!-- Центр: навигация и поиск -->
-      <div class="center">
+      <div class="center hide-on-mobile">
         <div class="nav-icons">
           <div class="icon-button active">
             <img :src="homeIcon" alt="Home" class="icon-img" />
@@ -486,29 +486,446 @@ onUnmounted(() => {
   transform: translateY(-10px);
 }
 
-/* Responsive adjustments */
+
+
 @media (max-width: 768px) {
-  .search-bar {
-    max-width: 250px;
+  .weather{
+    margin-right: 50%;
   }
-
-  .search-results {
+  .hide-on-mobile{
+    display: none;
+  }
+  .header {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 10px;
     width: 100%;
-    max-width: 300px;
+    padding: 8px 0px;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: none;
+    background: #fff;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 8px;
+    z-index: 1000;
+  }
+  .dropdown-menu {
+    top: auto;
+    bottom: 42px; 
+    right: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
   }
 
-  .result-image {
-    width: 50px;
-    height: 50px;
+  .header-left,
+  .center,
+  .header-right {
+    justify-content: center;
+  }
+  .logo{
+    max-height: 28px;
   }
 
-  .result-name {
-    font-size: 14px;
+  .center {
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
-  .result-address,
-  .result-category {
-    font-size: 12 Geolocators;
+  .search-bar {
+    display: none; /* Убрать поиск для компактности */
   }
 }
+@media (max-width: 540px) {
+  .weather{
+    order: -1;
+    margin-right: auto;
+  }
+  .hide-on-mobile{
+    display: none;
+  }
+  .header {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 10px;
+    width: 100%;
+    padding: 8px 0px;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: none;
+    background: #fff;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 8px;
+    z-index: 1000;
+  }
+  .dropdown-menu {
+    top: auto;
+    bottom: 42px; 
+    right: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+  }
+
+  .header-left,
+  .center,
+  .header-right {
+    justify-content: center;
+  }
+  .logo{
+    max-height: 28px;
+  }
+
+  .center {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .search-bar {
+    display: none; /* Убрать поиск для компактности */
+  }
+}
+
+@media (max-width: 430px) {
+  .weather{
+    order: -1;
+    margin-right: auto;
+  }
+  .hide-on-mobile{
+    display: none;
+  }
+  .header {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 10px;
+    width: 100%;
+    padding: 8px 0px;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: none;
+    background: #fff;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 8px;
+    z-index: 1000;
+  }
+  .dropdown-menu {
+    top: auto;
+    bottom: 42px; 
+    right: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+  }
+
+  .header-left,
+  .center,
+  .header-right {
+    justify-content: center;
+  }
+  .logo{
+    max-height: 28px;
+  }
+
+  .center {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .search-bar {
+    display: none; /* Убрать поиск для компактности */
+  }
+}
+@media (max-width: 414px) {
+  .weather{
+    order: -1;
+    margin-right: auto;
+  }
+  .hide-on-mobile{
+    display: none;
+  }
+  .header {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 10px;
+    width: 100%;
+    padding: 8px 0px;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: none;
+    background: #fff;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 8px;
+    z-index: 1000;
+  }
+  .dropdown-menu {
+    top: auto;
+    bottom: 42px; 
+    right: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+  }
+
+  .header-left,
+  .center,
+  .header-right {
+    justify-content: center;
+  }
+  .logo{
+    max-height: 28px;
+  }
+
+  .center {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .search-bar {
+    display: none; /* Убрать поиск для компактности */
+  }
+}
+@media (max-width: 412px) {
+  .weather{
+    order: -1;
+    margin-right: auto;
+  }
+  .hide-on-mobile{
+    display: none;
+  }
+  .header {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 10px;
+    width: 100%;
+    padding: 8px 0px;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: none;
+    background: #fff;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 8px;
+    z-index: 1000;
+  }
+  .dropdown-menu {
+    top: auto;
+    bottom: 42px; 
+    right: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+  }
+
+  .header-left,
+  .center,
+  .header-right {
+    justify-content: center;
+  }
+  .logo{
+    max-height: 28px;
+  }
+
+  .center {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .search-bar {
+    display: none; /* Убрать поиск для компактности */
+  }
+}
+
+@media (max-width: 390px) {
+  .weather{
+    order: -1;
+    margin-right: auto;
+  }
+  .hide-on-mobile{
+    display: none;
+  }
+  .header {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 10px;
+    width: 100%;
+    padding: 8px 0px;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: none;
+    background: #fff;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 8px;
+    z-index: 1000;
+  }
+  .dropdown-menu {
+    top: auto;
+    bottom: 42px; 
+    right: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+  }
+
+  .header-left,
+  .center,
+  .header-right {
+    justify-content: center;
+  }
+  .logo{
+    max-height: 28px;
+  }
+
+  .center {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .search-bar {
+    display: none; /* Убрать поиск для компактности */
+  }
+}
+
+@media (max-width: 375px) {
+  .weather{
+    order: -1;
+    margin-right: auto;
+  }
+  .hide-on-mobile{
+    display: none;
+  }
+  .header {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 10px;
+    width: 100%;
+    padding: 8px 0px;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: none;
+    background: #fff;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 8px;
+    z-index: 1000;
+  }
+  .dropdown-menu {
+    top: auto;
+    bottom: 42px; 
+    right: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+  }
+
+  .header-left,
+  .center,
+  .header-right {
+    justify-content: center;
+  }
+  .logo{
+    max-height: 28px;
+  }
+
+  .center {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .search-bar {
+    display: none; /* Убрать поиск для компактности */
+  }
+}
+
+@media (max-width: 360px) {
+  .weather{
+    order: -1;
+    margin-right: auto;
+  }
+  .hide-on-mobile{
+    display: none;
+  }
+  .header {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 10px;
+    width: 100%;
+    padding: 8px 0px;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: none;
+    background: #fff;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 8px;
+    z-index: 1000;
+  }
+  .dropdown-menu {
+    top: auto;
+    bottom: 42px; 
+    right: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+  }
+
+  .header-left,
+  .center,
+  .header-right {
+    justify-content: center;
+  }
+  .logo{
+    max-height: 28px;
+  }
+
+  .center {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .search-bar {
+    display: none; /* Убрать поиск для компактности */
+  }
+}
+
+@media (max-width: 344px) {
+  .weather{
+    order: -1;
+    margin-right: auto;
+  }
+  .hide-on-mobile{
+    display: none;
+  }
+  .header {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 10px;
+    width: 100%;
+    padding: 8px 0px;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: none;
+    background: #fff;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 8px;
+    z-index: 1000;
+  }
+  .dropdown-menu {
+    top: auto;
+    bottom: 42px; 
+    right: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+  }
+
+  .header-left,
+  .center,
+  .header-right {
+    justify-content: center;
+  }
+  .logo{
+    max-height: 28px;
+  }
+
+  .center {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .search-bar {
+    display: none; /* Убрать поиск для компактности */
+  }
+}
+
+
+
+
 </style>

@@ -38,7 +38,7 @@
     </div>
 
     <!-- Правая колонка: выбранные места -->
-    <div class="selected-places">
+    <div class="selected-places" :class="{ 'mobile-visible': isCartVisible }">
       <h2>Выбранные места</h2>
       <div class="scroll-area">
         <div
@@ -68,19 +68,48 @@
         Построить маршрут
       </button>
     </div>
-  </div>
 
+    <!-- Кнопка для открытия корзины на мобильных устройствах -->
+    <button 
+      v-if="selectedPlaces.length > 0" 
+      class="mobile-cart-button"
+      @click="toggleCart"
+    >
+      <span class="cart-icon">Маршрут</span>
+    </button>
+  </div>
 </template>
 
-
-
 <script setup>
-import { ref, computed, inject } from 'vue';
+import { ref, computed, inject, onMounted, onBeforeUnmount } from 'vue';
 import MapComponent from './Map.vue'
 const selectedPlaces = ref([]);
 const places = ref([]);
 const mapRef = inject('mapRef');
+const isCartVisible = ref(false);
+const isMobile = ref(false);
 
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth <= 375 || window.innerWidth <= 344 || window.innerWidth <= 853 || window.innerWidth <= 414 || window.innerWidth <= 390 || window.innerWidth <= 540 || window.innerWidth <= 912 || window.innerWidth <= 1024 || window.innerWidth <= 820 || window.innerWidth <= 768 || window.innerWidth <= 360 || window.innerWidth <= 412 || window.innerWidth <= 430;
+  if (!isMobile.value) {
+    isCartVisible.value = true;
+  } else {
+    isCartVisible.value = false;
+  }
+};
+
+onMounted(() => {
+  checkScreenSize();
+  window.addEventListener('resize', checkScreenSize);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', checkScreenSize);
+});
+
+function toggleCart() {
+  isCartVisible.value = !isCartVisible.value;
+}
 
 loadLandmark();
 function toggleSelection(id) {
@@ -103,16 +132,9 @@ function handleSelection() {
   }
 }
 
-
-
 import infoIcon from '@/assets/icons/info.png'
 import starIcon from '@/assets/icons/star.png'
 import reviewIcon from '@/assets/icons/review.png'
-
-// import place1 from '@/assets/images/place1.png'
-// import place2 from '@/assets/images/place2.png'
-// import place3 from '@/assets/images/place3.png'
-
 
 const news = [
   {
@@ -120,7 +142,6 @@ const news = [
     title: 'Власти планируют масштабную реконструкцию<br />Генуэзской крепости в Судаке',
     content: `
       <p>Судак, 11 мая — Власти Республики Крым объявили о начале подготовки к масштабной реконструкции
-
     `,
   },
 ]
@@ -155,17 +176,14 @@ async function loadLandmark() {
           image: `http://${domain}/images/${element.image_path}`
         });
       });
-      
     }
   } catch (error) {
     console.log("Ошибка при загрузке достопримечательностей:", error);
   }
 }
-
 </script>
 
 <style scoped>
-
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -187,6 +205,7 @@ async function loadLandmark() {
   flex: 1;
   gap: 24px;
   width: 100%;
+  position: relative;
 }
 
 .places {
@@ -208,7 +227,6 @@ async function loadLandmark() {
   transition: all 0.3s ease;
   border: 1px solid #2c473a54;
 }
-
 
 .place-card:hover {
   transform: translateX(10px);
@@ -288,7 +306,6 @@ async function loadLandmark() {
   pointer-events: none;
 }
 
-
 .news-card {
   position: relative;
   flex: 1;
@@ -316,14 +333,26 @@ async function loadLandmark() {
 .bottom-action-button {
   background-color: #2c473a;
   color: white;
-  padding: 12px 24px;
+  padding: 14px 28px;
   border: none;
-  border-radius: 24px;
-  font-size: 16px;
+  border-radius: 28px;
+  font-size: 17px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: opacity 0.3s ease;
+  box-shadow: 0 4px 14px rgba(44, 71, 58, 0.25);
+  transition: all 0.3s ease;
   width: 100%;
+  margin-top: auto;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+.bottom-action-button:hover {
+  background-color: #3a5e4a;
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(44, 71, 58, 0.35);
+}
+
+.bottom-action-button.in-cart {
   margin-top: auto;
 }
 
@@ -346,7 +375,7 @@ async function loadLandmark() {
 }
 
 .scroll-area {
-  flex: 1; /* растягиваем по доступной высоте */
+  flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -361,6 +390,937 @@ async function loadLandmark() {
   margin-bottom: 8px;
   font-size: 18px;
   color: #2c473a;
+}
+
+/* Стили для мобильной версии */
+.mobile-cart-button {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #2c473a;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+@media (max-width: 1024px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 1000px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 50px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1295px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 950px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 1000px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 50px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1295px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 950px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 912px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 870px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 50px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1305px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 840px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 853px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 820px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 40px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1220px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 750px;
+  }
+}
+@media (max-width: 820px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 790px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 40px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1120px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 750px;
+  }
+}
+@media (max-width: 768px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 740px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 35px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 870px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 700px;
+  }
+}
+@media (max-width: 540px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 510px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 20px;
+  }
+  .place-card.selected {
+    min-width: 470px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 567px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+
+
+@media (max-width: 430px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 390px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 8px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 775px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  .place-card.selected {
+    min-width: 270px;
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 414px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 390px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 8px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 740px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  .place-card.selected {
+    min-width: 270px;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+@media (max-width: 412px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 390px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 8px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 760px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  .place-card.selected {
+    min-width: 270px;
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+@media (max-width: 390px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 360px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 8px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 690px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; /* Добавлено */
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 226px;
+   
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 375px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 350px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 5px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 510px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  .place-card.selected {
+    min-width: 270px;
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; /* Добавлено */
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 210px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 334px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 5px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 585px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  .place-card.selected {
+    min-width: 270px;
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; /* Добавлено */
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 190px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 344px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 315px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 5px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 725px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  .place-card.selected {
+    min-width: 270px;
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; /* Добавлено */
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 160px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
 }
 
 

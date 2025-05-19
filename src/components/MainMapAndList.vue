@@ -27,4 +27,209 @@ provide('mapRef',mapRef)
   min-width: 159vh;
   box-sizing: border-box;
 }
+@media (max-width: 1280px) {
+    .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: 0%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 135vh;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 1024px) {
+    .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 135vh;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 912px) {
+    .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 135vh;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 853px) {
+    .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 135vh;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 820px) {
+    .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 135vh;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 768px) {
+    .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 135vh;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 540px) {
+    .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 135vh;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 430px) {
+    .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 135vh;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 414px) {
+    .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 135vh;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 414px) {
+    .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 135vh;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 390px) {
+    .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 135vh;
+    box-sizing: border-box;
+  }
+}
+
+
+@media (max-width: 375px) {
+  .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 159vh;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 360px) {
+  .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 159vh;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 344px) {
+  .main-layout {
+    display: flex;
+    flex-direction: column;
+    margin-left: -7%;
+    overflow-y: auto;
+    gap: 24px;
+    padding: 32px 24px 24px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    min-width: 159vh;
+    box-sizing: border-box;
+  }
+}
+
+
+
+
 </style>
