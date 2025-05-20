@@ -66,7 +66,7 @@ const loadOptimizedImage = async (url, targetWidth) => {
 const loadFacilities = async (targetMap) => {
   try {
     const bounds = targetMap.getBounds().toArray();
-    const response = await fetch(`http://${domain}/api/facilities`, {
+    const response = await fetch(`${domain}/api/facilities`, {
       method: 'POST',
       body: JSON.stringify({
         sw: { lng: bounds[0][0], lat: bounds[0][1] },
@@ -380,7 +380,7 @@ const toggleMap = () => {
 
 // Функции для работы с маршрутами
 async function getLandmarksByIDs(points) {
-  const url = `http://${domain}/api/getLandmarks`;
+  const url = `${domain}/api/getLandmarks`;
   try {
     const response = await fetch(url, {
       method: 'POST',

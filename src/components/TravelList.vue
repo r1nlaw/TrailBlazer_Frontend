@@ -154,7 +154,7 @@ async function loadLandmark() {
   }
 
   const domain = import.meta.env.VITE_BACKEND_URL;
-  const url = `http://${domain}/api/landmark?page=${page}`;
+  const url = `${domain}/api/landmark?page=${page}`;
 
   try {
     const response = await fetch(url, {
@@ -173,7 +173,7 @@ async function loadLandmark() {
           id: element.id,
           title: element.name,
           location: element.address,
-          image: `http://${domain}/images/${element.image_path}`
+          image: `${domain}/images/${element.image_path}`
         });
       });
     }
