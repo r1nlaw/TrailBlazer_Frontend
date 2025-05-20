@@ -124,13 +124,18 @@ const selectedPlaceObjects = computed(() =>
   places.value.filter(place => selectedPlaces.value.includes(place.id))
 );
 function handleSelection() {
-  if (mapRef.value && mapRef.value.RouteMaker) {
-    mapRef.value.RouteMaker(selectedPlaces.value);
-    console.log('Выбранные ID:', selectedPlaces.value);
-  } else {
-    console.error('Map component or RouteMaker not available');
+  try {
+    if (mapRef.value && mapRef.value.RouteMaker) {
+      mapRef.value.RouteMaker(selectedPlaces.value);
+      console.log('Выбранные ID:', selectedPlaces.value);
+    } else {
+      console.error('Map component or RouteMaker not available');
+    }
+  } catch (error) {
+    console.error('Error in handleSelection:', error);
   }
 }
+
 
 import infoIcon from '@/assets/icons/info.png'
 import starIcon from '@/assets/icons/star.png'

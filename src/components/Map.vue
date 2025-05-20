@@ -33,8 +33,10 @@ const mapHeight = ref(400);
 const routeSourceId = 'route';
 const isMapModalOpen = ref(false);
 const modalMap = ref(null); // Храним модальную карту
+const markers = ref({});
+const isRouting = ref(false);
+const selectedRoutePoints = ref([]);
 
-// Оптимизированная загрузка изображения с ресайзом
 const loadOptimizedImage = async (url, targetWidth) => {
   return new Promise((resolve) => {
     const img = new Image();
@@ -63,9 +65,17 @@ const loadOptimizedImage = async (url, targetWidth) => {
 };
 
 // Оптимизированная загрузка данных для карты
-const loadFacilities = async (targetMap) => {
+const loadFacilities = async (targetMap, selectedIds = selectedRoutePoints.value) => {
+  if (!targetMap || !targetMap.getSource) {
+    console.error('Invalid map instance');
+    return;
+  }
+
   try {
     const bounds = targetMap.getBounds().toArray();
+    const isMobile = window.innerWidth <= 768;
+    const markerSize = isMobile ? 150 : 100;
+
     const response = await fetch(`${domain}/api/facilities`, {
       method: 'POST',
       body: JSON.stringify({
@@ -80,10 +90,9 @@ const loadFacilities = async (targetMap) => {
     const facilities = await response.json();
     if (!facilities?.length) return;
 
-    const isMobile = window.innerWidth <= 768;
-    const markerSize = isMobile ? 150 : 100;
-
+    // Подготовка данных с учетом выбранных точек
     const newFeatures = await Promise.all(facilities.map(async facility => {
+      const isSelected = selectedIds.includes(facility.id);
       const imageUrl = facility.image_path
         ? `${import.meta.env.VITE_BACKEND_URL}/images/${facility.image_path}?width=${markerSize}`
         : null;
@@ -96,7 +105,9 @@ const loadFacilities = async (targetMap) => {
           address: facility.address,
           url: facility.url || '',
           image: imageUrl,
-          markerImage: imageUrl
+          markerImage: imageUrl,
+          // Добавляем свойство для фильтрации
+          isSelected: isSelected
         },
         geometry: {
           type: 'Point',
@@ -110,15 +121,20 @@ const loadFacilities = async (targetMap) => {
 
     source.setData({ type: 'FeatureCollection', features: newFeatures });
 
+    // Удаляем старый слой, если он существует
     if (targetMap.getLayer('unclustered-point')) {
       targetMap.removeLayer('unclustered-point');
     }
 
+    // Добавляем новый слой с фильтром по выбранным точкам
     targetMap.addLayer({
       id: 'unclustered-point',
       type: 'symbol',
       source: 'markers',
-      filter: ['!', ['has', 'point_count']],
+      // Показываем только выбранные точки или все, если маршрут не построен
+      filter: selectedIds.length > 0 
+        ? ['all', ['!', ['has', 'point_count']], ['==', ['get', 'isSelected'], true]]
+        : ['!', ['has', 'point_count']],
       layout: {
         'icon-image': ['coalesce', ['get', 'markerImage'], 'default-marker'],
         'icon-size': isMobile ? 0.6 : 0.6,
@@ -131,6 +147,7 @@ const loadFacilities = async (targetMap) => {
       }
     });
 
+    // Загрузка изображений (как в оригинале)
     const uniqueImages = [...new Set(newFeatures
       .filter(f => f.properties.markerImage)
       .map(f => f.properties.markerImage))];
@@ -150,8 +167,22 @@ const loadFacilities = async (targetMap) => {
         console.warn(`Error loading image ${url}`, e);
       }
     }));
+
   } catch (error) {
     console.error('Error loading facilities:', error);
+  }
+};
+
+const hideAllPoints = () => {
+  if (map) {
+    // Удаляем все маркеры с карты
+    Object.values(markers.value).forEach(marker => {
+      if (marker && map.hasLayer(marker)) {
+        map.removeLayer(marker);
+      }
+    });
+    // Очищаем хранилище
+    markers.value = {};
   }
 };
 
@@ -271,7 +302,12 @@ onMounted(async () => {
     });
   });
 
-  map.on('moveend', () => loadFacilities(map));
+  map.on('moveend', () => {
+    // Если есть построенный маршрут, не подгружаем новые точки
+    if (selectedRoutePoints.value.length > 0) return;
+    
+    loadFacilities(map);
+  });
   map.on('error', console.error);
 });
 
@@ -358,8 +394,31 @@ const initModalMap = () => {
     });
   });
 
-  modalMap.value.on('moveend', () => loadFacilities(modalMap.value));
+  modalMap.value.on('moveend', () => {
+      if (!isRouting.value) {
+        loadFacilities(modalMap.value);
+      }
+    });
 };
+
+function resetRoute() {
+  selectedRoutePoints.value = [];
+  if (map.getSource(routeSourceId)) {
+    map.getSource(routeSourceId).setData({
+      type: 'Feature',
+      geometry: { type: 'LineString', coordinates: [] }
+    });
+  }
+  loadFacilities(map); // Перезагружаем все точки
+}
+
+// Добавляем в defineExpose
+defineExpose({
+  RouteMaker,
+  hideAllPoints,
+  loadFacilities,
+  resetRoute
+});
 
 // Управление картой
 const toggleMap = () => {
@@ -397,51 +456,70 @@ async function getLandmarksByIDs(points) {
 }
 
 async function RouteMaker(points) {
-  if (map.getSource(routeSourceId)) {
-    map.getSource(routeSourceId).setData({
-      type: 'Feature',
-      geometry: {
-        type: 'LineString',
-        coordinates: []
-      }
-    });
+  isRouting.value = true;
+  selectedRoutePoints.value = points; 
+  
+  try {
+    if (map.getSource(routeSourceId)) {
+      map.getSource(routeSourceId).setData({
+        type: 'Feature',
+        geometry: { type: 'LineString', coordinates: [] }
+      });
+    }
+    
+    // Загружаем точки с учетом выбранных
+    await loadFacilities(map, points);
+    const landmarks = await getLandmarksByIDs(points);
+    if (landmarks) await getRoute(landmarks);
+  } catch (error) {
+    console.error('Error in RouteMaker:', error);
+  } finally {
+    isRouting.value = false;
   }
-
-  const landmarks = await getLandmarksByIDs(points);
-  if (landmarks) getRoute(landmarks);
 }
 
 function getRoute(coords) {
-  let strCoord = "";
-  for (let i = 0; i < coords.length; i++) {
-    strCoord += `${i===0?"":";"}${coords[i].location.lng},${coords[i].location.lat}`;
-  }
-
-  const url = `https://router.project-osrm.org/route/v1/driving/${strCoord}?overview=full&geometries=geojson`;
-
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      if (data.routes && data.routes[0]) {
-        const route = data.routes[0].geometry;
-        map.getSource(routeSourceId).setData({
-          type: 'Feature',
-          geometry: route
-        });
-        if (modalMap.value && modalMap.value.getSource(routeSourceId)) {
-          modalMap.value.getSource(routeSourceId).setData({
-            type: 'Feature',
-            geometry: route
-          });
-        }
+  return new Promise((resolve, reject) => {
+    try {
+      let strCoord = "";
+      for (let i = 0; i < coords.length; i++) {
+        strCoord += `${i===0?"":";"}${coords[i].location.lng},${coords[i].location.lat}`;
       }
-    })
-    .catch(err => console.error('Ошибка маршрута:', err));
+
+      const url = `https://router.project-osrm.org/route/v1/driving/${strCoord}?overview=full&geometries=geojson`;
+
+      fetch(url)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+          return res.json();
+        })
+        .then(data => {
+          if (data.routes && data.routes[0]) {
+            const route = data.routes[0].geometry;
+            map.getSource(routeSourceId).setData({
+              type: 'Feature',
+              geometry: route
+            });
+            if (modalMap.value && modalMap.value.getSource(routeSourceId)) {
+              modalMap.value.getSource(routeSourceId).setData({
+                type: 'Feature',
+                geometry: route
+              });
+            }
+            resolve();
+          }
+        })
+        .catch(err => {
+          console.error('Ошибка маршрута:', err);
+          reject(err);
+        });
+    } catch (error) {
+      console.error('Error in getRoute:', error);
+      reject(error);
+    }
+  });
 }
 
-defineExpose({
-  RouteMaker
-});
 </script>
 
 <style scoped>
