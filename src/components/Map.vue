@@ -26,7 +26,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 const map_style = import.meta.env.VITE_MAP_STYLE_URL;
 const isMapVisible = ref(true);
 const isMapExpanded = ref(false);
-const domain = "localhost:8080";
+const domain = import.meta.env.VITE_BACKEND_URL;
 const geojson = { type: 'FeatureCollection', features: [] };
 let map = null;
 const mapHeight = ref(400);

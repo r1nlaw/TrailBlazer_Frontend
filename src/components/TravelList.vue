@@ -153,7 +153,7 @@ async function loadLandmark() {
     page = "1";
   }
 
-  const domain = "localhost:8080";
+  const domain = import.meta.env.VITE_BACKEND_URL;
   const url = `http://${domain}/api/landmark?page=${page}`;
 
   try {
