@@ -90,7 +90,7 @@ const isCartVisible = ref(false);
 const isMobile = ref(false);
 
 const checkScreenSize = () => {
-  isMobile.value = window.innerWidth <= 375 || window.innerWidth <= 344 || window.innerWidth <= 853 || window.innerWidth <= 414 || window.innerWidth <= 390 || window.innerWidth <= 540 || window.innerWidth <= 912 || window.innerWidth <= 1024 || window.innerWidth <= 820 || window.innerWidth <= 768 || window.innerWidth <= 360 || window.innerWidth <= 412 || window.innerWidth <= 430;
+  isMobile.value = window.innerWidth <= 375 || window.innerWidth <= 344 || window.innerWidth <= 1100 || window.innerWidth <= 853 || window.innerWidth <= 900  || window.innerWidth <= 1060 || window.innerWidth <= 1150 || window.innerWidth <= 414 || window.innerWidth <= 390 || window.innerWidth <= 540 || window.innerWidth <= 912 || window.innerWidth <= 1024 || window.innerWidth <= 820 || window.innerWidth <= 768 || window.innerWidth <= 360 || window.innerWidth <= 412 || window.innerWidth <= 430;
   if (!isMobile.value) {
     isCartVisible.value = true;
   } else {
@@ -408,6 +408,347 @@ async function loadLandmark() {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 1000;
 }
+@media (max-width: 1150px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 1100px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 10px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 770px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 1070px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 1100px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 1100px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 10px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 770px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 1070px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 1060px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 1020px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 10px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 700px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+    
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 990px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 1045px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 1000px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 0px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1295px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 950px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 1030px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 1000px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 0px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1295px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 950px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
 @media (max-width: 1024px) {
   .places {
     flex: 2;
@@ -545,6 +886,414 @@ async function loadLandmark() {
     margin-bottom: 5px;
   }
 }
+@media (max-width: 1100px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 1020px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 30px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1305px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 840px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 1051px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 990px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 0px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1305px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 840px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 1050px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 990px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 50px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1305px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 840px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 1000px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 950px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 50px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1305px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 840px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 980px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 950px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 50px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1305px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 840px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 950px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 910px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 50px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1305px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 840px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
 @media (max-width: 912px) {
   .places {
     flex: 2;
@@ -613,6 +1362,138 @@ async function loadLandmark() {
     margin-bottom: 5px;
   }
 }
+@media (max-width: 900px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 860px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 50px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1305px;
+    margin-top: 70px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 840px;
+  }
+  .mobile-cart-button {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 860px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 830px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 40px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1220px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 750px;
+  }
+}
 @media (max-width: 853px) {
   .places {
     flex: 2;
@@ -621,6 +1502,70 @@ async function loadLandmark() {
     gap: 14px;
     overflow: visible;
     max-width: 820px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 40px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1220px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 750px;
+  }
+}
+@media (max-width: 830px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 800px;
   }
   .travel-list-wrapper {
     flex-direction: column;
@@ -741,6 +1686,70 @@ async function loadLandmark() {
     min-width: 750px;
   }
 }
+@media (max-width: 810px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 770px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 40px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 1120px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 750px;
+  }
+}
 @media (max-width: 768px) {
   .places {
     flex: 2;
@@ -803,6 +1812,326 @@ async function loadLandmark() {
   }
   .place-card.selected {
     min-width: 700px;
+  }
+}
+@media (max-width: 750px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 710px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 35px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 870px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 700px;
+  }
+}
+@media (max-width: 700px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 660px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 35px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 870px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+  .place-card.selected {
+    min-width: 700px;
+  }
+}
+@media (max-width: 650px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 620px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 20px;
+  }
+  .place-card.selected {
+    min-width: 470px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 567px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+@media (max-width: 600px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 580px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 20px;
+  }
+  .place-card.selected {
+    min-width: 470px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 567px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+@media (max-width: 560px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 530px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 20px;
+  }
+  .place-card.selected {
+    min-width: 470px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 567px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
   }
 }
 @media (max-width: 540px) {
@@ -869,7 +2198,264 @@ async function loadLandmark() {
     margin-left: 0;
   }
 }
+@media (max-width: 514px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 470px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 20px;
+  }
+  .place-card.selected {
+    min-width: 470px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 567px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+@media (max-width: 490px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 460px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 15px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 795px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  .place-card.selected {
+    min-width: 270px;
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+@media (max-width: 464px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 430px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 15px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 795px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  .place-card.selected {
+    min-width: 270px;
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
 
+
+@media (max-width: 444px) {
+  .places {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: visible;
+    max-width: 410px;
+  }
+  .travel-list-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 15px;
+  }
+  
+  .selected-places {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    min-width: unset;
+    max-height: 795px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .selected-places.mobile-visible {
+    transform: translateX(0);
+  }
+  
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px; 
+  }
+  .place-card.selected {
+    min-width: 270px;
+  }
+  
+  .bottom-action-button.in-cart {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    max-width: 230px;
+  }
+  
+  .mobile-cart-button {
+    display: block;
+    margin-bottom: 85px;
+  }
+  
+  .places {
+    flex: 1;
+    padding-bottom: 80px;
+    width: 100%;
+    margin-left: 0;
+  }
+}
 
 
 @media (max-width: 430px) {

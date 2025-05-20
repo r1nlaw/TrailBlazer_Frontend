@@ -226,6 +226,21 @@ onMounted(() => {
   transform: scale(0.95);
 
 }
+@media (max-width: 1500px) {
+  .sidebar {
+    position: fixed;
+    top: 9%; 
+    left: 0;
+    height: calc(100vh - 70px); 
+    overflow-y: auto; 
+    padding: 24px;
+    width: 246px;
+    font-family: 'Montserrat', sans-serif;
+    background: white;  
+    z-index: 1000; 
+  }
+}
+
 
 @media (max-width: 1280px) {
   .sidebar {
@@ -247,6 +262,7 @@ onMounted(() => {
     display: flex;
   }
 }
+
 
 
 @media (max-width: 1024px) {

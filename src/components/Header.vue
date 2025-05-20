@@ -485,7 +485,9 @@ onUnmounted(() => {
   opacity: 0;
   transform: translateY(-10px);
 }
-
+@media (max-width: 1978px) {
+  
+}
 
 
 @media (max-width: 768px) {

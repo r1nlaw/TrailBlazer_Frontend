@@ -493,15 +493,7 @@ defineExpose({
   height: 16px;
 }
 
-@media (max-width: 768px) {
-  .map-container {
-    height: 300px;
-  }
-  .map-button {
-    padding: 6px 12px;
-    font-size: 11px;
-  }
-}
+
 
 .modal-overlay {
   position: fixed;
@@ -636,11 +628,124 @@ defineExpose({
   text-align: center;
   color: #666;
 }
+@media (max-width: 1700px) {
+  .map-container {
+    position: relative;
+    width: 100%;
+    margin-top: -30px;
+    min-height: 400px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+
+@media (max-width: 1150px) {
+  .map-container {
+    position: relative;
+    width: 99%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 1060px) {
+  .map-container {
+    position: relative;
+    width: 96%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 1042px) {
+  .map-container {
+    position: relative;
+    width: 93%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 1030px) {
+  .map-container {
+    position: relative;
+    width: 90%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+
+@media (max-width: 1026px) {
+  .map-container {
+    position: relative;
+    width: 93%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+
 
 @media (max-width: 1024px) {
   .map-container {
     position: relative;
-    width: 60%;
+    width: 99%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 1020px) {
+  .map-container {
+    position: relative;
+    width: 98%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 1000px) {
+  .map-container {
+    position: relative;
+    width: 95%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 980px) {
+  .map-container {
+    position: relative;
+    width: 95%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 950px) {
+  .map-container {
+    position: relative;
+    width: 91%;
     margin-top: -30px;
     min-height: 300px;
     border-radius: 24px;
@@ -652,7 +757,29 @@ defineExpose({
 @media (max-width: 912px) {
   .map-container {
     position: relative;
-    width: 53%;
+    width: 87%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 900px) {
+  .map-container {
+    position: relative;
+    width: 86%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 870px) {
+  .map-container {
+    position: relative;
+    width: 83%;
     margin-top: -30px;
     min-height: 300px;
     border-radius: 24px;
@@ -661,10 +788,24 @@ defineExpose({
   }
 }
 
+@media (max-width: 860px) {
+  .map-container {
+    position: relative;
+    width: 83%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+
+
+
 @media (max-width: 853px) {
   .map-container {
     position: relative;
-    width: 53%;
+    width: 82%;
     margin-top: -30px;
     min-height: 300px;
     border-radius: 24px;
@@ -676,7 +817,18 @@ defineExpose({
 @media (max-width: 820px) {
   .map-container {
     position: relative;
-    width: 55%;
+    width: 79%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 810px) {
+  .map-container {
+    position: relative;
+    width: 77%;
     margin-top: -30px;
     min-height: 300px;
     border-radius: 24px;
@@ -685,10 +837,67 @@ defineExpose({
   }
 }
 
+
 @media (max-width: 768px) {
   .map-container {
     position: relative;
-    width: 59%;
+    width: 73%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 750px) {
+  .map-container {
+    position: relative;
+    width: 71%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+
+@media (max-width: 700px) {
+  .map-container {
+    position: relative;
+    width: 67%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 650px) {
+  .map-container {
+    position: relative;
+    width: 61%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 600px) {
+  .map-container {
+    position: relative;
+    width: 57%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 560px) {
+  .map-container {
+    position: relative;
+    width: 53%;
     margin-top: -30px;
     min-height: 300px;
     border-radius: 24px;
@@ -700,7 +909,40 @@ defineExpose({
 @media (max-width: 540px) {
   .map-container {
     position: relative;
-    width: 59%;
+    width: 51%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 514px) {
+  .map-container {
+    position: relative;
+    width: 48%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 464px) {
+  .map-container {
+    position: relative;
+    width: 43%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+@media (max-width: 444px) {
+  .map-container {
+    position: relative;
+    width: 41%;
     margin-top: -30px;
     min-height: 300px;
     border-radius: 24px;
@@ -720,11 +962,23 @@ defineExpose({
     transition: height 0.3s ease;
   }
 }
+@media (max-width: 425px) {
+  .map-container {
+    position: relative;
+    width: 39%;
+    margin-top: -30px;
+    min-height: 300px;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+}
+
 
 @media (max-width: 414px) {
   .map-container {
     position: relative;
-    width: 35%;
+    width: 38%;
     margin-top: -30px;
     min-height: 300px;
     border-radius: 24px;
@@ -760,7 +1014,7 @@ defineExpose({
 @media (max-width: 375px) {
   .map-container {
     position: relative;
-    width: 35%;
+    width: 29%;
     margin-top: -10px;
     min-height: 200px;
     border-radius: 24px;
@@ -772,7 +1026,7 @@ defineExpose({
 @media (max-width: 360px) {
   .map-container {
     position: relative;
-    width: 31%;
+    width: 27%;
     margin-top: -30px;
     min-height: 200px;
     border-radius: 24px;
