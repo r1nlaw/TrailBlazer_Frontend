@@ -85,7 +85,7 @@ const loadFacilities = async (targetMap) => {
 
     const newFeatures = await Promise.all(facilities.map(async facility => {
       const imageUrl = facility.image_path
-        ? `http://localhost:8080/images/${facility.image_path}?width=${markerSize}`
+        ? `${import.meta.env.VITE_BACKEND_URL}/images/${facility.image_path}?width=${markerSize}`
         : null;
 
       return {

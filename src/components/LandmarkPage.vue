@@ -46,7 +46,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const domain = 'http://localhost:8080'
+const domain = `${import.meta.env.VITE_BACKEND_URL}`
 const landmark = ref({})
 const loading = ref(true)
 const error = ref('')

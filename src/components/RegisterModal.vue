@@ -91,8 +91,8 @@ async function handleSubmit() {
 
   try {
     const endpoint = isRegistering.value
-      ? 'http://localhost:8080/user/signUp'
-      : 'http://localhost:8080/user/signIn'
+      ? `${import.meta.env.VITE_BACKEND_URL}/user/signUp`
+      : `${import.meta.env.VITE_BACKEND_URL}/user/signIn`
 
     const payload = isRegistering.value
       ? { username: name.value, email: email.value, password_hash: password.value }
