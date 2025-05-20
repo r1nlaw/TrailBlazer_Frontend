@@ -23,6 +23,7 @@ import { ref, onMounted } from 'vue';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
+const map_style = import.meta.env.VITE_MAP_STYLE_URL;
 const isMapVisible = ref(true);
 const isMapExpanded = ref(false);
 const domain = "localhost:8080";
@@ -31,6 +32,7 @@ let map = null;
 const mapHeight = ref(400);
 const routeSourceId = 'route';
 const isMapModalOpen = ref(false);
+const modalMap = ref(null); // Храним модальную карту
 
 // Оптимизированная загрузка изображения с ресайзом
 const loadOptimizedImage = async (url, targetWidth) => {
@@ -44,171 +46,45 @@ const loadOptimizedImage = async (url, targetWidth) => {
       canvas.height = img.height * ratio;
 
       const ctx = canvas.getContext('2d');
-
-      // Обрезка в круг
       ctx.beginPath();
       const radius = Math.min(canvas.width, canvas.height) / 2;
       ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, Math.PI * 2);
       ctx.closePath();
       ctx.clip();
-
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       canvas.toBlob(blob => {
         resolve(URL.createObjectURL(blob));
       }, 'image/webp', 0.7);
     };
-
     img.onerror = () => resolve(null);
     img.src = url;
   });
 };
 
-// Основная функция инициализации карты
-onMounted(async () => {
-  map = new maplibregl.Map({
-    container: 'map',
-    style: 'http://localhost:8100/styles/basic-preview2/style.json',
-    center: [34.09847, 44.94249],
-    zoom: 13
-  });
-
-  map.on('load', async () => {
-    map.addSource('markers', {
-      type: 'geojson',
-      data: geojson,
-      cluster: true,
-      clusterMaxZoom: 11,
-      clusterRadius: 30
-    });
-
-    // Слои кластеров (остаются без изменений)
-    map.addLayer({
-      id: 'clusters',
-      type: 'circle',
-      source: 'markers',
-      filter: ['has', 'point_count'],
-      paint: {
-        'circle-color': [
-          'step',
-          ['get', 'point_count'],
-          '#51bbd6',
-          10,
-          '#f1f075',
-          750,
-          '#f28cb1'
-        ],
-        'circle-radius': [
-          'step',
-          ['get', 'point_count'],
-          35,  // Уменьшенные размеры
-          100, 20,
-          250, 25
-        ]
-      }
-    });
-
-    map.addLayer({
-      id: 'cluster-count',
-      type: 'symbol',
-      source: 'markers',
-      filter: ['has', 'point_count'],
-      layout: {
-        'text-field': '{point_count_abbreviated}',
-        'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
-        'text-size': 10 // Уменьшенный размер текста
-        
-      },
-      paint: {
-        'text-color': '#ffffff'
-      }
-    });
-
-    // Слой маршрута
-    map.addSource(routeSourceId, {
-      type: 'geojson',
-      data: { type: 'FeatureCollection', features: [] }
-    });
-    
-    map.addLayer({
-      id: 'route-line',
-      type: 'line',
-      source: routeSourceId,
-      paint: {
-        'line-color': '#3b9ddd',
-        'line-width': 4 // Более тонкая линия
-      }
-    });
-
-    await loadFacilities();
-
-    // Обработчики событий
-    map.on('click', 'unclustered-point', (e) => {
-      if (!e.features?.[0]) return;
-      showPopup(e.features[0]);
-    });
-
-    map.on('mouseenter', ['clusters', 'unclustered-point'], () => {
-      map.getCanvas().style.cursor = 'pointer';
-    });
-    
-    map.on('mouseleave', ['clusters', 'unclustered-point'], () => {
-      map.getCanvas().style.cursor = '';
-    });
-  });
-
-  map.on('moveend', loadFacilities);
-  map.on('error', console.error);
-});
-
-// Оптимизированная функция показа popup 50x50
-const showPopup = (feature) => {
-  const { geometry, properties } = feature;
-  const { name, address, url, image } = properties;
-
-  const popupHTML = `
-    <div class="popup-card">
-      ${image ? `<img src="${image}" alt="${name}" class="popup-card-image" style="max-width: 180px; max-height: 200px; object-fit: contain;" />` : ''}
-      <div class="popup-card-body">
-        <h3 class="popup-card-title">${name || 'Без названия'}</h3>
-        ${address ? `<p class="popup-card-address">${address}</p>` : ''}
-        ${url ? `<a href="${url}" class="popup-card-link" target="_blank">Подробнее</a>` : ''}
-      </div>
-    </div>
-  `;
-  new maplibregl.Popup({
-    closeOnClick: true,
-    className: 'custom-popup',
-    maxWidth: '300px'
-  })
-    .setLngLat(geometry.coordinates)
-    .setHTML(popupHTML)
-    .addTo(map);
-};
-
-// Оптимизированная загрузка данных
-const loadFacilities = async () => {
+// Оптимизированная загрузка данных для карты
+const loadFacilities = async (targetMap) => {
   try {
-    const bounds = map.getBounds().toArray();
+    const bounds = targetMap.getBounds().toArray();
     const response = await fetch(`http://${domain}/api/facilities`, {
       method: 'POST',
       body: JSON.stringify({
-        sw: { lng: bounds[0][0], lat: bounds[0][1] }, 
+        sw: { lng: bounds[0][0], lat: bounds[0][1] },
         ne: { lng: bounds[1][0], lat: bounds[1][1] }
       }),
       headers: { 'Content-Type': 'application/json' }
     });
 
     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-    
+
     const facilities = await response.json();
     if (!facilities?.length) return;
 
     const isMobile = window.innerWidth <= 768;
-    const markerSize = isMobile ? 150 : 100; // Размеры для разных устройств
+    const markerSize = isMobile ? 150 : 100;
 
     const newFeatures = await Promise.all(facilities.map(async facility => {
-      const imageUrl = facility.image_path 
+      const imageUrl = facility.image_path
         ? `http://localhost:8080/images/${facility.image_path}?width=${markerSize}`
         : null;
 
@@ -229,99 +105,127 @@ const loadFacilities = async () => {
       };
     }));
 
-    const source = map.getSource('markers');
+    const source = targetMap.getSource('markers');
     if (!source) return;
 
     source.setData({ type: 'FeatureCollection', features: newFeatures });
 
-    if (map.getLayer('unclustered-point')) {
-      map.removeLayer('unclustered-point');
+    if (targetMap.getLayer('unclustered-point')) {
+      targetMap.removeLayer('unclustered-point');
     }
 
-    // Добавляем слой с оптимизированными размерами
-    map.addLayer({
+    targetMap.addLayer({
       id: 'unclustered-point',
       type: 'symbol',
       source: 'markers',
       filter: ['!', ['has', 'point_count']],
       layout: {
         'icon-image': ['coalesce', ['get', 'markerImage'], 'default-marker'],
-        'icon-size': isMobile ? 0.6 : 0.6, // Уменьшенный размер
+        'icon-size': isMobile ? 0.6 : 0.6,
         'icon-allow-overlap': true,
         'icon-anchor': 'bottom',
         'icon-padding': 10
-
       },
       paint: {
-        'icon-opacity': 1,
+        'icon-opacity': 1
       }
-      
     });
-    
 
-    // Загрузка и кэширование изображений
     const uniqueImages = [...new Set(newFeatures
       .filter(f => f.properties.markerImage)
       .map(f => f.properties.markerImage))];
 
     await Promise.all(uniqueImages.map(async url => {
       try {
-        if (!map.hasImage(url)) {
+        if (!targetMap.hasImage(url)) {
           const optimizedUrl = await loadOptimizedImage(url, markerSize);
           if (optimizedUrl) {
             const img = new Image();
             img.src = optimizedUrl;
             await img.decode();
-            map.addImage(url, img);
+            targetMap.addImage(url, img);
           }
         }
       } catch (e) {
         console.warn(`Error loading image ${url}`, e);
       }
     }));
-
   } catch (error) {
     console.error('Error loading facilities:', error);
   }
 };
 
-// Функции для модального окна (аналогично оптимизированы)
-const openMapModal = () => {
-  isMapModalOpen.value = true;
-  setTimeout(initModalMap, 300);
+// Показ popup
+const showPopup = (feature, targetMap) => {
+  const { geometry, properties } = feature;
+  const { name, address, url, image } = properties;
+
+  const popupHTML = `
+    <div class="popup-card">
+      ${image ? `<img src="${image}" alt="${name}" class="popup-card-image" style="max-width: 180px; max-height: 200px; object-fit: contain;" />` : ''}
+      <div class="popup-card-body">
+        <h3 class="popup-card-title">${name || 'Без названия'}</h3>
+        ${address ? `<p class="popup-card-address">${address}</p>` : ''}
+        ${url ? `<a href="${url}" class="popup-card-link" target="_blank">Подробнее</a>` : ''}
+      </div>
+    </div>
+  `;
+  new maplibregl.Popup({
+    closeOnClick: true,
+    className: 'custom-popup',
+    maxWidth: '300px'
+  })
+    .setLngLat(geometry.coordinates)
+    .setHTML(popupHTML)
+    .addTo(targetMap);
 };
 
-const initModalMap = () => {
-  const modalMap = new maplibregl.Map({
-    container: 'map-modal',
-    style: 'http://localhost:8100/styles/basic-preview2/style.json',
-    center: map.getCenter(),
-    zoom: map.getZoom()
+// Инициализация основной карты
+onMounted(async () => {
+  map = new maplibregl.Map({
+    container: 'map',
+    style: map_style,
+    center: [34.09847, 44.94249],
+    zoom: 13
   });
 
-  modalMap.on('load', async () => {
-    const markerSourceData = map.getSource('markers')?._data || geojson;
-
-    modalMap.addSource('markers', {
+  map.on('load', async () => {
+    map.addSource('markers', {
       type: 'geojson',
-      data: markerSourceData,
+      data: geojson,
       cluster: true,
       clusterMaxZoom: 11,
       clusterRadius: 30
     });
 
-    modalMap.addLayer({
+    map.addLayer({
       id: 'clusters',
       type: 'circle',
       source: 'markers',
       filter: ['has', 'point_count'],
       paint: {
-        'circle-color': ['step', ['get', 'point_count'], '#51bbd6', 10, '#f1f075', 750, '#f28cb1'],
-        'circle-radius': ['step', ['get', 'point_count'], 15, 100, 20, 750, 25]
+        'circle-color': [
+          'step',
+          ['get', 'point_count'],
+          '#51bbd6',
+          10,
+          '#f1f075',
+          750,
+          '#f28cb1'
+        ],
+        'circle-radius': [
+          'step',
+          ['get', 'point_count'],
+          35,
+          100,
+          20,
+          250,
+          25
+        ]
       }
     });
 
-    modalMap.addLayer({
+    map.addLayer({
       id: 'cluster-count',
       type: 'symbol',
       source: 'markers',
@@ -336,56 +240,99 @@ const initModalMap = () => {
       }
     });
 
-    const features = markerSourceData?.features || [];
-    const uniqueImages = [...new Set(features
-      .filter(f => f.properties.markerImage)
-      .map(f => f.properties.markerImage))];
+    map.addSource(routeSourceId, {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] }
+    });
 
-    await Promise.all(uniqueImages.map(async url => {
-      try {
-        if (!modalMap.hasImage(url)) {
-          const optimizedUrl = await loadOptimizedImage(url, 100);
-          if (optimizedUrl) {
-            const img = new Image();
-            img.src = optimizedUrl;
-            await img.decode();
-            modalMap.addImage(url, img);
-          }
-        }
-      } catch (e) {
-        console.warn(`Ошибка загрузки изображения ${url}`, e);
-      }
-    }));
-
-    modalMap.addLayer({
-      id: 'unclustered-point',
-      type: 'symbol',
-      source: 'markers',
-      filter: ['!', ['has', 'point_count']],
-      layout: {
-        'icon-image': ['coalesce', ['get', 'markerImage'], 'default-marker'],
-        'icon-size': 0.7,
-        'icon-allow-overlap': true,
-        'icon-anchor': 'bottom',
-        'icon-padding': 10
-      },
+    map.addLayer({
+      id: 'route-line',
+      type: 'line',
+      source: routeSourceId,
       paint: {
-        'icon-opacity': 1
+        'line-color': '#3b9ddd',
+        'line-width': 4
       }
     });
 
-    modalMap.on('click', 'unclustered-point', (e) => {
-      if (e.features?.[0]) showModalPopup(e.features[0], modalMap);
+    await loadFacilities(map);
+
+    map.on('click', 'unclustered-point', (e) => {
+      if (!e.features?.[0]) return;
+      showPopup(e.features[0], map);
+    });
+
+    map.on('mouseenter', ['clusters', 'unclustered-point'], () => {
+      map.getCanvas().style.cursor = 'pointer';
+    });
+
+    map.on('mouseleave', ['clusters', 'unclustered-point'], () => {
+      map.getCanvas().style.cursor = '';
+    });
+  });
+
+  map.on('moveend', () => loadFacilities(map));
+  map.on('error', console.error);
+});
+
+// Открытие модального окна
+const openMapModal = () => {
+  isMapModalOpen.value = true;
+  setTimeout(() => initModalMap(), 300);
+};
+
+// Инициализация модальной карты
+const initModalMap = () => {
+  modalMap.value = new maplibregl.Map({
+    container: 'map-modal',
+    style: map_style,
+    center: map.getCenter(),
+    zoom: map.getZoom()
+  });
+
+  modalMap.value.on('load', async () => {
+    modalMap.value.addSource('markers', {
+      type: 'geojson',
+      data: geojson,
+      cluster: true,
+      clusterMaxZoom: 11,
+      clusterRadius: 30
+    });
+
+    modalMap.value.addLayer({
+      id: 'clusters',
+      type: 'circle',
+      source: 'markers',
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': ['step', ['get', 'point_count'], '#51bbd6', 10, '#f1f075', 750, '#f28cb1'],
+        'circle-radius': ['step', ['get', 'point_count'], 15, 100, 20, 750, 25]
+      }
+    });
+
+    modalMap.value.addLayer({
+      id: 'cluster-count',
+      type: 'symbol',
+      source: 'markers',
+      filter: ['has', 'point_count'],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
+        'text-size': 10
+      },
+      paint: {
+        'text-color': '#ffffff'
+      }
     });
 
     const routeData = map.getSource(routeSourceId)?._data;
     if (routeData) {
-      modalMap.addSource(routeSourceId, {
+      modalMap.value.addSource(routeSourceId, {
         type: 'geojson',
         data: routeData
       });
 
-      modalMap.addLayer({
+      modalMap.value.addLayer({
         id: 'route-line',
         type: 'line',
         source: routeSourceId,
@@ -395,38 +342,23 @@ const initModalMap = () => {
         }
       });
     }
+
+    await loadFacilities(modalMap.value);
+
+    modalMap.value.on('click', 'unclustered-point', (e) => {
+      if (e.features?.[0]) showPopup(e.features[0], modalMap.value);
+    });
+
+    modalMap.value.on('mouseenter', ['clusters', 'unclustered-point'], () => {
+      modalMap.value.getCanvas().style.cursor = 'pointer';
+    });
+
+    modalMap.value.on('mouseleave', ['clusters', 'unclustered-point'], () => {
+      modalMap.value.getCanvas().style.cursor = '';
+    });
   });
-};
 
-const showModalPopup = (feature, modalMap) => {
-  const { geometry, properties } = feature;
-  const { name, address, url, image } = properties;
-
-  const popupHTML = `
-    <div class="popup-card">
-      <img 
-        src="${image || '/placeholder.jpg'}" 
-        alt="${name || 'Без названия'}" 
-        class="popup-card-image" 
-        style="max-width: 180px; max-height: 200px; object-fit: contain;" 
-      />
-      <div class="popup-card-body">
-        <h3 class="popup-card-title">${name || 'Без названия'}</h3>
-        <p class="popup-card-address">${address || 'Адрес не указан'}</p>
-        <a href="${url || '#'}" class="popup-card-link" target="_blank">
-        </a>
-      </div>
-    </div>
-  `;
-
-  new maplibregl.Popup({
-    closeOnClick: true,
-    className: 'custom-popup',
-    maxWidth: '300px'
-  })
-    .setLngLat(geometry.coordinates)
-    .setHTML(popupHTML)
-    .addTo(modalMap);
+  modalMap.value.on('moveend', () => loadFacilities(modalMap.value));
 };
 
 // Управление картой
@@ -440,7 +372,7 @@ const toggleMap = () => {
     isMapExpanded.value = false;
   }
   mapHeight.value = isMapExpanded.value ? 600 : 400;
-  
+
   if (isMapVisible.value && map) {
     setTimeout(() => map.resize(), 0);
   }
@@ -482,9 +414,9 @@ async function RouteMaker(points) {
 function getRoute(coords) {
   let strCoord = "";
   for (let i = 0; i < coords.length; i++) {
-    strCoord += `${i===0?"":';'}${coords[i].location.lng},${coords[i].location.lat}`;
+    strCoord += `${i===0?"":";"}${coords[i].location.lng},${coords[i].location.lat}`;
   }
-  
+
   const url = `https://router.project-osrm.org/route/v1/driving/${strCoord}?overview=full&geometries=geojson`;
 
   fetch(url)
@@ -496,6 +428,12 @@ function getRoute(coords) {
           type: 'Feature',
           geometry: route
         });
+        if (modalMap.value && modalMap.value.getSource(routeSourceId)) {
+          modalMap.value.getSource(routeSourceId).setData({
+            type: 'Feature',
+            geometry: route
+          });
+        }
       }
     })
     .catch(err => console.error('Ошибка маршрута:', err));
@@ -506,9 +444,7 @@ defineExpose({
 });
 </script>
 
-
 <style scoped>
-
 #map {
   position: relative;
 }
@@ -550,7 +486,6 @@ defineExpose({
   font-weight: 500;
   border: none;
   cursor: pointer;
-  
 }
 
 .map-button img {
@@ -612,7 +547,6 @@ defineExpose({
   opacity: 0;
 }
 
-
 :deep(.custom-popup) {
   width: 200px !important;
   height: 200px !important;
@@ -626,7 +560,6 @@ defineExpose({
 :deep(.popup-container) {
   width: 80%;
   height: 80%;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -714,8 +647,8 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
+
 @media (max-width: 912px) {
   .map-container {
     position: relative;
@@ -726,8 +659,8 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
+
 @media (max-width: 853px) {
   .map-container {
     position: relative;
@@ -738,7 +671,6 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
 
 @media (max-width: 820px) {
@@ -751,7 +683,6 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
 
 @media (max-width: 768px) {
@@ -764,8 +695,8 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
+
 @media (max-width: 540px) {
   .map-container {
     position: relative;
@@ -776,9 +707,7 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
-
 
 @media (max-width: 430px) {
   .map-container {
@@ -790,7 +719,6 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
 
 @media (max-width: 414px) {
@@ -803,8 +731,8 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
+
 @media (max-width: 412px) {
   .map-container {
     position: relative;
@@ -815,8 +743,8 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
+
 @media (max-width: 390px) {
   .map-container {
     position: relative;
@@ -827,9 +755,7 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
-
 
 @media (max-width: 375px) {
   .map-container {
@@ -841,7 +767,6 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
 
 @media (max-width: 360px) {
@@ -854,7 +779,6 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
 
 @media (max-width: 344px) {
@@ -867,8 +791,5 @@ defineExpose({
     overflow: hidden;
     transition: height 0.3s ease;
   }
-
 }
-
-
 </style>
