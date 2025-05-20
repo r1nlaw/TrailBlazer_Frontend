@@ -82,84 +82,28 @@
 
 <script setup>
 import { ref, computed, inject, onMounted, onBeforeUnmount } from 'vue';
-import MapComponent from './Map.vue'
+
+// Состояния
 const selectedPlaces = ref([]);
 const places = ref([]);
+const currentPage = ref(1);
+const isLoading = ref(false);
+const noMoreData = ref(false);
+
 const mapRef = inject('mapRef');
 const isCartVisible = ref(false);
 const isMobile = ref(false);
 
-const checkScreenSize = () => {
-  isMobile.value = window.innerWidth <= 375 || window.innerWidth <= 344 || window.innerWidth <= 1100 || window.innerWidth <= 853 || window.innerWidth <= 900  || window.innerWidth <= 1060 || window.innerWidth <= 1150 || window.innerWidth <= 414 || window.innerWidth <= 390 || window.innerWidth <= 540 || window.innerWidth <= 912 || window.innerWidth <= 1024 || window.innerWidth <= 820 || window.innerWidth <= 768 || window.innerWidth <= 360 || window.innerWidth <= 412 || window.innerWidth <= 430;
-  if (!isMobile.value) {
-    isCartVisible.value = true;
-  } else {
-    isCartVisible.value = false;
-  }
-};
+let scrollContainer = null;
 
-onMounted(() => {
-  checkScreenSize();
-  window.addEventListener('resize', checkScreenSize);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', checkScreenSize);
-});
-
-function toggleCart() {
-  isCartVisible.value = !isCartVisible.value;
-}
-
-loadLandmark();
-function toggleSelection(id) {
-  const index = selectedPlaces.value.indexOf(id)
-  if (index === -1) {
-    selectedPlaces.value.push(id)
-  } else {
-    selectedPlaces.value.splice(index, 1)
-  }
-}
-const selectedPlaceObjects = computed(() =>
-  places.value.filter(place => selectedPlaces.value.includes(place.id))
-);
-function handleSelection() {
-  try {
-    if (mapRef.value && mapRef.value.RouteMaker) {
-      mapRef.value.RouteMaker(selectedPlaces.value);
-      console.log('Выбранные ID:', selectedPlaces.value);
-    } else {
-      console.error('Map component or RouteMaker not available');
-    }
-  } catch (error) {
-    console.error('Error in handleSelection:', error);
-  }
-}
-
-
-import infoIcon from '@/assets/icons/info.png'
-import starIcon from '@/assets/icons/star.png'
-import reviewIcon from '@/assets/icons/review.png'
-
-const news = [
-  {
-    id: 1,
-    title: 'Власти планируют масштабную реконструкцию<br />Генуэзской крепости в Судаке',
-    content: `
-      <p>Судак, 11 мая — Власти Республики Крым объявили о начале подготовки к масштабной реконструкции
-    `,
-  },
-]
-
+// Загрузка данных по страницам
 async function loadLandmark() {
-  const params = new URLSearchParams(window.location.search);
-  let page = params.get('page');
-  if (page === null) {
-    page = "1";
-  }
+  if (isLoading.value || noMoreData.value) return;
+
+  isLoading.value = true;
 
   const domain = import.meta.env.VITE_BACKEND_URL;
-  const url = `${domain}/api/landmark?page=${page}`;
+  const url = `${domain}/api/landmark?page=${currentPage.value}`;
 
   try {
     const response = await fetch(url, {
@@ -167,26 +111,111 @@ async function loadLandmark() {
       headers: { 'Content-Type': 'application/json' }
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
     const landmarks = await response.json();
-    if (landmarks && landmarks.length > 0) {
-      landmarks.forEach(element => {
-        places.value.push({
-          id: element.id,
-          title: element.name,
-          location: element.address,
-          image: `${domain}/images/${element.image_path}`
-        });
-      });
+
+    if (!landmarks || landmarks.length === 0) {
+      noMoreData.value = true;
+      return;
     }
+
+    landmarks.forEach(element => {
+      places.value.push({
+        id: element.id,
+        title: element.name,
+        location: element.address,
+        time: element.time ?? '',
+        price: element.price ?? '',
+        rating: element.rating ?? '',
+        reviews: element.reviews ?? '',
+        image: `${domain}/images/${element.image_path}`
+      });
+    });
+
+    currentPage.value++;
   } catch (error) {
-    console.log("Ошибка при загрузке достопримечательностей:", error);
+    console.error("Ошибка при загрузке достопримечательностей:", error);
+  } finally {
+    isLoading.value = false;
   }
 }
+
+// Обработчик скролла по контейнеру .main-layout
+function handleScroll() {
+  if (!scrollContainer) return;
+
+  const scrollTop = scrollContainer.scrollTop;
+  const scrollHeight = scrollContainer.scrollHeight;
+  const clientHeight = scrollContainer.clientHeight;
+
+  const buffer = 200; // px до конца контейнера для срабатывания
+
+  if (scrollTop + clientHeight + buffer >= scrollHeight) {
+    loadLandmark();
+  }
+}
+
+// Адаптация под мобильные устройства и отображение корзины
+function checkScreenSize() {
+  isMobile.value = window.innerWidth <= 1100;
+  isCartVisible.value = !isMobile.value;
+}
+
+function toggleCart() {
+  isCartVisible.value = !isCartVisible.value;
+}
+
+function toggleSelection(id) {
+  const index = selectedPlaces.value.indexOf(id);
+  if (index === -1) {
+    selectedPlaces.value.push(id);
+  } else {
+    selectedPlaces.value.splice(index, 1);
+  }
+}
+
+const selectedPlaceObjects = computed(() =>
+  places.value.filter(place => selectedPlaces.value.includes(place.id))
+);
+
+function handleSelection() {
+  if (mapRef.value && mapRef.value.RouteMaker) {
+    mapRef.value.RouteMaker(selectedPlaces.value);
+    console.log('Выбранные ID:', selectedPlaces.value);
+  } else {
+    console.error('Map component or RouteMaker not available');
+  }
+}
+
+// Иконки
+import infoIcon from '@/assets/icons/info.png'
+import starIcon from '@/assets/icons/star.png'
+import reviewIcon from '@/assets/icons/review.png'
+
+// Жизненный цикл компонента
+onMounted(() => {
+  checkScreenSize();
+  window.addEventListener('resize', checkScreenSize);
+
+  scrollContainer = document.querySelector('.main-layout');
+  if (scrollContainer) {
+    scrollContainer.addEventListener('scroll', handleScroll);
+  }
+
+  loadLandmark();
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', checkScreenSize);
+
+  if (scrollContainer) {
+    scrollContainer.removeEventListener('scroll', handleScroll);
+  }
+});
 </script>
+
+
 
 <style scoped>
 @keyframes fadeInUp {
