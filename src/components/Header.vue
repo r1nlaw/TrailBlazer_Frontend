@@ -45,7 +45,7 @@
               >
                 <div class="result-item">
                   <img
-                    :src="'http://localhost:8080/images/' + landmark.image_path"
+                    :src="`${import.meta.env.VITE_BACKEND_URL}/images/` + landmark.image_path"
                     alt="Landmark"
                     class="result-image"
                     @error="handleImageError"
@@ -125,7 +125,7 @@ const searchBarRef = ref(null)
 const searchQuery = ref('')
 const searchResults = ref([])
 const showSearchResults = ref(false)
-const domain = "http://localhost:8080"
+const domain = `${import.meta.env.VITE_BACKEND_URL}`
 
 function toggleDropdown() {
   showDropdown.value = !showDropdown.value
