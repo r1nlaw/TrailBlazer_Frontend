@@ -45,7 +45,7 @@
               >
                 <div class="result-item">
                   <img
-                    :src="`${import.meta.env.VITE_BACKEND_URL}/images/` + landmark.image_path"
+                    :src="`${domain}/images/` + landmark.image_path"
                     alt="Landmark"
                     class="result-image"
                     @error="handleImageError"
