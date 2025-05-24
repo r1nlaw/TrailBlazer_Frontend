@@ -42,8 +42,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
+import { useHead } from '@vueuse/head'
 
 const route = useRoute()
 const domain = `${import.meta.env.VITE_BACKEND_URL}`
@@ -83,6 +84,27 @@ function formatDate(date) {
 function handleImageError(event) {
   event.target.src = '/placeholder-image.png'
 }
+
+watchEffect(() => {
+  if (!loading.value && landmark.value?.name) {
+    const name = landmark.value.name
+    const address = landmark.value.address
+
+    useHead({
+      title: `${name} — достопримечательность Крыма`,
+      meta: [
+        {
+          name: 'description',
+          content: `${name} в Крыму по адресу ${address}. История, факты и фотографии.`,
+        },
+        {
+          name: 'keywords',
+          content: `${name},${address},Крым,Путевод,туризм,интересные места Крым,куда сходить в Крыму,достопримечательности`,
+        },
+      ],
+    })
+  }
+})
 
 onMounted(fetchLandmark)
 watch(() => route.params.name, fetchLandmark)
