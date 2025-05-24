@@ -1,4 +1,5 @@
 <template>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <div class="app-container">
     <Header />
     <div class="main-content">
@@ -7,6 +8,7 @@
       <RegisterModal ref="registerModal" @register="handleRegister" />
     </div>
   </div>
+
 </template>
 
 <script setup>

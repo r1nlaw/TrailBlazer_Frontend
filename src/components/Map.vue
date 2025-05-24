@@ -1,7 +1,7 @@
 <template>
   <div class="map-container" :style="{ height: mapHeight + 'px' }">
     <img v-if="!isMapVisible" src="@/assets/images/map_placeholder.png" alt="Карта" class="map-image" :class="{ blurred: isMapModalOpen }" />
-    <div v-show="isMapVisible" id="map" style="height: 100%; width: 100%; z-index: 0;"></div>
+    <div v-show="isMapVisible" id="map" style="z-index: 0;"></div>
     <button class="map-button" @click="toggleMap">
       <img src="@/assets/icons/map-pin.png" alt="Pin" />
       {{ isMapExpanded ? 'Уменьшить карту' : isMapVisible ? 'Увеличить карту' : 'Раскрыть карту' }}
@@ -36,6 +36,9 @@ const modalMap = ref(null); // Храним модальную карту
 const markers = ref({});
 const isRouting = ref(false);
 const selectedRoutePoints = ref([]);
+import { nextTick } from 'vue';
+
+
 
 const loadOptimizedImage = async (url, targetWidth) => {
   return new Promise((resolve) => {
@@ -423,6 +426,7 @@ defineExpose({
 // Управление картой
 const toggleMap = () => {
   if (!isMapVisible.value) {
+    
     isMapVisible.value = true;
     isMapExpanded.value = false;
   } else if (!isMapExpanded.value) {
@@ -523,8 +527,17 @@ function getRoute(coords) {
 </script>
 
 <style scoped>
+html, body, #app {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 #map {
-  position: relative;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 .blurred {
   filter: blur(8px);
@@ -533,10 +546,11 @@ function getRoute(coords) {
 
 .map-container {
   position: relative;
-  width: 100%;
+  width: 1520px;
   margin-top: 0;
   min-height: 300px;
   border-radius: 24px;
+  transition: none;
   overflow: hidden;
   transition: height 0.3s ease;
 }
@@ -706,422 +720,80 @@ function getRoute(coords) {
   text-align: center;
   color: #666;
 }
-@media (max-width: 1700px) {
-  .map-container {
-    position: relative;
-    width: 100%;
-    margin-top: -30px;
-    min-height: 400px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+@media (max-width: 3840px) {
+    .map-container {
+    width: 2000px;
   }
 }
-
-@media (max-width: 1150px) {
-  .map-container {
-    position: relative;
-    width: 99%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+@media (max-width: 2560px) {
+    .map-container {
+    width: 1520px;
   }
 }
-@media (max-width: 1060px) {
-  .map-container {
-    position: relative;
-    width: 96%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+@media (max-width: 1366px) {
+    .map-container {
+    width: 1080px;
   }
 }
-@media (max-width: 1042px) {
-  .map-container {
-    position: relative;
-    width: 93%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-@media (max-width: 1030px) {
-  .map-container {
-    position: relative;
-    width: 90%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-
-@media (max-width: 1026px) {
-  .map-container {
-    position: relative;
-    width: 93%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-
 
 @media (max-width: 1024px) {
-  .map-container {
-    position: relative;
-    width: 99%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+    .map-container {
+    width: 1000px;
   }
 }
-@media (max-width: 1020px) {
-  .map-container {
-    position: relative;
-    width: 98%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-@media (max-width: 1000px) {
-  .map-container {
-    position: relative;
-    width: 95%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-@media (max-width: 980px) {
-  .map-container {
-    position: relative;
-    width: 95%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-@media (max-width: 950px) {
-  .map-container {
-    position: relative;
-    width: 91%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-
 @media (max-width: 912px) {
-  .map-container {
-    position: relative;
-    width: 87%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+    .map-container {
+    width: 900px;
   }
 }
-@media (max-width: 900px) {
-  .map-container {
-    position: relative;
-    width: 86%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-@media (max-width: 870px) {
-  .map-container {
-    position: relative;
-    width: 83%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-
-@media (max-width: 860px) {
-  .map-container {
-    position: relative;
-    width: 83%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-
-
-
 @media (max-width: 853px) {
-  .map-container {
-    position: relative;
-    width: 82%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+    .map-container {
+    width: 830px;
   }
 }
-
 @media (max-width: 820px) {
-  .map-container {
-    position: relative;
-    width: 79%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+    .map-container {
+    width: 785px;
   }
 }
-@media (max-width: 810px) {
-  .map-container {
-    position: relative;
-    width: 77%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-
-
 @media (max-width: 768px) {
-  .map-container {
-    position: relative;
-    width: 73%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+    .map-container {
+    width: 710px;
   }
 }
-@media (max-width: 750px) {
-  .map-container {
-    position: relative;
-    width: 71%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-
-@media (max-width: 700px) {
-  .map-container {
-    position: relative;
-    width: 67%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-@media (max-width: 650px) {
-  .map-container {
-    position: relative;
-    width: 61%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-@media (max-width: 600px) {
-  .map-container {
-    position: relative;
-    width: 57%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-@media (max-width: 560px) {
-  .map-container {
-    position: relative;
-    width: 53%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-
 @media (max-width: 540px) {
-  .map-container {
-    position: relative;
-    width: 51%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+    .map-container {
+    width: 500px;
   }
 }
-@media (max-width: 514px) {
-  .map-container {
-    position: relative;
-    width: 48%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-@media (max-width: 464px) {
-  .map-container {
-    position: relative;
-    width: 43%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-@media (max-width: 444px) {
-  .map-container {
-    position: relative;
-    width: 41%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-
 @media (max-width: 430px) {
-  .map-container {
-    position: relative;
-    width: 35%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+    .map-container {
+    width: 380px;
   }
 }
-@media (max-width: 425px) {
-  .map-container {
-    position: relative;
-    width: 39%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
-
-
 @media (max-width: 414px) {
-  .map-container {
-    position: relative;
-    width: 38%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+    .map-container {
+    width: 370px;
   }
 }
-
 @media (max-width: 412px) {
-  .map-container {
-    position: relative;
-    width: 35%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+    .map-container {
+    width: 365px;
   }
 }
-
 @media (max-width: 390px) {
-  .map-container {
-    position: relative;
-    width: 35%;
-    margin-top: -30px;
-    min-height: 300px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+    .map-container {
+    width: 340px;
   }
 }
 
 @media (max-width: 375px) {
-  .map-container {
-    position: relative;
-    width: 29%;
-    margin-top: -10px;
-    min-height: 200px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
+    .map-container {
+    width: 325px;
   }
 }
 
-@media (max-width: 360px) {
-  .map-container {
-    position: relative;
-    width: 27%;
-    margin-top: -30px;
-    min-height: 200px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
 
-@media (max-width: 344px) {
-  .map-container {
-    position: relative;
-    width: 25%;
-    margin-top: -30px;
-    min-height: 200px;
-    border-radius: 24px;
-    overflow: hidden;
-    transition: height 0.3s ease;
-  }
-}
+
+
 </style>

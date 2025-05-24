@@ -1,4 +1,5 @@
 <template>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <transition name="fade-slide">
     <header v-if="visible" class="header">
       <!-- Левая часть -->
@@ -10,18 +11,20 @@
       </div>
 
       <!-- Центр: навигация и поиск -->
-      <div class="center hide-on-mobile">
+      <div class="center ">
         <div class="nav-icons">
-          <div class="icon-button active">
-            <img :src="homeIcon" alt="Home" class="icon-img" />
+          <div class="icon-button active hide-on-mobile">
+            <router-link to="/" class="logo" style="text-decoration: none;">
+              <img :src="homeIcon" alt="Home" class="icon-img" />
+            </router-link>
           </div>
-          <div class="icon-button">
+          <div class="icon-button hide-on-mobile">
             <img :src="fireIcon" alt="Fire" class="icon-img" />
           </div>
-          <div class="icon-button">
+          <div class="icon-button hide-on-mobile">
             <img :src="chatIcon" alt="Chat" class="icon-img" />
           </div>
-          <div class="icon-button badge-button">
+          <div class="icon-button badge-button hide-on-mobile">
             <img :src="calendarIcon" alt="Calendar" class="icon-img" />
             <span class="badge">NEW</span>
           </div>
@@ -74,9 +77,6 @@
           </div>
         </div>
 
-        <div class="history">
-          <img :src="historyIcon" class="icon-circle" />
-        </div>
 
         <router-link to="/profile" class="avatar">
           <img :src="avatarImage" class="avatar" />
@@ -485,447 +485,95 @@ onUnmounted(() => {
   opacity: 0;
   transform: translateY(-10px);
 }
-@media (max-width: 1978px) {
-  
+
+.hide-on-mobile {
+  display: flex;
 }
 
+.show-on-mobile {
+  display: none;
+}
+@media (max-width: 1366px) {
+  .header-right{
+   margin-right: 60px;
+  }
+}
 
-@media (max-width: 768px) {
-  .weather{
-    margin-right: 50%;
-  }
-  .hide-on-mobile{
-    display: none;
-  }
+@media (max-width: 860px) {
   .header {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 10px;
-    width: 100%;
-    padding: 8px 0px;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: none;
-    background: #fff;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 8px;
-    z-index: 1000;
-  }
-  .dropdown-menu {
-    top: auto;
-    bottom: 42px; 
-    right: 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+    margin-right: 10px;
   }
 
-  .header-left,
-  .center,
-  .header-right {
-    justify-content: center;
+  .logo-text {
+    font-size: 20px;
   }
-  .logo{
-    max-height: 28px;
+  .hide-on-mobile {
+    display: none !important;
   }
-
-  .center {
-    flex-wrap: wrap;
+   .header-right {
     gap: 12px;
   }
+   .icon-circle {
+    width: 32px;
+    height: 32px;
+    padding: 3px;
+  }
 
-  .search-bar {
-    display: none; /* Убрать поиск для компактности */
+  .logo-icon {
+    width: 28px;
+    height: 28px;
   }
-}
-@media (max-width: 540px) {
-  .weather{
-    order: -1;
-    margin-right: auto;
+
+  .hide-on-mobile {
+    display: none !important;
   }
-  .hide-on-mobile{
-    display: none;
+
+  .search-results {
+    width: 90vw;
+    left: 5%;
+    transform: none;
   }
-  .header {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 10px;
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+
+  .show-on-mobile {
+    display: flex !important;
+    flex-direction: column;
     width: 100%;
-    padding: 8px 0px;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: none;
-    background: #fff;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 8px;
-    z-index: 1000;
-  }
-  .dropdown-menu {
-    top: auto;
-    bottom: 42px; 
-    right: 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
-  }
-
-  .header-left,
-  .center,
-  .header-right {
-    justify-content: center;
-  }
-  .logo{
-    max-height: 28px;
-  }
-
-  .center {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .search-bar {
-    display: none; /* Убрать поиск для компактности */
   }
 }
+@media (max-width: 548px) {
+  .search-bar {
+    position: absolute; /* убираем из потока */
+    top: 70px; /* ниже header */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    min-width: 100px;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    z-index: 1000; /* поверх других элементов */
+    background-color: white; /* если фон прозрачный — будет перекрытие */
+    border-radius: 50px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
 
-@media (max-width: 430px) {
-  .weather{
-    order: -1;
-    margin-right: auto;
-  }
-  .hide-on-mobile{
-    display: none;
-  }
-  .header {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 10px;
+  .search-bar input {
     width: 100%;
-    padding: 8px 0px;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: none;
-    background: #fff;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 8px;
-    z-index: 1000;
-  }
-  .dropdown-menu {
-    top: auto;
-    bottom: 42px; 
-    right: 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+    min-width: 150px;
+    padding: 10px 14px;
+    font-size: 16px;
+    border-radius: 50px;
   }
 
-  .header-left,
-  .center,
-  .header-right {
-    justify-content: center;
-  }
-  .logo{
-    max-height: 28px;
-  }
 
-  .center {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .search-bar {
-    display: none; /* Убрать поиск для компактности */
-  }
-}
-@media (max-width: 414px) {
-  .weather{
-    order: -1;
-    margin-right: auto;
-  }
-  .hide-on-mobile{
-    display: none;
-  }
-  .header {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 10px;
-    width: 100%;
-    padding: 8px 0px;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: none;
-    background: #fff;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 8px;
-    z-index: 1000;
-  }
-  .dropdown-menu {
-    top: auto;
-    bottom: 42px; 
-    right: 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
-  }
-
-  .header-left,
-  .center,
-  .header-right {
-    justify-content: center;
-  }
-  .logo{
-    max-height: 28px;
-  }
-
-  .center {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .search-bar {
-    display: none; /* Убрать поиск для компактности */
-  }
-}
-@media (max-width: 412px) {
-  .weather{
-    order: -1;
-    margin-right: auto;
-  }
-  .hide-on-mobile{
-    display: none;
-  }
-  .header {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 10px;
-    width: 100%;
-    padding: 8px 0px;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: none;
-    background: #fff;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 8px;
-    z-index: 1000;
-  }
-  .dropdown-menu {
-    top: auto;
-    bottom: 42px; 
-    right: 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
-  }
-
-  .header-left,
-  .center,
-  .header-right {
-    justify-content: center;
-  }
-  .logo{
-    max-height: 28px;
-  }
-
-  .center {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .search-bar {
-    display: none; /* Убрать поиск для компактности */
-  }
 }
 
-@media (max-width: 390px) {
-  .weather{
-    order: -1;
-    margin-right: auto;
-  }
-  .hide-on-mobile{
-    display: none;
-  }
-  .header {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 10px;
-    width: 100%;
-    padding: 8px 0px;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: none;
-    background: #fff;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 8px;
-    z-index: 1000;
-  }
-  .dropdown-menu {
-    top: auto;
-    bottom: 42px; 
-    right: 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
-  }
 
-  .header-left,
-  .center,
-  .header-right {
-    justify-content: center;
-  }
-  .logo{
-    max-height: 28px;
-  }
-
-  .center {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .search-bar {
-    display: none; /* Убрать поиск для компактности */
-  }
-}
-
-@media (max-width: 375px) {
-  .weather{
-    order: -1;
-    margin-right: auto;
-  }
-  .hide-on-mobile{
-    display: none;
-  }
-  .header {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 10px;
-    width: 100%;
-    padding: 8px 0px;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: none;
-    background: #fff;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 8px;
-    z-index: 1000;
-  }
-  .dropdown-menu {
-    top: auto;
-    bottom: 42px; 
-    right: 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
-  }
-
-  .header-left,
-  .center,
-  .header-right {
-    justify-content: center;
-  }
-  .logo{
-    max-height: 28px;
-  }
-
-  .center {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .search-bar {
-    display: none; /* Убрать поиск для компактности */
-  }
-}
-
-@media (max-width: 360px) {
-  .weather{
-    order: -1;
-    margin-right: auto;
-  }
-  .hide-on-mobile{
-    display: none;
-  }
-  .header {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 10px;
-    width: 100%;
-    padding: 8px 0px;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: none;
-    background: #fff;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 8px;
-    z-index: 1000;
-  }
-  .dropdown-menu {
-    top: auto;
-    bottom: 42px; 
-    right: 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
-  }
-
-  .header-left,
-  .center,
-  .header-right {
-    justify-content: center;
-  }
-  .logo{
-    max-height: 28px;
-  }
-
-  .center {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .search-bar {
-    display: none; /* Убрать поиск для компактности */
-  }
-}
-
-@media (max-width: 344px) {
-  .weather{
-    order: -1;
-    margin-right: auto;
-  }
-  .hide-on-mobile{
-    display: none;
-  }
-  .header {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 10px;
-    width: 100%;
-    padding: 8px 0px;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: none;
-    background: #fff;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 8px;
-    z-index: 1000;
-  }
-  .dropdown-menu {
-    top: auto;
-    bottom: 42px; 
-    right: 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
-  }
-
-  .header-left,
-  .center,
-  .header-right {
-    justify-content: center;
-  }
-  .logo{
-    max-height: 28px;
-  }
-
-  .center {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .search-bar {
-    display: none; /* Убрать поиск для компактности */
-  }
-}
 
 
 

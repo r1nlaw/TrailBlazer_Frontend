@@ -4,53 +4,55 @@
   </button>
   <transition name="fade-slide">
     <aside :class="['sidebar', { open: visible }]">
-      <div class="region">
-        <img :src="russiaFlag" alt="Флаг" class="flag" />
-        <span>Республика Крым</span>
-      </div>
+      <div class="sidebar-content">
+          <div class="region">
+          <img :src="russiaFlag" alt="Флаг" class="flag" />
+          <span>Республика Крым</span>
+        </div>
 
-      <h2>Маршруты</h2>
-      <div class="routes">
-        <div
-          v-for="(route, index) in routes"
-          :key="index"
-          :class="['route-circle', { active: activeRoute === index }]"
-          @click="activeRoute = index"
-        >
-          <img :src="route" alt="Маршрут" />
+        <h2>Маршруты</h2>
+        <div class="routes">
+          <div
+            v-for="(route, index) in routes"
+            :key="index"
+            :class="['route-circle', { active: activeRoute === index }]"
+            @click="activeRoute = index"
+          >
+            <img :src="route" alt="Маршрут" />
+          </div>
         </div>
-      </div>
 
-      <h2>Фильтры</h2>
-      <div class="filters">
-        <div class="filter-row">
-          <div class="filter-item filter-gray">
-            <img :src="zamkiIcon" class="filter-icon" />
-            <span>Замки</span>
+        <h2>Фильтры</h2>
+        <div class="filters">
+          <div class="filter-row">
+            <div class="filter-item filter-gray">
+              <img :src="zamkiIcon" class="filter-icon" />
+              <span>Замки</span>
+            </div>
+            <div class="filter-item filter-green">
+              <img :src="religionIcon" class="filter-icon" />
+              <span>Религиозное</span>
+            </div>
           </div>
-          <div class="filter-item filter-green">
-            <img :src="religionIcon" class="filter-icon" />
-            <span>Религиозное</span>
+          <div class="filter-row">
+            <div class="filter-item filter-blue">
+              <img :src="museumIcon" class="filter-icon" />
+              <span>Музеи</span>
+            </div>
+            <div class="filter-item filter-gray">
+              <img :src="cryptIcon" class="filter-icon" />
+              <span>Склепы</span>
+            </div>
           </div>
-        </div>
-        <div class="filter-row">
-          <div class="filter-item filter-blue">
-            <img :src="museumIcon" class="filter-icon" />
-            <span>Музеи</span>
-          </div>
-          <div class="filter-item filter-gray">
-            <img :src="cryptIcon" class="filter-icon" />
-            <span>Склепы</span>
-          </div>
-        </div>
-        <div class="filter-row">
-          <div class="filter-item filter-pink">
-            <img :src="zooIcon" class="filter-icon" />
-            <span>Зоопарк</span>
-          </div>
-          <div class="filter-item filter-green">
-            <img :src="parkIcon" class="filter-icon" />
-            <span>Парки</span>
+          <div class="filter-row">
+            <div class="filter-item filter-pink">
+              <img :src="zooIcon" class="filter-icon" />
+              <span>Зоопарк</span>
+            </div>
+            <div class="filter-item filter-green">
+              <img :src="parkIcon" class="filter-icon" />
+              <span>Парки</span>
+            </div>
           </div>
         </div>
       </div>
@@ -79,26 +81,24 @@ const activeRoute = ref(0)
 const routes = [route1, route2, route3, route4, route5]
 
 const visible = ref(false)
-onMounted(() => {
-  setTimeout(() => {
-    visible.value = true
-  }, 100) 
-})
+
 </script>
 
 <style scoped>
 .sidebar {
   position: fixed;
-  top: 9%; 
+  top: 90px;
   left: 0;
-  height: calc(100vh - 70px); 
-  overflow-y: auto; 
-  padding: 24px;
   width: 250px;
+  height: 100vh; 
+  min-height: 100vh;
+  overflow-y: auto;
+  padding: 24px;
   font-family: 'Montserrat', sans-serif;
-  background: white;  
-  z-index: 1000; 
-
+  background: white;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
 }
 
 
@@ -226,314 +226,170 @@ onMounted(() => {
   transform: scale(0.95);
 
 }
-@media (max-width: 1500px) {
-  .sidebar {
-    position: fixed;
-    top: 9%; 
-    left: 0;
-    height: calc(100vh - 70px); 
-    overflow-y: auto; 
-    padding: 24px;
-    width: 246px;
-    font-family: 'Montserrat', sans-serif;
-    background: white;  
-    z-index: 1000; 
-  }
-}
-
-
-@media (max-width: 1280px) {
-  .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 380px;
-    left: -590px;
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
-  }
-
-  .sidebar.open {
-    left: 0;
-  }
-
-  .sidebar-toggle {
-    display: flex;
-  }
-}
 
 
 
 @media (max-width: 1024px) {
   .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 380px;
-    left: -590px;
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
+    width: 420px; 
+    transform: translateX(-100%); 
+    transition: transform 0.3s ease-in-out;
+    margin-top:-0.3vh;
   }
 
   .sidebar.open {
-    left: 0;
+    transform: translateX(0);
   }
 
   .sidebar-toggle {
-    display: flex;
+    margin-top: 80px;
+    display: flex; 
   }
-}
+  .sidebar-content{
+    margin-top: 10%;
 
-@media (max-width: 912px) {
+  }
+
+}
+@media (max-width: 1024px) {
   .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 380px;
-    left: -590px;
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
+    width: 420px; 
+    transform: translateX(-100%); 
+    transition: transform 0.3s ease-in-out;
+    top: 89px;
   }
 
   .sidebar.open {
-    left: 0;
+    transform: translateX(0);
   }
 
   .sidebar-toggle {
-    display: flex;
+    margin-top: 80px;
+    display: flex; 
+  }
+  .sidebar-content{
+    margin-top: 10%;
+
   }
 }
+
 @media (max-width: 853px) {
   .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 380px;
-    left: -590px;
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
+    width: 420px; 
+    transform: translateX(-100%); 
+    transition: transform 0.3s ease-in-out;
+    top: 88px;
   }
 
   .sidebar.open {
-    left: 0;
+    transform: translateX(0);
   }
 
   .sidebar-toggle {
-    display: flex;
+    margin-top: 80px;
+    display: flex; 
   }
+  .sidebar-content{
+    margin-top: 10%;
+
+  }
+
 }
 @media (max-width: 820px) {
   .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 380px;
-    left: -590px;
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
+    width: 420px; 
+    transform: translateX(-100%); 
+    transition: transform 0.3s ease-in-out;
+    top: 89px;
   }
 
   .sidebar.open {
-    left: 0;
+    transform: translateX(0);
   }
 
   .sidebar-toggle {
-    display: flex;
+    margin-top: 80px;
+    display: flex; 
   }
+  .sidebar-content{
+    margin-top: 10%;
+
+  }
+
 }
-@media (max-width: 768px) {
+@media (max-width: 548px) {
   .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 380px;
-    left: -590px;
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
+    width: 420px; 
+    transform: translateX(-100%); 
+    transition: transform 0.3s ease-in-out;
+    top: 72px;
   }
 
   .sidebar.open {
-    left: 0;
+    transform: translateX(0);
   }
 
   .sidebar-toggle {
-    display: flex;
+    margin-top: 80px;
+    display: flex; 
   }
+  .sidebar-content{
+    margin-top: 10%;
+
+  }
+
 }
-@media (max-width: 540px) {
+
+@media (max-width: 440px) {
   .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 580px;
-    left: -690px;
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+        top: 75px;
   }
 
   .sidebar.open {
-    left: 0;
+    transform: translateX(0);
   }
 
   .sidebar-toggle {
-    display: flex;
+    margin-top: 100px;
+    display: flex; 
   }
 }
-
-
-@media (max-width: 430px) {
-  .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 380px;
-    left: -590px;
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
-  }
-
-  .sidebar.open {
-    left: 0;
-  }
-
-  .sidebar-toggle {
-    display: flex;
-  }
-}
-@media (max-width: 414px) {
-  .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 370px;
-    left: -490px;
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
-  }
-
-  .sidebar.open {
-    left: 0;
-  }
-
-  .sidebar-toggle {
-    display: flex;
-  }
-}
-
 @media (max-width: 412px) {
   .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 370px;
-    left: -490px;
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    top: 70px;
   }
 
   .sidebar.open {
-    left: 0;
+    transform: translateX(0);
   }
 
   .sidebar-toggle {
-    display: flex;
+    margin-top: 100px;
+    display: flex; 
   }
 }
-
-@media (max-width: 390px) {
-  .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 370px;
-    left: -490px;
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
-  }
-
-  .sidebar.open {
-    left: 0;
-  }
-
-  .sidebar-toggle {
-    display: flex;
-  }
-}
-@media (max-width: 390px) {
-  .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 320px;
-    left: -380px; /* скрыт по умолчанию */
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
-  }
-
-  .sidebar.open {
-    left: 0;
-  }
-
-  .sidebar-toggle {
-    display: flex;
-  }
-}
-
-
 
 @media (max-width: 375px) {
   .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 320px;
-    left: -380px; /* скрыт по умолчанию */
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    top: 70px;
   }
 
   .sidebar.open {
-    left: 0;
+    transform: translateX(0);
   }
 
   .sidebar-toggle {
-    display: flex;
+    margin-top: 100px;
+    display: flex; 
   }
 }
 
-@media (max-width: 360px) {
-  .sidebar {
-    top: 0;
-    height: 100vh;
-    width: 320px;
-    left: -380px;
-    transition: left 0.3s ease;
-  }
-  .region{
-    margin-top: 20%;
-  }
-
-  .sidebar.open {
-    left: 0;
-  }
-
-  .sidebar-toggle {
-    display: flex;
-  }
-}
 
 
 
