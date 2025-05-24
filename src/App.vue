@@ -28,8 +28,20 @@ const isLandmarkPage = computed(() => /^\/landmark\/[^/]+$/.test(route.path))
 
 function handleRegister(userData) {
   console.log('Зарегистрирован пользователь:', userData)
-  // Здесь можно добавить API-запрос
+
 }
+
+import { useHead } from '@vueuse/head'
+
+useHead({
+  title: 'Путевод',
+  meta: [
+    {
+      name: 'description',
+      content: 'Планируй маршруты по Крыму, открывай памятники, достопримечательности и красивые места полуострова.'
+    }
+  ]
+})
 </script>
 
 <style scoped>
