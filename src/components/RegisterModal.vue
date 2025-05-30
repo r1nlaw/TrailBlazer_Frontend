@@ -24,11 +24,29 @@
           <input id="email" v-model="email" type="email" required />
         </div>
 
-        <div class="form-group">
-          <label for="password">Пароль</label>
-          <input id="password" v-model="password" type="password" />
+        <div class="form-group password-group">
+        <label for="password">Пароль</label>
+        <div class="password-wrapper">
+          <input
+            id="password"
+            v-model="password"
+            :type="showPassword ? 'text' : 'password'"
+            required
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            @click="togglePassword"
+            :aria-label="showPassword ? 'Скрыть пароль' : 'Показать пароль'"
+          >
+            <img
+              :src="showPassword ? eyeOffIcon : eyeIcon"
+              alt="toggle password visibility"
+              class="toggle-icon"
+            />
+          </button>
         </div>
-
+      </div>
         <div class="modal-actions">
           <button type="submit" class="primary-btn">
             {{ isRegistering ? 'Зарегистрироваться' : 'Войти' }}
@@ -50,6 +68,8 @@
 
 <script setup>
 import { ref, defineExpose } from 'vue'
+import eyeIcon from '@/assets/icons/eye.png'
+import eyeOffIcon from '@/assets/icons/eye-off.png'
 
 const isOpen = ref(false)
 const isRegistering = ref(false)
@@ -58,8 +78,14 @@ const name = ref('')
 const email = ref('')
 const password = ref('')
 
+const showPassword = ref(false)
+
 const errorModal = ref(false)
 const errorMessage = ref('')
+
+function togglePassword() {
+  showPassword.value = !showPassword.value
+}
 
 function open() {
   isOpen.value = true
@@ -72,6 +98,7 @@ function close() {
   name.value = ''
   email.value = ''
   password.value = ''
+  showPassword.value = false 
 }
 
 function toggleMode() {
@@ -296,7 +323,31 @@ input:focus {
   margin-bottom: 1.5rem;
 }
 
+.password-group {
+  position: relative;
+}
 
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-icon {
+  width: 20px;
+  height: 20px;
+}
 /* Animations */
 @keyframes fadeIn {
   from {
