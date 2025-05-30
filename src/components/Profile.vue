@@ -45,7 +45,7 @@
 <script setup>
 import { reactive, ref, onMounted, computed } from 'vue'
 import avatarImage from '@/assets/images/user_avatar.png'
-
+let username = localStorage.getItem("username") 
 const visible = ref(false)
 
 onMounted(() => {
@@ -53,10 +53,9 @@ onMounted(() => {
     visible.value = true
   })
 })
-
 const profile = reactive({
   photo: avatarImage,
-  name: 'Иван Иванов',
+  name: username,
   bio: 'Люблю путешествовать и открывать новые маршруты!',
   rating: 4.7,
   routes: [

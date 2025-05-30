@@ -130,9 +130,18 @@ async function handleSubmit() {
       showError(`Ошибка: ${message}`)
       return
     }
+    if (isRegistering.value==true){
+      isRegistering.value = false;
+      handleSubmit()
 
+    }
     const data = await response.json()
+    if (data.user!=null){
+      localStorage.setItem("username",data.user.username);
+    }
     console.log('Успешно:', data)
+    window.location.reload();
+
     close()
   } catch (error) {
     console.error('Ошибка при отправке запроса:', error)
