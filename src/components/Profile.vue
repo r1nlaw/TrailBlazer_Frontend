@@ -88,11 +88,13 @@ const edited = reactive({
   name: profile.name,
   bio: profile.bio,
 })
+const domain = `${import.meta.env.VITE_BACKEND_URL}`
 
 onMounted(async () => {
+
   try {
     const token = localStorage.getItem("token")
-    const response = await fetch(`http://localhost:8080/user/profile`, {
+    const response = await fetch(`${domain}/user/profile`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -143,7 +145,7 @@ async function toggleEdit() {
         avatar: avatarData,
       }
 
-      const response = await fetch('http://localhost:8080/user/changeProfile', {
+      const response = await fetch(`${domain}/user/changeProfile`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
