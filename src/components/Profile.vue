@@ -3,10 +3,21 @@
     <section v-if="visible" class="profile-section">
       <!-- Header -->
       <header class="profile-header">
-        <img :src="profile.photo" alt="Фото профиля" class="avatar" />
+        <img
+          :src="getAvatarSrc"
+          alt="Фото профиля"
+          class="avatar"
+        />
         <div class="info">
-          <h2 class="name">{{ profile.name }}</h2>
-          <p class="bio">{{ profile.bio }}</p>
+          <template v-if="isEditing">
+            <input v-model="edited.name" placeholder="Введите имя" class="edit-input" />
+            <textarea v-model="edited.bio" placeholder="Введите био" class="edit-textarea"></textarea>
+            <input type="file" @change="onFileChange" class="file-input" />
+          </template>
+          <template v-else>
+            <h2 class="name">{{ profile.name }}</h2>
+            <p class="bio">{{ profile.bio }}</p>
+          </template>
 
           <div class="stars">
             <span
@@ -21,8 +32,8 @@
           </div>
         </div>
 
-        <button class="edit-button" @click="editProfile">
-          ✏️ Редактировать
+        <button class="edit-button" @click="toggleEdit">
+          {{ isEditing ? '💾 Сохранить' : '✏️ Редактировать' }}
         </button>
       </header>
 
@@ -45,16 +56,14 @@
 <script setup>
 import { reactive, ref, onMounted, computed } from 'vue'
 import avatarImage from '@/assets/images/user_avatar.png'
-let username = localStorage.getItem("username") 
-const visible = ref(false)
 
-onMounted(() => {
-  requestAnimationFrame(() => {
-    visible.value = true
-  })
-})
+
+const visible = ref(false)
+const isEditing = ref(false)
+const username = localStorage.getItem("username")
+
 const profile = reactive({
-  photo: avatarImage,
+  photo: '', // будет base64-строка (без data:image/...),
   name: username,
   bio: 'Люблю путешествовать и открывать новые маршруты!',
   rating: 4.7,
@@ -65,12 +74,84 @@ const profile = reactive({
   ],
 })
 
+const edited = reactive({
+  photo: '',
+  name: profile.name,
+  bio: profile.bio,
+})
+
+onMounted(() => {
+  // Пример установки начального аватара (по желанию)
+  profile.photo = '' // base64 без префикса или пусто
+  visible.value = true
+})
+
 const filledStars = computed(() => Math.round(profile.rating))
 
-function editProfile() {
-  alert('Переход к редактированию профиля')
+const getAvatarSrc = computed(() => {
+  const base64 = edited.photo || profile.photo
+  return base64 ? `data:image/jpeg;base64,${base64}` : avatarImage
+})
+
+async function toggleEdit() {
+  if (isEditing.value) {
+    try {
+      const token = localStorage.getItem("token")
+
+      let avatarData = null
+      if (edited.photo) {
+        avatarData = edited.photo
+      }
+
+      const payload = {
+        username: edited.name,
+        user_bio: edited.bio,
+        avatar: avatarData,
+      }
+
+      const response = await fetch('http://localhost:8080/user/changeProfile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`Ошибка при сохранении профиля: ${errorText}`)
+      }
+
+      // Обновление данных
+      profile.name = edited.name
+      profile.bio = edited.bio
+      if (edited.photo) profile.photo = edited.photo
+
+    } catch (err) {
+      console.error(err)
+      alert(err.message)
+    }
+  } else {
+    edited.name = profile.name
+    edited.bio = profile.bio
+    edited.photo = profile.photo
+  }
+
+  isEditing.value = !isEditing.value
 }
 
+function onFileChange(e) {
+  const file = e.target.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1]
+      edited.photo = base64
+    }
+    reader.readAsDataURL(file)
+  }
+}
 </script>
 
 <style scoped>
@@ -205,4 +286,18 @@ function editProfile() {
   opacity: 1;
   transform: translateY(0);
 }
+.edit-input, .edit-textarea {
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  padding: 0.5rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+.file-input {
+  margin-top: 0.5rem;
+}
+
 </style>

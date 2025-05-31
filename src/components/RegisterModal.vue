@@ -166,7 +166,9 @@ async function handleSubmit() {
     if (data.user!=null){
       localStorage.setItem("username",data.user.username);
     }
-    console.log('Успешно:', data)
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+    }
     window.location.reload();
 
     close()
