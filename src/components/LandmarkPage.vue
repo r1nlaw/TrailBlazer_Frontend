@@ -22,7 +22,8 @@
             <p><strong>📖 История:</strong> {{ landmark.history }}</p>
           </div>
         </div>
-        <div class="landmark-section">
+
+        <div v-if="landmark.schedules && landmark.schedules.length" class="landmark-section">
           <h3>🕒 Расписание</h3>
           <ul>
             <li v-for="schedule in landmark.schedules" :key="schedule.start">
@@ -31,7 +32,7 @@
           </ul>
         </div>
 
-        <div class="landmark-section">
+        <div v-if="landmark.prices && landmark.prices.length" class="landmark-section">
           <h3>💰 Цены</h3>
           <ul>
             <li v-for="price in landmark.prices" :key="price.description">
