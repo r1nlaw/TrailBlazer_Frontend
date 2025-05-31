@@ -560,6 +560,61 @@ html, body, #app {
   transition: filter 0.3s ease;
 }
 
+:deep(.popup-card) {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  width: 280px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:deep(.popup-card-image) {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-bottom: 1px solid #eee;
+}
+
+:deep(.popup-card-body) {
+  padding: 12px 16px;
+}
+
+:deep(.popup-card-title) {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 0;
+  color: #333;
+}
+
+:deep(.popup-card-address) {
+  margin: 6px 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+:deep(.popup-card-link) {
+  background-color: #125341;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+:deep(.popup-card-link:hover) {
+  background-color: #0d3c2f;
+}
+
+:deep(.maplibregl-popup-content){
+
+  min-width: 270px;
+  background-color: RGBA(0,0,0,0);
+}
+
+
 .map-container {
   position: relative;
   width: 1520px;
@@ -613,6 +668,7 @@ html, body, #app {
   transition: opacity 0.3s ease;
 }
 
+
 .modal-content {
   background: white;
   border-radius: 8px;
@@ -664,12 +720,18 @@ html, body, #app {
   justify-content: center;
 }
 
-:deep(.popup-image) {
-  width: 100%;
-  height: 100%;
+:deep(.popup-card-image) {
+  min-width: 100%;
+  height: auto; 
   object-fit: cover;
-  border-radius: 4px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  display: block;
 }
+
+
 
 :deep(.popup-text) {
   width: 100%;

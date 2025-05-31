@@ -453,7 +453,7 @@ onUnmounted(() => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
-  z-index: 10;
+  z-index: 1000;
 }
 
 .dropdown-menu ul {
@@ -560,6 +560,9 @@ onUnmounted(() => {
     background-color: white; /* если фон прозрачный — будет перекрытие */
     border-radius: 50px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  .search-results{
+    transform: translateX(-7%);
   }
 
   .search-bar input {

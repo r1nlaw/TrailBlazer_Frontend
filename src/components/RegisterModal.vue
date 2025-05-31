@@ -183,6 +183,9 @@ defineExpose({ open, close })
 
 
 <style scoped>
+input{
+  max-width: 475px;
+}
 .modal-overlay {
   position: fixed;
   inset: 0;

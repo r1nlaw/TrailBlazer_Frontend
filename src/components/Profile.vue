@@ -1,18 +1,28 @@
 <template>
   <transition name="fade-slide">
     <section v-if="visible" class="profile-section">
-      <!-- Header -->
       <header class="profile-header">
+        <label v-if="isEditing" class="avatar-label" title="Нажмите, чтобы изменить аватар">
+          <img
+            :src="getAvatarSrc"
+            alt="Фото профиля"
+            class="avatar"
+          />
+          <input type="file" @change="onFileChange" class="file-input" />
+        </label>
         <img
+          v-else
           :src="getAvatarSrc"
           alt="Фото профиля"
           class="avatar"
+          :class="{ 'avatar-editing': isEditing }"
         />
+
         <div class="info">
           <template v-if="isEditing">
             <input v-model="edited.name" placeholder="Введите имя" class="edit-input" />
             <textarea v-model="edited.bio" placeholder="Введите био" class="edit-textarea"></textarea>
-            <input type="file" @change="onFileChange" class="file-input" />
+            <!-- Кнопка выбора файла убрана, теперь через клик по аватару -->
           </template>
           <template v-else>
             <h2 class="name">{{ profile.name }}</h2>
@@ -57,13 +67,12 @@
 import { reactive, ref, onMounted, computed } from 'vue'
 import avatarImage from '@/assets/images/user_avatar.png'
 
-
 const visible = ref(false)
 const isEditing = ref(false)
 const username = localStorage.getItem("username")
 
 const profile = reactive({
-  photo: '', // будет base64-строка (без data:image/...),
+  photo: '', // base64-строка
   name: username,
   bio: 'Люблю путешествовать и открывать новые маршруты!',
   rating: 4.7,
@@ -181,6 +190,10 @@ function onFileChange(e) {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
 
+.avatar-editing {
+  cursor: pointer; 
+}
+
 .profile-section {
   max-width: 780px;
   margin: 3.5rem auto 0;
@@ -195,6 +208,31 @@ function onFileChange(e) {
   margin-bottom: 2rem;
   flex-wrap: wrap;
   justify-content: space-between;
+}
+
+.avatar-label {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+}
+
+.avatar-label .avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 6px 18px rgba(39, 158, 58, 0.35);
+  border: 3px solid #ffffff;
+  display: block;
+}
+
+.file-input {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
 }
 
 .avatar {
@@ -310,6 +348,7 @@ function onFileChange(e) {
   opacity: 1;
   transform: translateY(0);
 }
+
 .edit-input, .edit-textarea {
   width: 100%;
   font-family: 'Montserrat', sans-serif;
@@ -319,9 +358,4 @@ function onFileChange(e) {
   border: 1px solid #cbd5e1;
   border-radius: 8px;
 }
-
-.file-input {
-  margin-top: 0.5rem;
-}
-
 </style>
