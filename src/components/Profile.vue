@@ -99,7 +99,7 @@ onMounted(async () => {
 
     profile.name = data.username
     profile.bio = data.user_bio
-    profile.photo = data.avatar // строка base64 без префикса
+    profile.photo = data.avatar 
     profile.rating = data.rating || 4.7
     profile.routes = data.routes || []
 

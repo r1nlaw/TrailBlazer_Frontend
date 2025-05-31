@@ -36,9 +36,8 @@ const modalMap = ref(null); // Храним модальную карту
 const markers = ref({});
 const isRouting = ref(false);
 const selectedRoutePoints = ref([]);
-import { nextTick } from 'vue';
-
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const loadOptimizedImage = async (url, targetWidth) => {
   return new Promise((resolve) => {
@@ -67,7 +66,6 @@ const loadOptimizedImage = async (url, targetWidth) => {
   });
 };
 
-// Оптимизированная загрузка данных для карты
 const loadFacilities = async (targetMap, selectedIds = selectedRoutePoints.value) => {
   if (!targetMap || !targetMap.getSource) {
     console.error('Invalid map instance');
@@ -93,7 +91,6 @@ const loadFacilities = async (targetMap, selectedIds = selectedRoutePoints.value
     const facilities = await response.json();
     if (!facilities?.length) return;
 
-    // Подготовка данных с учетом выбранных точек
     const newFeatures = await Promise.all(facilities.map(async facility => {
       const isSelected = selectedIds.includes(facility.id);
       const imageUrl = facility.image_path
@@ -105,11 +102,11 @@ const loadFacilities = async (targetMap, selectedIds = selectedRoutePoints.value
         properties: {
           id: facility.id,
           name: facility.name,
+          translated_name: facility.translated_name,
           address: facility.address,
           url: facility.url || '',
           image: imageUrl,
           markerImage: imageUrl,
-          // Добавляем свойство для фильтрации
           isSelected: isSelected
         },
         geometry: {
@@ -124,17 +121,14 @@ const loadFacilities = async (targetMap, selectedIds = selectedRoutePoints.value
 
     source.setData({ type: 'FeatureCollection', features: newFeatures });
 
-    // Удаляем старый слой, если он существует
     if (targetMap.getLayer('unclustered-point')) {
       targetMap.removeLayer('unclustered-point');
     }
 
-    // Добавляем новый слой с фильтром по выбранным точкам
     targetMap.addLayer({
       id: 'unclustered-point',
       type: 'symbol',
       source: 'markers',
-      // Показываем только выбранные точки или все, если маршрут не построен
       filter: selectedIds.length > 0 
         ? ['all', ['!', ['has', 'point_count']], ['==', ['get', 'isSelected'], true]]
         : ['!', ['has', 'point_count']],
@@ -150,7 +144,6 @@ const loadFacilities = async (targetMap, selectedIds = selectedRoutePoints.value
       }
     });
 
-    // Загрузка изображений (как в оригинале)
     const uniqueImages = [...new Set(newFeatures
       .filter(f => f.properties.markerImage)
       .map(f => f.properties.markerImage))];
@@ -178,21 +171,18 @@ const loadFacilities = async (targetMap, selectedIds = selectedRoutePoints.value
 
 const hideAllPoints = () => {
   if (map) {
-    // Удаляем все маркеры с карты
     Object.values(markers.value).forEach(marker => {
       if (marker && map.hasLayer(marker)) {
         map.removeLayer(marker);
       }
     });
-    // Очищаем хранилище
     markers.value = {};
   }
 };
 
-// Показ popup
 const showPopup = (feature, targetMap) => {
   const { geometry, properties } = feature;
-  const { name, address, url, image } = properties;
+  const { name, translated_name, image, address } = properties;
 
   const popupHTML = `
     <div class="popup-card">
@@ -200,21 +190,39 @@ const showPopup = (feature, targetMap) => {
       <div class="popup-card-body">
         <h3 class="popup-card-title">${name || 'Без названия'}</h3>
         ${address ? `<p class="popup-card-address">${address}</p>` : ''}
-        ${url ? `<a href="${url}" class="popup-card-link" target="_blank">Подробнее</a>` : ''}
+        <div style="margin-top: 10px; text-align: right;">
+          <button class="popup-card-link" data-name="${translated_name || name}">Подробнее</button>
+        </div>
       </div>
     </div>
   `;
-  new maplibregl.Popup({
-    closeOnClick: true,
-    className: 'custom-popup',
-    maxWidth: '300px'
-  })
+
+  const popup = new maplibregl.Popup({ closeOnClick: true, className: 'custom-popup', maxWidth: '300px' })
     .setLngLat(geometry.coordinates)
     .setHTML(popupHTML)
     .addTo(targetMap);
+
+  setTimeout(() => {
+    const button = document.querySelector('.popup-card-link');
+    if (button) {
+      button.addEventListener('click', () => {
+        const name = button.getAttribute('data-name');
+        if (name) {
+          router.push(`/landmark/${encodeURIComponent(name)}`);
+          popup.remove();
+          if (targetMap === modalMap.value) {
+            isMapModalOpen.value = false;
+          }
+        }
+      });
+    }
+  }, 0);
 };
 
-// Инициализация основной карты
+function goToLandmark(nameTranslate) {
+  router.push(`/landmark/${encodeURIComponent(nameTranslate)}`);
+}
+
 onMounted(async () => {
   map = new maplibregl.Map({
     container: 'map',
@@ -274,6 +282,24 @@ onMounted(async () => {
       }
     });
 
+    map.on('click', 'clusters', (e) => {
+      const features = map.queryRenderedFeatures(e.point, {
+        layers: ['clusters']
+      });
+      const clusterId = features[0].properties.cluster_id;
+      map.getSource('markers').getClusterExpansionZoom(
+        clusterId,
+        (err, zoom) => {
+          if (err) return;
+
+          map.easeTo({
+            center: features[0].geometry.coordinates,
+            zoom: zoom
+          });
+        }
+      );
+    });
+
     map.addSource(routeSourceId, {
       type: 'geojson',
       data: { type: 'FeatureCollection', features: [] }
@@ -306,21 +332,17 @@ onMounted(async () => {
   });
 
   map.on('moveend', () => {
-    // Если есть построенный маршрут, не подгружаем новые точки
     if (selectedRoutePoints.value.length > 0) return;
-    
     loadFacilities(map);
   });
   map.on('error', console.error);
 });
 
-// Открытие модального окна
 const openMapModal = () => {
   isMapModalOpen.value = true;
   setTimeout(() => initModalMap(), 300);
 };
 
-// Инициализация модальной карты
 const initModalMap = () => {
   modalMap.value = new maplibregl.Map({
     container: 'map-modal',
@@ -412,10 +434,9 @@ function resetRoute() {
       geometry: { type: 'LineString', coordinates: [] }
     });
   }
-  loadFacilities(map); // Перезагружаем все точки
+  loadFacilities(map);
 }
 
-// Добавляем в defineExpose
 defineExpose({
   RouteMaker,
   hideAllPoints,
@@ -423,7 +444,6 @@ defineExpose({
   resetRoute
 });
 
-// Управление картой
 const toggleMap = () => {
   if (!isMapVisible.value) {
     
@@ -441,7 +461,6 @@ const toggleMap = () => {
   }
 };
 
-// Функции для работы с маршрутами
 async function getLandmarksByIDs(points) {
   const url = `${domain}/api/getLandmarks`;
   try {
@@ -471,7 +490,6 @@ async function RouteMaker(points) {
       });
     }
     
-    // Загружаем точки с учетом выбранных
     await loadFacilities(map, points);
     const landmarks = await getLandmarksByIDs(points);
     if (landmarks) await getRoute(landmarks);
@@ -523,9 +541,7 @@ function getRoute(coords) {
     }
   });
 }
-
 </script>
-
 <style scoped>
 html, body, #app {
   width: 100%;
@@ -585,8 +601,6 @@ html, body, #app {
   height: 16px;
 }
 
-
-
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -621,6 +635,7 @@ html, body, #app {
   color: #333;
   z-index: 1001;
 }
+
 
 .modal-fade-enter-active,
 .modal-fade-leave-active {
@@ -720,6 +735,7 @@ html, body, #app {
   text-align: center;
   color: #666;
 }
+
 @media (max-width: 3840px) {
     .map-container {
     width: 2000px;

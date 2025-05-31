@@ -13,7 +13,13 @@
         <div class="place-content">
           <div class="title-row">
             <h3 class="place-title">{{ place.title }}</h3>
-            <img :src="infoIcon" alt="info" class="icon info-icon" />
+            <img
+              :src="infoIcon"
+              alt="info"
+              class="icon info-icon"
+              @click.stop="goToLandmark(place.translated_name)"
+            />
+
           </div>
           <p class="location">{{ place.location }}</p>
           <p class="time">{{ place.time }}</p>
@@ -84,6 +90,8 @@
 </template>
 <script setup>
 import { ref, computed, inject, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 // Состояния
 const selectedPlaces = ref([]);
@@ -127,6 +135,7 @@ async function loadLandmark() {
         id: element.id,
         title: element.name,
         location: element.address,
+        translated_name: element.translated_name, 
         time: element.time ?? '',
         price: element.price ?? '',
         rating: element.rating ?? '',
@@ -142,6 +151,13 @@ async function loadLandmark() {
     isLoading.value = false;
   }
 }
+
+
+
+function goToLandmark(nameTranslate) {
+  router.push(`/landmark/${encodeURIComponent(nameTranslate)}`);
+}
+
 
 // Обработчик скролла по контейнеру .main-layout
 function handleScroll() {
