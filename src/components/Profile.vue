@@ -33,7 +33,7 @@
         </div>
 
         <button class="edit-button" @click="toggleEdit">
-          {{ isEditing ? '💾 Сохранить' : '✏️ Редактировать' }}
+          {{ isEditing ? ' Сохранить' : ' Редактировать' }}
         </button>
       </header>
 
@@ -80,9 +80,34 @@ const edited = reactive({
   bio: profile.bio,
 })
 
-onMounted(() => {
-  // Пример установки начального аватара (по желанию)
-  profile.photo = '' // base64 без префикса или пусто
+onMounted(async () => {
+  try {
+    const token = localStorage.getItem("token")
+    const response = await fetch(`http://localhost:8080/user/profile`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Ошибка загрузки профиля: ${errorText}`)
+    }
+
+    const data = await response.json()
+
+    profile.name = data.username
+    profile.bio = data.user_bio
+    profile.photo = data.avatar // строка base64 без префикса
+    profile.rating = data.rating || 4.7
+    profile.routes = data.routes || []
+
+  } catch (err) {
+    console.error(err)
+    alert('Не удалось загрузить профиль: ' + err.message)
+  }
+
   visible.value = true
 })
 
@@ -123,7 +148,6 @@ async function toggleEdit() {
         throw new Error(`Ошибка при сохранении профиля: ${errorText}`)
       }
 
-      // Обновление данных
       profile.name = edited.name
       profile.bio = edited.bio
       if (edited.photo) profile.photo = edited.photo
