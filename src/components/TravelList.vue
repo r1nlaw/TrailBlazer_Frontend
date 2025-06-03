@@ -2,6 +2,7 @@
   <div class="travel-list-wrapper">
     <!-- Левая колонка: все места -->
     <div class="places">
+      
       <div
         v-for="(place, index) in allDisplayedPlaces"
         :key="place.id"
@@ -98,7 +99,7 @@ const places = ref([]);
 const currentPage = ref(1);
 const isLoading = ref(false);
 const noMoreData = ref(false);
-
+const filteredPlaces = ref([]);
 const mapRef = inject('mapRef');
 const isCartVisible = ref(true);
 const isMobileView = ref(false);
@@ -112,7 +113,6 @@ const props = defineProps({
   }
 });
 
-const filteredPlaces = ref([]);
 
 // Новая функция для построения URL с категориями в query
 function buildUrlWithCategories(baseUrl, categories) {
@@ -131,22 +131,22 @@ watch(() => props.selectedCategories, async (newVal) => {
   noMoreData.value = false;
 
   if (newVal.length > 0) {
-    await loadFilteredPlaces(newVal); // Дождись полной загрузки отфильтрованных
+    await loadFilteredPlaces(newVal); 
     setTimeout(() => {
-      loadLandmark(); // Подгрузи остальные через небольшой интервал
-    }, 100); // Можно даже 200 мс
+      loadLandmark(); 
+    }, 200); 
   } else {
-    loadLandmark(); // Если фильтры пустые — просто загрузи всё
+    loadLandmark(); 
   }
 }, { immediate: true });
 
 
 
 
-async function loadFilteredPlaces(categories) {
-  const domain = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+async function loadFilteredPlaces(category) {
+  const domain = import.meta.env.VITE_BACKEND_URL;
   const baseUrl = `${domain}/api/landmarks/filtersCategories`;
-  const url = buildUrlWithCategories(baseUrl, categories);
+  const url = buildUrlWithCategories(baseUrl, category);
 
   try {
     const response = await fetch(url, {
@@ -159,19 +159,21 @@ async function loadFilteredPlaces(categories) {
     const data = await response.json();
 
     filteredPlaces.value = data.map(element => ({
-      id: element.id,
-      title: element.name,
-      location: element.address,
-      translated_name: element.translated_name,
-      categories: element.categories ?? '',
-      time: element.time ?? '',
-      price: element.price ?? '',
-      rating: element.rating ?? '',
-      reviews: element.reviews ?? '',
-      image: `${domain}/images/${element.image_path}`
+        id: element.id,
+        title: element.name,
+        location: element.address,
+        category: element.category,
+        translated_name: element.translated_name,
+        time: element.time ?? '',
+        price: element.price ?? '',
+        rating: element.rating ?? '',
+        reviews: element.reviews ?? '',
+        image: `${domain}/images/${element.image_path}`
     }));
 
     console.log('filteredPlaces updated:', filteredPlaces.value);
+
+
 
   } catch (error) {
     console.error('Ошибка при загрузке фильтрованных достопримечательностей:', error);
@@ -179,26 +181,18 @@ async function loadFilteredPlaces(categories) {
   }
 }
 
+//const allDisplayedPlaces = computed(() => filteredPlaces.value);
+
 
 const allDisplayedPlaces = computed(() => {
-  const filteredIds = new Set(filteredPlaces.value.map(p => p.id));
-  const all = [...filteredPlaces.value, ...places.value];
+  const filteredIds = new Set(filteredPlaces.value.map(place => place.id));
+  const remainingPlaces = places.value.filter(place => !filteredIds.has(place.id));
+  console.log("filteredPlaces.value", filteredPlaces.value);
+  console.log("filteredIds", filteredIds);
 
-  // Удалить дубликаты по id
-  const unique = new Map();
-  for (const place of all) {
-    if (!unique.has(place.id)) {
-      unique.set(place.id, place);
-    }
-  }
-
-  // Сортировать: сначала те, что были в filteredIds
-  return Array.from(unique.values()).sort((a, b) => {
-    const aFiltered = filteredIds.has(a.id) ? 0 : 1;
-    const bFiltered = filteredIds.has(b.id) ? 0 : 1;
-    return aFiltered - bFiltered;
-  });
+  return [...filteredPlaces.value, ...remainingPlaces];
 });
+
 
 
 
@@ -207,7 +201,7 @@ async function loadLandmark() {
 
   isLoading.value = true;
 
-  const domain = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+  const domain = import.meta.env.VITE_BACKEND_URL;
   const url = `${domain}/api/landmark?page=${currentPage.value}`;
 
   try {
@@ -228,12 +222,13 @@ async function loadLandmark() {
     const filteredIds = new Set(filteredPlaces.value.map(p => p.id));
 
     const newPlaces = landmarks
-      .filter(element => !filteredIds.has(element.id)) // Исключаем уже отфильтрованные
+      .filter(element => !filteredIds.has(element.id)) 
       .map(element => ({
         id: element.id,
         title: element.name,
         location: element.address,
         translated_name: element.translated_name,
+        category: element.category,
         time: element.time ?? '',
         price: element.price ?? '',
         rating: element.rating ?? '',
@@ -241,7 +236,7 @@ async function loadLandmark() {
         image: `${domain}/images/${element.image_path}`
       }));
 
-    // Добавляем в конец `places`
+    
     places.value.push(...newPlaces);
 
     currentPage.value++;
