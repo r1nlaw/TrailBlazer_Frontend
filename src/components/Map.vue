@@ -6,7 +6,10 @@
       <img src="@/assets/icons/map-pin.png" alt="Pin" />
       {{ isMapExpanded ? 'Уменьшить карту' : isMapVisible ? 'Увеличить карту' : 'Раскрыть карту' }}
     </button>
-
+    <!-- <button class="geo-button" @click="requestGeolocation"> -->
+      <!-- <img src="@/assets/icons/geolocation.png" alt="Geo" /> -->
+      <!-- Найти меня -->
+    <!-- </button> -->
     <transition name="modal-fade">
       <div v-if="isMapModalOpen" class="modal-overlay" @click.self="isMapModalOpen = false">
         <div class="modal-content">
@@ -65,6 +68,71 @@ const loadOptimizedImage = async (url, targetWidth) => {
     img.src = url;
   });
 };
+
+
+const requestGeolocation = async () => {
+  if (!navigator.geolocation) {
+    console.error('Геолокация не поддерживается браузером');
+    return;
+  }
+
+  try {
+    const position = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      });
+    });
+
+    const userCoords = [position.coords.longitude, position.coords.latitude];
+    map.easeTo({ center: userCoords, zoom: 14 });
+
+    // Загружаем объекты и находим ближайший
+    const facilities = await loadFacilities(map);
+    if (!facilities.length) {
+      console.warn('Объекты не найдены');
+      return;
+    }
+
+    let closestFacility = null;
+    let minDistance = Infinity;
+    facilities.forEach(facility => {
+      const facilityCoords = [facility.location.lng, facility.location.lat];
+      const distance = turf.distance(userCoords, facilityCoords, { units: 'kilometers' });
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestFacility = facility;
+      }
+    });
+
+    if (closestFacility) {
+      // Добавляем маркер для позиции пользователя
+      new maplibregl.Marker({ color: '#FF0000' })
+        .setLngLat(userCoords)
+        .addTo(map);
+
+      // Вызываем RouteMaker для построения маршрута к ближайшему объекту
+      await RouteMaker([closestFacility.id]);
+      
+      // Центрируем карту по маршруту
+      const bounds = new maplibregl.LngLatBounds();
+      bounds.extend(userCoords);
+      bounds.extend([closestFacility.location.lng, closestFacility.location.lat]);
+      map.fitBounds(bounds, { padding: 100, duration: 1500 });
+
+      // Если модальная карта открыта, обновляем её
+      if (modalMap.value) {
+        modalMap.value.easeTo({ center: userCoords, zoom: 14 });
+        await loadFacilities(modalMap.value, [closestFacility.id]);
+        modalMap.value.getSource(routeSourceId).setData(map.getSource(routeSourceId)._data);
+      }
+    }
+  } catch (error) {
+    console.error('Ошибка получения геопозиции:', error);
+  }
+};
+
 
 const loadFacilities = async (targetMap, selectedIds = selectedRoutePoints.value) => {
   if (!targetMap || !targetMap.getSource) {
@@ -635,7 +703,7 @@ html, body, #app {
   border-radius: 50px;
 }
 
-.map-button {
+.map-button, .geo-button {
   position: absolute;
   bottom: 16px;
   right: 16px;
@@ -650,11 +718,14 @@ html, body, #app {
   border: none;
   cursor: pointer;
 }
-
-.map-button img {
+.geo-button {
+  right: 140px; /* Смещаем, чтобы не перекрывать map-button */
+}
+.map-button img , .geo-button img{
   width: 16px;
   height: 16px;
 }
+
 
 .modal-overlay {
   position: fixed;

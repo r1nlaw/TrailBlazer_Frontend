@@ -4,7 +4,7 @@
     <div class="places">
       
       <div
-        v-for="(place, index) in allDisplayedPlaces"
+        v-for="(place, index) in places"
         :key="place.id"
         class="place-card"
         :class="{ selected: selectedPlaces.includes(place.id) }"
@@ -99,7 +99,6 @@ const places = ref([]);
 const currentPage = ref(1);
 const isLoading = ref(false);
 const noMoreData = ref(false);
-const filteredPlaces = ref([]);
 const mapRef = inject('mapRef');
 const isCartVisible = ref(true);
 const isMobileView = ref(false);
@@ -113,139 +112,83 @@ const props = defineProps({
   }
 });
 
+let prevVal;
 
 // Новая функция для построения URL с категориями в query
-function buildUrlWithCategories(baseUrl, categories) {
+function buildUrlWithCategories(baseUrl, categories,page) {
   const params = new URLSearchParams();
+  params.append("page", page);
   categories.forEach(cat => params.append('category', cat));
   return `${baseUrl}?${params.toString()}`;
 }
-
-watch(() => props.selectedCategories, async (newVal) => {
-  console.log('selectedCategories changed:', newVal);
-
-  // Очистка и сброс
+const clearPlaces = () => {
   places.value = [];
-  filteredPlaces.value = [];
+  selectedPlaces.value = [];
   currentPage.value = 1;
   noMoreData.value = false;
-
-  if (newVal.length > 0) {
-    await loadFilteredPlaces(newVal); 
-    setTimeout(() => {
-      loadLandmark(); 
-    }, 200); 
-  } else {
-    loadLandmark(); 
-  }
+};
+watch(() => props.selectedCategories, (newVal) => {
+  clearPlaces();
+  loadLandmark(newVal);
 }, { immediate: true });
 
 
 
 
-async function loadFilteredPlaces(category) {
-  const domain = import.meta.env.VITE_BACKEND_URL;
-  const baseUrl = `${domain}/api/landmarks/filtersCategories`;
-  const url = buildUrlWithCategories(baseUrl, category);
-
-  try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-    const data = await response.json();
-
-    filteredPlaces.value = data.map(element => ({
-        id: element.id,
-        title: element.name,
-        location: element.address,
-        category: element.category,
-        translated_name: element.translated_name,
-        time: element.time ?? '',
-        price: element.price ?? '',
-        rating: element.rating ?? '',
-        reviews: element.reviews ?? '',
-        image: `${domain}/images/${element.image_path}`
-    }));
-
-    console.log('filteredPlaces updated:', filteredPlaces.value);
-
-
-
-  } catch (error) {
-    console.error('Ошибка при загрузке фильтрованных достопримечательностей:', error);
-    filteredPlaces.value = [];
-  }
-}
-
-//const allDisplayedPlaces = computed(() => filteredPlaces.value);
 
 
 const allDisplayedPlaces = computed(() => {
-  const filteredIds = new Set(filteredPlaces.value.map(place => place.id));
-  const remainingPlaces = places.value.filter(place => !filteredIds.has(place.id));
-  console.log("filteredPlaces.value", filteredPlaces.value);
-  console.log("filteredIds", filteredIds);
-
-  return [...filteredPlaces.value, ...remainingPlaces];
+  
+  return  places;
 });
 
 
 
 
-async function loadLandmark() {
+async function loadLandmark(categories = []) {
   if (isLoading.value || noMoreData.value) return;
-
   isLoading.value = true;
 
   const domain = import.meta.env.VITE_BACKEND_URL;
-  const url = `${domain}/api/landmark?page=${currentPage.value}`;
+  let url = `${domain}/api/landmark?page=${currentPage.value}`;
+  
+  if (categories.length > 0) {
+    url += `&${categories.map(cat => `category=${cat}`).join('&')}`;
+  }
 
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
+    
     const landmarks = await response.json();
-
-    if (!landmarks || landmarks.length === 0) {
+    
+    if (landmarks.length === 0) {
       noMoreData.value = true;
       return;
     }
 
-    const filteredIds = new Set(filteredPlaces.value.map(p => p.id));
-
-    const newPlaces = landmarks
-      .filter(element => !filteredIds.has(element.id)) 
-      .map(element => ({
+    landmarks.forEach(element => {
+      places.value.push({
         id: element.id,
         title: element.name,
         location: element.address,
         translated_name: element.translated_name,
-        category: element.category,
         time: element.time ?? '',
         price: element.price ?? '',
         rating: element.rating ?? '',
         reviews: element.reviews ?? '',
         image: `${domain}/images/${element.image_path}`
-      }));
-
+      });
+    });
     
-    places.value.push(...newPlaces);
-
     currentPage.value++;
   } catch (error) {
-    console.error("Ошибка при загрузке достопримечательностей:", error);
+    console.error("Ошибка при загрузке:", error);
   } finally {
     isLoading.value = false;
   }
 }
+
 
 function goToLandmark(nameTranslate) {
   if (!nameTranslate) return;
@@ -285,10 +228,9 @@ function toggleSelection(id) {
   }
 }
 
-const selectedPlaceObjects = computed(() =>
-  allDisplayedPlaces.value.filter(place => selectedPlaces.value.includes(place.id))
-);
-
+const selectedPlaceObjects = computed(() => {
+  return places.value.filter(place => selectedPlaces.value.includes(place.id));
+});
 function handleSelection() {
   if (mapRef?.value?.RouteMaker) {
     mapRef.value.RouteMaker(selectedPlaces.value);
