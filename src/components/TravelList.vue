@@ -121,21 +121,26 @@ function buildUrlWithCategories(baseUrl, categories) {
   return `${baseUrl}?${params.toString()}`;
 }
 
-watch(() => props.selectedCategories, (newVal) => {
+watch(() => props.selectedCategories, async (newVal) => {
   console.log('selectedCategories changed:', newVal);
 
-  // Сброс старых данных
+  // Очистка и сброс
   places.value = [];
+  filteredPlaces.value = [];
   currentPage.value = 1;
   noMoreData.value = false;
 
   if (newVal.length > 0) {
-    loadFilteredPlaces(newVal);
+    await loadFilteredPlaces(newVal); // Дождись полной загрузки отфильтрованных
+    setTimeout(() => {
+      loadLandmark(); // Подгрузи остальные через небольшой интервал
+    }, 100); // Можно даже 200 мс
   } else {
-    filteredPlaces.value = [];
-    loadLandmark(); // снова грузим все достопримечательности без фильтра
+    loadLandmark(); // Если фильтры пустые — просто загрузи всё
   }
 }, { immediate: true });
+
+
 
 
 async function loadFilteredPlaces(categories) {
@@ -158,6 +163,7 @@ async function loadFilteredPlaces(categories) {
       title: element.name,
       location: element.address,
       translated_name: element.translated_name,
+      categories: element.categories ?? '',
       time: element.time ?? '',
       price: element.price ?? '',
       rating: element.rating ?? '',
@@ -175,11 +181,25 @@ async function loadFilteredPlaces(categories) {
 
 
 const allDisplayedPlaces = computed(() => {
-  if (props.selectedCategories.length > 0) {
-    return filteredPlaces.value;
+  const filteredIds = new Set(filteredPlaces.value.map(p => p.id));
+  const all = [...filteredPlaces.value, ...places.value];
+
+  // Удалить дубликаты по id
+  const unique = new Map();
+  for (const place of all) {
+    if (!unique.has(place.id)) {
+      unique.set(place.id, place);
+    }
   }
-  return places.value;
+
+  // Сортировать: сначала те, что были в filteredIds
+  return Array.from(unique.values()).sort((a, b) => {
+    const aFiltered = filteredIds.has(a.id) ? 0 : 1;
+    const bFiltered = filteredIds.has(b.id) ? 0 : 1;
+    return aFiltered - bFiltered;
+  });
 });
+
 
 
 async function loadLandmark() {
@@ -205,8 +225,11 @@ async function loadLandmark() {
       return;
     }
 
-    landmarks.forEach(element => {
-      places.value.push({
+    const filteredIds = new Set(filteredPlaces.value.map(p => p.id));
+
+    const newPlaces = landmarks
+      .filter(element => !filteredIds.has(element.id)) // Исключаем уже отфильтрованные
+      .map(element => ({
         id: element.id,
         title: element.name,
         location: element.address,
@@ -216,8 +239,10 @@ async function loadLandmark() {
         rating: element.rating ?? '',
         reviews: element.reviews ?? '',
         image: `${domain}/images/${element.image_path}`
-      });
-    });
+      }));
+
+    // Добавляем в конец `places`
+    places.value.push(...newPlaces);
 
     currentPage.value++;
   } catch (error) {

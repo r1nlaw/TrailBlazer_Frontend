@@ -3,7 +3,6 @@
   <div class="app-container">
     <Header />
     <div class="main-content">
-      <Sidebar v-if="!isProfilePage && !isLandmarkPage"/>
       <MainMapAndList v-if="!isProfilePage && !isLandmarkPage" />
       <RegisterModal ref="registerModal" @register="handleRegister" />
     </div>

@@ -25,15 +25,15 @@
           <div class="filter-row">
             <div
               class="filter-item filter-gray"
-              :class="{ active: isActiveCategory('Замки') }"
+              :class="{ active: isActiveCategory('Храм') }"
               @click="toggleCategory('Замки')"
             >
               <img :src="zamkiIcon" class="filter-icon" />
-              <span>Замки</span>
+              <span>Храм</span>
             </div>
             <div
               class="filter-item filter-green"
-              :class="{ active: isActiveCategory('Религиозное') }"
+              :class="{ active: isActiveCategory('Религия') }"
               @click="toggleCategory('Религиозное')"
             >
               <img :src="religionIcon" class="filter-icon" />
@@ -43,7 +43,7 @@
           <div class="filter-row">
             <div
               class="filter-item filter-blue"
-              :class="{ active: isActiveCategory('Музеи') }"
+              :class="{ active: isActiveCategory('Музей') }"
               @click="toggleCategory('Музеи')"
             >
               <img :src="museumIcon" class="filter-icon" />
@@ -69,7 +69,7 @@
             </div>
             <div
               class="filter-item filter-green"
-              :class="{ active: isActiveCategory('Парки') }"
+              :class="{ active: isActiveCategory('Парк') }"
               @click="toggleCategory('Парки')"
             >
               <img :src="parkIcon" class="filter-icon" />
