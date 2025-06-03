@@ -3,7 +3,7 @@
     <!-- Левая колонка: все места -->
     <div class="places">
       <div
-        v-for="(place, index) in places"
+        v-for="(place, index) in allDisplayedPlaces"
         :key="place.id"
         class="place-card"
         :class="{ selected: selectedPlaces.includes(place.id) }"
@@ -19,7 +19,6 @@
               class="icon info-icon"
               @click.stop="goToLandmark(place.translated_name)"
             />
-
           </div>
           <p class="location">{{ place.location }}</p>
           <p class="time">{{ place.time }}</p>
@@ -68,7 +67,6 @@
         </div>
       </div>
 
-      <!-- Кнопка внутри корзины -->
       <button
         v-if="selectedPlaces.length > 0"
         class="bottom-action-button in-cart"
@@ -88,12 +86,13 @@
     </button>
   </div>
 </template>
+
 <script setup>
-import { ref, computed, inject, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, inject, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRouter } from 'vue-router';
+
 const router = useRouter();
 
-// Состояния
 const selectedPlaces = ref([]);
 const places = ref([]);
 const currentPage = ref(1);
@@ -101,18 +100,94 @@ const isLoading = ref(false);
 const noMoreData = ref(false);
 
 const mapRef = inject('mapRef');
-const isCartVisible = ref(true); // по умолчанию видим (для десктопа)
+const isCartVisible = ref(true);
 const isMobileView = ref(false);
 
 let scrollContainer = null;
 
-// Загрузка данных по страницам
+const props = defineProps({
+  selectedCategories: {
+    type: Array,
+    default: () => []
+  }
+});
+
+const filteredPlaces = ref([]);
+
+// Новая функция для построения URL с категориями в query
+function buildUrlWithCategories(baseUrl, categories) {
+  const params = new URLSearchParams();
+  categories.forEach(cat => params.append('category', cat));
+  return `${baseUrl}?${params.toString()}`;
+}
+
+watch(() => props.selectedCategories, (newVal) => {
+  console.log('selectedCategories changed:', newVal);
+
+  // Сброс старых данных
+  places.value = [];
+  currentPage.value = 1;
+  noMoreData.value = false;
+
+  if (newVal.length > 0) {
+    loadFilteredPlaces(newVal);
+  } else {
+    filteredPlaces.value = [];
+    loadLandmark(); // снова грузим все достопримечательности без фильтра
+  }
+}, { immediate: true });
+
+
+async function loadFilteredPlaces(categories) {
+  const domain = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+  const baseUrl = `${domain}/api/landmarks/filtersCategories`;
+  const url = buildUrlWithCategories(baseUrl, categories);
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+    const data = await response.json();
+
+    filteredPlaces.value = data.map(element => ({
+      id: element.id,
+      title: element.name,
+      location: element.address,
+      translated_name: element.translated_name,
+      time: element.time ?? '',
+      price: element.price ?? '',
+      rating: element.rating ?? '',
+      reviews: element.reviews ?? '',
+      image: `${domain}/images/${element.image_path}`
+    }));
+
+    console.log('filteredPlaces updated:', filteredPlaces.value);
+
+  } catch (error) {
+    console.error('Ошибка при загрузке фильтрованных достопримечательностей:', error);
+    filteredPlaces.value = [];
+  }
+}
+
+
+const allDisplayedPlaces = computed(() => {
+  if (props.selectedCategories.length > 0) {
+    return filteredPlaces.value;
+  }
+  return places.value;
+});
+
+
 async function loadLandmark() {
   if (isLoading.value || noMoreData.value) return;
 
   isLoading.value = true;
 
-  const domain = import.meta.env.VITE_BACKEND_URL;
+  const domain = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
   const url = `${domain}/api/landmark?page=${currentPage.value}`;
 
   try {
@@ -135,7 +210,7 @@ async function loadLandmark() {
         id: element.id,
         title: element.name,
         location: element.address,
-        translated_name: element.translated_name, 
+        translated_name: element.translated_name,
         time: element.time ?? '',
         price: element.price ?? '',
         rating: element.rating ?? '',
@@ -152,14 +227,11 @@ async function loadLandmark() {
   }
 }
 
-
-
 function goToLandmark(nameTranslate) {
+  if (!nameTranslate) return;
   router.push(`/landmark/${encodeURIComponent(nameTranslate)}`);
 }
 
-
-// Обработчик скролла по контейнеру .main-layout
 function handleScroll() {
   if (!scrollContainer) return;
 
@@ -167,21 +239,19 @@ function handleScroll() {
   const scrollHeight = scrollContainer.scrollHeight;
   const clientHeight = scrollContainer.clientHeight;
 
-  const buffer = 200; // px до конца контейнера для срабатывания
+  const buffer = 200;
 
   if (scrollTop + clientHeight + buffer >= scrollHeight) {
     loadLandmark();
   }
 }
 
-// Адаптация под мобильные устройства и отображение корзины
 function checkScreenSize() {
   const width = window.innerWidth;
   isMobileView.value = width <= 1026;
-
-  // Для мобильного вида по умолчанию корзина скрыта
   isCartVisible.value = !isMobileView.value;
 }
+
 function toggleCart() {
   isCartVisible.value = !isCartVisible.value;
 }
@@ -196,11 +266,11 @@ function toggleSelection(id) {
 }
 
 const selectedPlaceObjects = computed(() =>
-  places.value.filter(place => selectedPlaces.value.includes(place.id))
+  allDisplayedPlaces.value.filter(place => selectedPlaces.value.includes(place.id))
 );
 
 function handleSelection() {
-  if (mapRef.value && mapRef.value.RouteMaker) {
+  if (mapRef?.value?.RouteMaker) {
     mapRef.value.RouteMaker(selectedPlaces.value);
     console.log('Выбранные ID:', selectedPlaces.value);
   } else {
@@ -208,12 +278,10 @@ function handleSelection() {
   }
 }
 
-// Иконки
-import infoIcon from '@/assets/icons/info.png'
-import starIcon from '@/assets/icons/star.png'
-import reviewIcon from '@/assets/icons/review.png'
+import infoIcon from '@/assets/icons/info.png';
+import starIcon from '@/assets/icons/star.png';
+import reviewIcon from '@/assets/icons/review.png';
 
-// Жизненный цикл компонента
 onMounted(() => {
   checkScreenSize();
   window.addEventListener('resize', checkScreenSize);

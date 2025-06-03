@@ -1,11 +1,9 @@
 <template>
-  <button class="sidebar-toggle" @click="visible = !visible">
-    ☰
-  </button>
+  <button class="sidebar-toggle" @click="visible = !visible">☰</button>
   <transition name="fade-slide">
     <aside :class="['sidebar', { open: visible }]">
       <div class="sidebar-content">
-          <div class="region">
+        <div class="region">
           <img :src="russiaFlag" alt="Флаг" class="flag" />
           <span>Республика Крым</span>
         </div>
@@ -25,31 +23,55 @@
         <h2>Фильтры</h2>
         <div class="filters">
           <div class="filter-row">
-            <div class="filter-item filter-gray">
+            <div
+              class="filter-item filter-gray"
+              :class="{ active: isActiveCategory('Замки') }"
+              @click="toggleCategory('Замки')"
+            >
               <img :src="zamkiIcon" class="filter-icon" />
               <span>Замки</span>
             </div>
-            <div class="filter-item filter-green">
+            <div
+              class="filter-item filter-green"
+              :class="{ active: isActiveCategory('Религиозное') }"
+              @click="toggleCategory('Религиозное')"
+            >
               <img :src="religionIcon" class="filter-icon" />
               <span>Религиозное</span>
             </div>
           </div>
           <div class="filter-row">
-            <div class="filter-item filter-blue">
+            <div
+              class="filter-item filter-blue"
+              :class="{ active: isActiveCategory('Музеи') }"
+              @click="toggleCategory('Музеи')"
+            >
               <img :src="museumIcon" class="filter-icon" />
               <span>Музеи</span>
             </div>
-            <div class="filter-item filter-gray">
+            <div
+              class="filter-item filter-gray"
+              :class="{ active: isActiveCategory('Склепы') }"
+              @click="toggleCategory('Склепы')"
+            >
               <img :src="cryptIcon" class="filter-icon" />
               <span>Склепы</span>
             </div>
           </div>
           <div class="filter-row">
-            <div class="filter-item filter-pink">
+            <div
+              class="filter-item filter-pink"
+              :class="{ active: isActiveCategory('Зоопарк') }"
+              @click="toggleCategory('Зоопарк')"
+            >
               <img :src="zooIcon" class="filter-icon" />
               <span>Зоопарк</span>
             </div>
-            <div class="filter-item filter-green">
+            <div
+              class="filter-item filter-green"
+              :class="{ active: isActiveCategory('Парки') }"
+              @click="toggleCategory('Парки')"
+            >
               <img :src="parkIcon" class="filter-icon" />
               <span>Парки</span>
             </div>
@@ -59,8 +81,9 @@
     </aside>
   </transition>
 </template>
+
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 
 import russiaFlag from '@/assets/icons/russia_flag.png'
 import zamkiIcon from '@/assets/emoji/zamki.png'
@@ -70,18 +93,29 @@ import cryptIcon from '@/assets/emoji/crypt.png'
 import zooIcon from '@/assets/emoji/zoo.png'
 import parkIcon from '@/assets/emoji/park.png'
 
-import route1 from '@/assets/images/route1.png'
-import route2 from '@/assets/images/route2.png'
-import route3 from '@/assets/images/route3.png'
-import route4 from '@/assets/images/route4.png'
-import route5 from '@/assets/images/route5.png'
+const props = defineProps({
+  selectedCategories: {
+    type: Array,
+    default: () => []
+  },
+  routes: {
+    type: Array,
+    default: () => []
+  }
+})
 
-
-const activeRoute = ref(0)
-const routes = [route1, route2, route3, route4, route5]
+const emit = defineEmits(['toggle-category'])
 
 const visible = ref(false)
+const activeRoute = ref(null)
 
+function toggleCategory(category) {
+  emit('toggle-category', category)
+}
+
+function isActiveCategory(category) {
+  return props.selectedCategories.includes(category)
+}
 </script>
 
 <style scoped>
@@ -90,7 +124,7 @@ const visible = ref(false)
   top: 90px;
   left: 0;
   width: 250px;
-  height: 100vh; 
+  height: 100vh;
   min-height: 100vh;
   overflow-y: auto;
   padding: 24px;
@@ -100,7 +134,6 @@ const visible = ref(false)
   display: flex;
   flex-direction: column;
 }
-
 
 .region {
   display: flex;
@@ -152,6 +185,12 @@ const visible = ref(false)
   gap: 10px;
 }
 
+.filter-item.active {
+  outline: 2px solid #555;
+  background-color: #b3d4fc !important;
+  transition: 0.3s ease;
+}
+
 .filter-item {
   display: flex;
   align-items: center;
@@ -161,6 +200,7 @@ const visible = ref(false)
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .filter-icon {
@@ -168,7 +208,6 @@ const visible = ref(false)
   height: 20px;
 }
 
-/* Цветовые стили */
 .filter-gray {
   background: #e0e0e0;
 }
@@ -224,37 +263,12 @@ const visible = ref(false)
 }
 .sidebar-toggle:active {
   transform: scale(0.95);
-
 }
-
-
 
 @media (max-width: 1024px) {
   .sidebar {
-    width: 420px; 
-    transform: translateX(-100%); 
-    transition: transform 0.3s ease-in-out;
-    margin-top:-0.3vh;
-  }
-
-  .sidebar.open {
-    transform: translateX(0);
-  }
-
-  .sidebar-toggle {
-    margin-top: 80px;
-    display: flex; 
-  }
-  .sidebar-content{
-    margin-top: 10%;
-
-  }
-
-}
-@media (max-width: 1024px) {
-  .sidebar {
-    width: 420px; 
-    transform: translateX(-100%); 
+    width: 420px;
+    transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
     top: 89px;
   }
@@ -265,18 +279,17 @@ const visible = ref(false)
 
   .sidebar-toggle {
     margin-top: 80px;
-    display: flex; 
+    display: flex;
   }
-  .sidebar-content{
+  .sidebar-content {
     margin-top: 10%;
-
   }
 }
 
 @media (max-width: 853px) {
   .sidebar {
-    width: 420px; 
-    transform: translateX(-100%); 
+    width: 420px;
+    transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
     top: 88px;
   }
@@ -287,18 +300,17 @@ const visible = ref(false)
 
   .sidebar-toggle {
     margin-top: 80px;
-    display: flex; 
+    display: flex;
   }
-  .sidebar-content{
+  .sidebar-content {
     margin-top: 10%;
-
   }
-
 }
+
 @media (max-width: 820px) {
   .sidebar {
-    width: 420px; 
-    transform: translateX(-100%); 
+    width: 420px;
+    transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
     top: 89px;
   }
@@ -309,18 +321,17 @@ const visible = ref(false)
 
   .sidebar-toggle {
     margin-top: 80px;
-    display: flex; 
+    display: flex;
   }
-  .sidebar-content{
+  .sidebar-content {
     margin-top: 10%;
-
   }
-
 }
+
 @media (max-width: 548px) {
   .sidebar {
-    width: 420px; 
-    transform: translateX(-100%); 
+    width: 420px;
+    transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
     top: 72px;
   }
@@ -331,20 +342,18 @@ const visible = ref(false)
 
   .sidebar-toggle {
     margin-top: 80px;
-    display: flex; 
+    display: flex;
   }
-  .sidebar-content{
+  .sidebar-content {
     margin-top: 10%;
-
   }
-
 }
 
 @media (max-width: 440px) {
   .sidebar {
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
-        top: 75px;
+    top: 75px;
   }
 
   .sidebar.open {
@@ -353,9 +362,10 @@ const visible = ref(false)
 
   .sidebar-toggle {
     margin-top: 100px;
-    display: flex; 
+    display: flex;
   }
 }
+
 @media (max-width: 412px) {
   .sidebar {
     transform: translateX(-100%);
@@ -369,7 +379,7 @@ const visible = ref(false)
 
   .sidebar-toggle {
     margin-top: 100px;
-    display: flex; 
+    display: flex;
   }
 }
 
@@ -386,11 +396,7 @@ const visible = ref(false)
 
   .sidebar-toggle {
     margin-top: 100px;
-    display: flex; 
+    display: flex;
   }
 }
-
-
-
-
 </style>

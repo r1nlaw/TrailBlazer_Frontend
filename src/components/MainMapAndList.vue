@@ -2,14 +2,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <div class="main-layout">
     <Map ref="mapRef"/>
-    <TravelList />
+    <SidebarAndTravelList />
   </div>
 </template>
 
 <script setup>
 import {ref,provide} from "vue";
 import Map from './Map.vue'
-import TravelList from './TravelList.vue'
+import SidebarAndTravelList from "./SidebarAndTravelList.vue";
 
 const mapRef = ref(null);
 provide('mapRef',mapRef)
