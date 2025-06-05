@@ -112,51 +112,31 @@ const props = defineProps({
   }
 });
 
-let prevVal;
-
-// Новая функция для построения URL с категориями в query
-function buildUrlWithCategories(baseUrl, categories,page) {
-  const params = new URLSearchParams();
-  params.append("page", page);
-  categories.forEach(cat => params.append('category', cat));
-  return `${baseUrl}?${params.toString()}`;
-}
-const clearPlaces = () => {
+async function reloadPlaces() {
   places.value = [];
   selectedPlaces.value = [];
   currentPage.value = 1;
   noMoreData.value = false;
-};
-watch(() => props.selectedCategories, (newVal) => {
-  clearPlaces();
-  loadLandmark(newVal);
+  await loadLandmark();
+}
+
+watch(() => props.selectedCategories, async () => {
+  await reloadPlaces();
 }, { immediate: true });
 
-
-
-
-
-
-const allDisplayedPlaces = computed(() => {
-  
-  return  places;
-});
-
-
-
-
-async function loadLandmark(categories = []) {
+async function loadLandmark() {
   if (isLoading.value || noMoreData.value) return;
-  isLoading.value = true;
-
-  const domain = import.meta.env.VITE_BACKEND_URL;
-  let url = `${domain}/api/landmark?page=${currentPage.value}`;
   
-  if (categories.length > 0) {
-    url += `&${categories.map(cat => `category=${cat}`).join('&')}`;
-  }
-
+  isLoading.value = true;
+  const domain = import.meta.env.VITE_BACKEND_URL;
+  
   try {
+
+    let url = `${domain}/api/landmark?page=${currentPage.value}`;
+    if (props.selectedCategories.length > 0) {
+      url += `&${props.selectedCategories.map(cat => `category=${cat}`).join('&')}`;
+    }
+
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
     
@@ -167,6 +147,7 @@ async function loadLandmark(categories = []) {
       return;
     }
 
+    // Добавляем новые места
     landmarks.forEach(element => {
       places.value.push({
         id: element.id,
@@ -189,7 +170,7 @@ async function loadLandmark(categories = []) {
   }
 }
 
-
+// Остальные функции без изменений
 function goToLandmark(nameTranslate) {
   if (!nameTranslate) return;
   router.push(`/landmark/${encodeURIComponent(nameTranslate)}`);
@@ -231,15 +212,16 @@ function toggleSelection(id) {
 const selectedPlaceObjects = computed(() => {
   return places.value.filter(place => selectedPlaces.value.includes(place.id));
 });
+
 function handleSelection() {
   if (mapRef?.value?.RouteMaker) {
     mapRef.value.RouteMaker(selectedPlaces.value);
-    console.log('Выбранные ID:', selectedPlaces.value);
   } else {
     console.error('Map component or RouteMaker not available');
   }
 }
 
+// Импорт иконок
 import infoIcon from '@/assets/icons/info.png';
 import starIcon from '@/assets/icons/star.png';
 import reviewIcon from '@/assets/icons/review.png';
@@ -252,8 +234,6 @@ onMounted(() => {
   if (scrollContainer) {
     scrollContainer.addEventListener('scroll', handleScroll);
   }
-
-  loadLandmark();
 });
 
 onBeforeUnmount(() => {
@@ -264,7 +244,6 @@ onBeforeUnmount(() => {
   }
 });
 </script>
-
 
 
 <style scoped>
@@ -279,11 +258,12 @@ onBeforeUnmount(() => {
   }
 }
 .selected-places.mobile-hidden {
-  display: none;
+  transition: transform 0.4s ease;
+  transform: translateX(100%);
 }
 .selected-places.mobile-visible {
-  display: flex;
-  flex-direction: column;
+  transition: transform 0.4s ease;
+  transform: translateX(0);
 }
 
 .place-card,
@@ -471,6 +451,7 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
+
 .scroll-area {
   flex: 1;
   overflow-y: auto;
@@ -505,6 +486,7 @@ onBeforeUnmount(() => {
   z-index: 1000;
   cursor: pointer;
 }
+
 @media (max-width: 3840px) {
   .place-card{
    width: 1480px;
@@ -516,15 +498,24 @@ onBeforeUnmount(() => {
 
 
 }
-@media (max-width: 2560px) {
+@media (max-width: 3024px) {
   .place-card{
-   width: 1480px;
+   width: 1780px;
   }
   .selected-places{
     margin-right: 900px;
     min-width: 445px;
   }
 
+}
+@media (max-width: 2560px) {
+  .place-card{
+   width: 1460px;
+  }
+  .selected-places{
+    margin-right: 900px;
+    min-width: 445px;
+  }
 
 }
 @media (max-width: 1920px) {
@@ -558,6 +549,8 @@ onBeforeUnmount(() => {
   }
 
 }
+
+
 @media (max-width: 1025px) {
   .place-card{
    width: 500px;
@@ -612,7 +605,7 @@ onBeforeUnmount(() => {
     width: 1000px;
   }
   .selected-places{
-    margin-left: 568px;
+    margin-left: 580px;
     min-width: 410px;
     left: 0;
   }
@@ -623,7 +616,7 @@ onBeforeUnmount(() => {
     width: 880px;
   }
   .selected-places{
-    margin-left: 450px;
+    margin-left: 470px;
     min-width: 410px;
     left: 0;
   }
@@ -645,7 +638,7 @@ onBeforeUnmount(() => {
     width: 790px;
   }
   .selected-places{
-    margin-left: 363px;
+    margin-left: 383px;
     min-width: 410px;
     left: 0;
   }
@@ -657,7 +650,7 @@ onBeforeUnmount(() => {
     width: 710px;
   }
   .selected-places{
-    margin-left: 300px;
+    margin-left: 340px;
     min-width: 410px;
     left: 0;
   }
@@ -668,19 +661,28 @@ onBeforeUnmount(() => {
     width: 495px;
   }
   .selected-places{
-    margin-left: 87px;
-    min-width: 396px;
-    left: 0;
+    margin-left: 0px;
+    min-width: 560px;
+    min-height: 600px;
+    z-index: 20000;
   }
 }
 @media (max-width: 430px) { 
   .place-card{
     width: 385px;
   }
+  .selected-places.mobile-visible {
+    transform: translateX(0%);
+  }
+
+  .selected-places.mobile-hidden {
+    transform: translateX(100%);
+  }
   .selected-places{
     margin-left: 0px;
     min-width: 396px;
-    left: 0;
+    min-height: 790px;
+    z-index: 20000;
   }
 }
 
@@ -688,10 +690,34 @@ onBeforeUnmount(() => {
   .place-card{
     width: 370px;
   }
+  .place-title{
+    font-size: 15px;
+  }
+  .location{
+    font-size: 10px;
+  }
+  .selected-places{
+    margin-left: 0px;
+    min-width: 400px;
+    min-height: 750px;
+    z-index: 20000;
+  }
+}
+@media (max-width: 412px) { 
+  .place-card{
+    width: 370px;
+  }
+  .place-title{
+    font-size: 15px;
+  }
+  .location{
+    font-size: 10px;
+  }
   .selected-places{
     margin-left: 0px;
     min-width: 380px;
-    left: 0;
+    min-height: 770px;
+    z-index: 20000;
   }
 }
 @media (max-width: 390px) { 
@@ -699,10 +725,18 @@ onBeforeUnmount(() => {
     width: 350px;
     height: 160px;
   }
+  .place-title{
+    font-size: 15px;
+  }
+  .location{
+    font-size: 12px;
+  }
+
   .selected-places{
     margin-left: 0px;
-    min-width: 350px;
-    left: 0;
+    min-width: 380px;
+    min-height: 700px;
+    z-index: 20000;
   }
 }
 
@@ -711,10 +745,17 @@ onBeforeUnmount(() => {
     width: 335px;
     height: 160px;
   }
+  .place-title{
+    font-size: 15px;
+  }
+  .location{
+    font-size: 10px;
+  }
   .selected-places{
     margin-left: 0px;
-    min-width: 350px;
-    left: 0;
+    min-width: 360px;
+    min-height: 530px;
+    z-index: 20000;
   }
 }
 @media (max-width: 360px) { 
@@ -724,8 +765,22 @@ onBeforeUnmount(() => {
   }
   .selected-places{
     margin-left: 0px;
-    min-width: 350px;
-    left: 0;
+    min-width: 330px;
+    min-height: 610px;
+    z-index: 20000;
+  }
+  
+}
+@media (max-width: 350px) { 
+  .place-card{
+    width: 300px;
+    height: 200px;
+  }
+  .selected-places{
+    margin-left: 0px;
+    min-width: 330px;
+    min-height: 500px;
+    z-index: 20000;
   }
 }
 
@@ -736,8 +791,9 @@ onBeforeUnmount(() => {
   }
   .selected-places{
     margin-left: 0px;
-    min-width: 350px;
-    left: 0;
+    min-width: 330px;
+    min-height: 540px;
+    z-index: 20000;
   }
 }
 

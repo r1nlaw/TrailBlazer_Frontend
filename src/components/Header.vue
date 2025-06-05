@@ -493,9 +493,20 @@ onUnmounted(() => {
 .show-on-mobile {
   display: none;
 }
+
+@media (max-width: 3024px) {
+  .header-right{
+   margin-right: 60px;
+  }
+}
 @media (max-width: 1366px) {
   .header-right{
    margin-right: 60px;
+  }
+}
+@media (max-width: 920px) {
+  .header{
+    max-width: 835px;
   }
 }
 
@@ -546,6 +557,11 @@ onUnmounted(() => {
     width: 100%;
   }
 }
+@media (max-width: 768px) {
+  .header{
+    max-width: 635px;
+  }
+}
 @media (max-width: 548px) {
   .search-bar {
     position: absolute; /* убираем из потока */
@@ -574,6 +590,55 @@ onUnmounted(() => {
   }
 
 
+}
+@media (max-width: 430px) {
+  .header{
+    max-width: 325px;
+  }
+}
+@media (max-width: 414px) {
+  .header{
+    max-width: 325px;
+  }
+}
+
+@media (max-width: 375px) {
+  .header{
+    max-width: 325px;
+  }
+  .search-bar {
+    position: absolute; /* убираем из потока */
+    top: 70px; /* ниже header */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    min-width: 100px;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    z-index: 1000; /* поверх других элементов */
+    background-color: white; /* если фон прозрачный — будет перекрытие */
+    border-radius: 50px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  .search-results{
+    transform: translateX(-7%);
+  }
+
+  .search-bar input {
+    width: 100%;
+    min-width: 150px;
+    padding: 10px 14px;
+    font-size: 16px;
+    border-radius: 50px;
+  }
+
+
+}
+
+@media (max-width: 360px) {
+  .header{
+    max-width: 250px;
+  }
 }
 
 

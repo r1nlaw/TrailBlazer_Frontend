@@ -874,14 +874,41 @@ html, body, #app {
     width: 2000px;
   }
 }
+@media (max-width: 3024px) {
+    .map-container {
+    width: 2300px;
+  }
+}
+
 @media (max-width: 2560px) {
+    .map-container {
+    width: 1985px;
+  }
+}
+@media (max-width: 2200px) {
+    .map-container {
+    width: 1700px;
+  }
+  .modal-overlay{
+    z-index: 5000;
+  }
+}
+@media (max-width: 1920px) {
     .map-container {
     width: 1520px;
   }
+  .modal-overlay{
+    z-index: 5000;
+  }
 }
+
+
 @media (max-width: 1366px) {
     .map-container {
     width: 1080px;
+  }
+  .modal-overlay{
+    z-index: 5000;
   }
 }
 
@@ -889,50 +916,80 @@ html, body, #app {
     .map-container {
     width: 1000px;
   }
+  .modal-overlay{
+    z-index: 5000;
+  }
 }
 @media (max-width: 912px) {
     .map-container {
     width: 900px;
+  }
+  .modal-overlay{
+    z-index: 5000;
   }
 }
 @media (max-width: 853px) {
     .map-container {
     width: 830px;
   }
+  .modal-overlay{
+    z-index: 5000;
+  }
 }
 @media (max-width: 820px) {
     .map-container {
     width: 785px;
+  }
+  .modal-overlay{
+    z-index: 5000;
   }
 }
 @media (max-width: 768px) {
     .map-container {
     width: 710px;
   }
+  .modal-overlay{
+    z-index: 5000;
+  }
 }
 @media (max-width: 540px) {
     .map-container {
     width: 500px;
+  }
+  .modal-overlay{
+    z-index: 5000;
   }
 }
 @media (max-width: 430px) {
     .map-container {
     width: 380px;
   }
+  .modal-overlay{
+    z-index: 5000;
+  }
 }
 @media (max-width: 414px) {
     .map-container {
     width: 370px;
+  }
+  .modal-overlay{
+    z-index: 5000;
   }
 }
 @media (max-width: 412px) {
     .map-container {
     width: 365px;
   }
+  .modal-overlay{
+    z-index: 5000;
+  }
 }
 @media (max-width: 390px) {
     .map-container {
     width: 340px;
+  }
+  .modal-overlay{
+    z-index: 5000;
   }
 }
 
@@ -940,6 +997,10 @@ html, body, #app {
     .map-container {
     width: 325px;
   }
+  .modal-overlay{
+    z-index: 5000;
+  }
+
 }
 
 
