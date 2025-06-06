@@ -201,6 +201,15 @@ function handleImageError(event) {
 
 const visible = ref(false)
 
+function handleProfileClick() {
+  const token = localStorage.getItem('authToken')
+  if (token) {
+    router.push('/profile')
+  } else {
+    registerModalRef.value?.open()
+  }
+}
+
 onMounted(() => {
   setTimeout(() => {
     visible.value = true
