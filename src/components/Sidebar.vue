@@ -153,7 +153,7 @@ function applyFilters() {
   position: fixed;
   top: 90px;
   left: 0;
-  width: 30%;
+  width: 20%;
   height: 100vh;
   min-height: 100vh;
   overflow-y: auto;
@@ -174,7 +174,7 @@ function applyFilters() {
 .apply-button {
   margin-top: 16px;
   padding: 10px 20px;
-  background-color: #3478f6;
+  background-color: #2c473a;
   color: white;
   font-weight: 600;
   border: none;
@@ -184,7 +184,7 @@ function applyFilters() {
 }
 
 .apply-button:hover {
-  background-color: #245dc1;
+  background-color: #3f6653;
 }
 
 
@@ -244,7 +244,7 @@ function applyFilters() {
 
 .filter-item.active {
   outline: 2px solid #555;
-  background-color: #b3d4fc !important;
+  background-color: #4c7a64bd !important;
   transition: 0.3s ease;
 }
 

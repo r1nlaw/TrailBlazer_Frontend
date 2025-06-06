@@ -577,6 +577,40 @@ onUnmounted(() => {
 
 }
 
+@media (max-width: 375px) {
+  .header{
+    max-width: 10px;
+  }
+  .search-bar {
+    position: absolute; /* убираем из потока */
+    top: 70px; /* ниже header */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    min-width: 100px;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    z-index: 1000; /* поверх других элементов */
+    background-color: white; /* если фон прозрачный — будет перекрытие */
+    border-radius: 50px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  .search-results{
+    transform: translateX(-7%);
+  }
+
+  .search-bar input {
+    width: 100%;
+    min-width: 150px;
+    padding: 10px 14px;
+    font-size: 16px;
+    border-radius: 50px;
+  }
+
+
+}
+
+
 
 
 

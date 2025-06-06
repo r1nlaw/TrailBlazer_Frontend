@@ -352,7 +352,6 @@ import reviewIcon from '@/assets/icons/review.png';
 }
 
 .place-card:hover {
-  transform: translateX(10px);
   box-shadow: 2px 2px 6px #2c473a6b;
   cursor: pointer;
 }
@@ -642,8 +641,8 @@ import reviewIcon from '@/assets/icons/review.png';
 
 @media (max-width: 375px) { 
   .place-card{
-    width: 335px;
-    height: 160px;
+    width: 305px;
+    height: 120px;
   }
   .selected-places{
     margin-left: 0px;
