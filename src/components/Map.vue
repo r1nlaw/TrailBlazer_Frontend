@@ -617,7 +617,7 @@ html, body, #app {
 
 .map-container {
   position: relative;
-  width: 1520px;
+  width: 100%;
   margin-top: 0;
   min-height: 300px;
   border-radius: 24px;
@@ -797,7 +797,7 @@ html, body, #app {
   text-align: center;
   color: #666;
 }
-
+/*
 @media (max-width: 3840px) {
     .map-container {
     width: 2000px;
@@ -871,7 +871,7 @@ html, body, #app {
   }
 }
 
-
+*/
 
 
 </style>

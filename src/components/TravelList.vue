@@ -6,7 +6,7 @@
       <div
         v-for="(place, index) in allDisplayedPlaces"
         :key="place.id"
-        class="place-card"
+        class="card place-card"
         :class="{ selected: selectedPlaces.includes(place.id) }"
         @click="toggleSelection(place.id)"
         :style="{ animationDelay: (index * 100) + 'ms' }"
@@ -48,33 +48,35 @@
       class="selected-places"
       :class="{ 'mobile-visible': isCartVisible, 'mobile-hidden': !isCartVisible && isMobileView }"
     >
-      <h2>Выбранные места</h2>
-      <div class="scroll-area">
-        <div
-          v-for="(place, index) in selectedPlaceObjects"
-          :key="place.id"
-          class="place-card selected"
-          :style="{ animationDelay: (index * 150) + 'ms' }"
-        >
-          <div class="place-content">
-            <div class="title-row">
-              <h3 class="place-title">{{ place.title }}</h3>
+      <div class="card h-100 p-3">
+        <h2>Выбранные места</h2>
+        <div class="scroll-area">
+          <div
+            v-for="(place, index) in selectedPlaceObjects"
+            :key="place.id"
+            class="place-card selected"
+            :style="{ animationDelay: (index * 150) + 'ms' }"
+          >
+            <div class="place-content">
+              <div class="title-row">
+                <h3 class="place-title">{{ place.title }}</h3>
+              </div>
+              <p class="location">{{ place.location }}</p>
             </div>
-            <p class="location">{{ place.location }}</p>
-          </div>
-          <div class="img">
-            <img :src="place.image" class="place-image" />
+            <div class="img">
+              <img :src="place.image" class="place-image" />
+            </div>
           </div>
         </div>
-      </div>
 
-      <button
-        v-if="selectedPlaces.length > 0"
-        class="bottom-action-button in-cart"
-        @click="handleSelection"
-      >
-        Построить маршрут
-      </button>
+        <button
+          v-if="selectedPlaces.length > 0"
+          class="bottom-action-button in-cart"
+          @click="handleSelection"
+        >
+          Построить маршрут
+        </button>
+      </div>
     </div>
 
     <!-- Кнопка для открытия/закрытия корзины на мобильных устройствах -->
@@ -347,10 +349,10 @@ onBeforeUnmount(() => {
 .place-card,
 .news-card {
   animation: fadeInUp 0.6s ease both;
-  width: 1200px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   height: 120px;
-  flex-shrink: 0;
-  flex-grow: 0;
   box-sizing: border-box;
 }
 
@@ -518,15 +520,11 @@ onBeforeUnmount(() => {
   flex: 0.5;
   display: flex;
   flex-direction: column;
-  width: 450px;
   gap: 16px;
-  max-height: 70vh;
   background: #f6fdf8;
   border-radius: 16px;
   padding: 26px;
   border: 1px solid #2c473a54;
-  max-height: 500px;
-  overflow: hidden;
 }
 
 .scroll-area {
@@ -563,68 +561,6 @@ onBeforeUnmount(() => {
   z-index: 1000;
   cursor: pointer;
 }
-@media (max-width: 3840px) {
-  .place-card{
-   width: 1480px;
-  }
-  .selected-places{
-    margin-right: 1900px;
-    min-width: 430px;
-  }
-
-
-}
-@media (max-width: 2560px) {
-  .place-card{
-   width: 1480px;
-  }
-  .selected-places{
-    margin-right: 900px;
-    min-width: 445px;
-  }
-
-
-}
-@media (max-width: 1920px) {
-  .place-card{
-   width: 1000px;
-  }
-  .selected-places{
-    margin-right: 900px;
-    min-width: 445px;
-  }
-
-
-}
-@media (max-width: 1366px) { 
-
-  .place-card{
-    width: 550px;
-  }
-  .selected-places{
-    margin-right: 900px;
-    min-width: 410px;
-  }
-   .travel-list-wrapper {
-    margin-left: 45px;
-  }
-
-}
-@media (max-width: 1280px) { 
-  .place-card{
-    width: 500px;
-  }
-
-}
-@media (max-width: 1025px) {
-  .place-card{
-   width: 500px;
-  }
-  .travel-list-wrapper {
-    margin-left: 0px;
-  }
-
-}
 
 @media (max-width: 1024px) {
   .mobile-cart-button {
@@ -632,7 +568,7 @@ onBeforeUnmount(() => {
   }
   .travel-list-wrapper {
     flex-direction: column;
-    width: 60%;
+    width: 100%;
     gap: 16px; 
   }
   
@@ -641,7 +577,6 @@ onBeforeUnmount(() => {
     width: 100%;
   }
   .place-card{
-    width: 955px;
     height: 120px;
   }
   
