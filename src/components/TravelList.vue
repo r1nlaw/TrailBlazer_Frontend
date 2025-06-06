@@ -23,9 +23,6 @@
           </div>
           <p class="location">{{ place.location }}</p>
           <p class="time">{{ place.time }}</p>
-          <div class="description">
-            {{place.description}}  
-          </div>
           <div class="rating">
             <span class="price">{{ place.price }}</span>
             <img :src="starIcon" alt="star" class="icon" />
@@ -221,7 +218,6 @@ async function loadLandmark(categories = selectedCategories.value) {
       price: element.price ?? '',
       rating: element.rating ?? '',
       reviews: element.reviews ?? '',
-      description: element.description.slice(0,150)+"..."?? '',
       image: `${domain}/images/${element.image_path}`
     }));
 
