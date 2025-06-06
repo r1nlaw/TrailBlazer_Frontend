@@ -54,7 +54,7 @@
           <div
             v-for="(place, index) in selectedPlaceObjects"
             :key="place.id"
-            class="place-card selected"
+            class="selected-place place-card  selected"
             :style="{ animationDelay: (index * 150) + 'ms' }"
           >
             <div class="place-content">
@@ -338,22 +338,23 @@ onBeforeUnmount(() => {
     transform: translateY(0);
   }
 }
+.selected-place,
+.selected-places .place-card {
+  height: auto !important;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  white-space: normal;
+}
+.selected-places{
+  max-height:45%
+}
 .selected-places.mobile-hidden {
   display: none;
 }
 .selected-places.mobile-visible {
   display: flex;
   flex-direction: column;
-}
-
-.place-card,
-.news-card {
-  animation: fadeInUp 0.6s ease both;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  height: 120px;
-  box-sizing: border-box;
 }
 
 .travel-list-wrapper {
@@ -462,29 +463,8 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
-.news-card {
-  position: relative;
-  flex: 1;
-  background: linear-gradient(135deg, #2b4739, #0b4f34);
-  border-radius: 16px;
-  padding: 16px;
-  font-size: 14px;
-  color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  max-height: 650px;
-}
 
-.news-card h3 {
-  font-size: 16px;
-  margin-bottom: 12px;
-  color: white;
-}
 
-.news-card p {
-  margin-bottom: 12px;
-  line-height: 1.5;
-}
 
 .bottom-action-button {
   background-color: #2c473a;
@@ -535,10 +515,6 @@ onBeforeUnmount(() => {
   gap: 16px;
 }
 
-.selected-places .place-card {
-  max-width: 405px; 
-}
-
 .selected-places h2 {
   margin-bottom: 8px;
   font-size: 18px;
@@ -584,7 +560,6 @@ onBeforeUnmount(() => {
 
   .selected-places {
     min-width: unset;
-    max-height: 70vh;
     border-radius: 12px;
     padding: 16px;
     position: fixed;
