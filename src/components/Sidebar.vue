@@ -299,7 +299,7 @@ function applyFilters() {
   align-items: center;
   justify-content: center;
   position: fixed;
-  top: 1%;
+  top: 2%;
   left: 2%;
   z-index: 2001;
   background: rgba(51, 51, 51, 0.85);

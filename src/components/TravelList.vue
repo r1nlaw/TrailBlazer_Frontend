@@ -60,6 +60,12 @@
             <div class="place-content">
               <div class="title-row">
                 <h3 class="place-title">{{ place.title }}</h3>
+                  <img
+                    :src="infoIcon"
+                    alt="info"
+                    class="icon info-icon"
+                    @click.stop="goToLandmark(place.translated_name)"
+                  />
               </div>
               <p class="location">{{ place.location }}</p>
             </div>
@@ -315,12 +321,16 @@ import reviewIcon from '@/assets/icons/review.png';
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 .selected-places{
-  max-height:45%;
+  max-height:25%;
   animation: fadeInUp 0.4s ease both;
 }
 .selected-places.mobile-hidden {
   transition: transform 0.4s ease;
   transform: translateX(100%);
+}
+.scroll-area {
+  max-height: 450px; 
+  overflow-y: auto;
 }
 .selected-places.mobile-visible {
   transition: transform 0.4s ease;
@@ -592,7 +602,7 @@ import reviewIcon from '@/assets/icons/review.png';
     z-index: 20000;
   }
   .selected-places.mobile-hidden{
-    margin-left: 500px;
+    margin-left: 1500px;
   }
 
   .bottom-action-button.in-cart{
@@ -616,7 +626,7 @@ import reviewIcon from '@/assets/icons/review.png';
   }
 
   .selected-places.mobile-hidden{
-    margin-left: 500px;
+    margin-left: 1000px;
   }
 
   .bottom-action-button.in-cart{
@@ -634,12 +644,12 @@ import reviewIcon from '@/assets/icons/review.png';
   .selected-places{
     margin-left: 0px;
     min-width: 820px;
-    min-height: 1130px;
+    min-height: 570px;
     left: 0;
     z-index: 20000;
   }
   .selected-places.mobile-hidden{
-    margin-left: 500px;
+    margin-left: 1000px;
   }
 
   .bottom-action-button.in-cart{
@@ -663,7 +673,7 @@ import reviewIcon from '@/assets/icons/review.png';
     z-index: 20000;
   }
   .selected-places.mobile-hidden{
-    margin-left: 500px;
+    margin-left: 1000px;
   }
 
   .bottom-action-button.in-cart{
@@ -687,7 +697,7 @@ import reviewIcon from '@/assets/icons/review.png';
     z-index: 20000;
   }
   .selected-places.mobile-hidden{
-    margin-left: 500px;
+    margin-left: 1000px;
   }
 
   .bottom-action-button.in-cart{
@@ -703,7 +713,8 @@ import reviewIcon from '@/assets/icons/review.png';
     width: 450px;
   }
   .selected-place.place-card.selected{
-    min-width: 490px;
+    min-width: 470px;
+    max-width: 470px;
   }
   .selected-places{
     margin-left: 0px;
@@ -713,7 +724,7 @@ import reviewIcon from '@/assets/icons/review.png';
     z-index: 20000;
   }
   .selected-places.mobile-hidden{
-    margin-left: 500px;
+    margin-left: 1000px;
   }
   .bottom-action-button.in-cart{
     background-color: #2c473a;
@@ -729,12 +740,13 @@ import reviewIcon from '@/assets/icons/review.png';
   .selected-places{
     margin-left: 0px;
     min-width: 400px;
-    min-height: 793px;
+    min-height: 493px;
     left: 0;
     z-index: 20000;
   }
   .selected-place.place-card.selected{
-    min-width: 300px;
+    max-width: 370px;
+    min-width: 370px;
   }
   .selected-places.mobile-hidden{
     margin-left: 500px;
@@ -755,16 +767,19 @@ import reviewIcon from '@/assets/icons/review.png';
   .selected-places{
     margin-left: 0px;
     min-width: 380px;
-    min-height: 753px;
+    min-height: 553px;
     left: 0;
     z-index: 20000;
   }
-  .selected-place.place-card.selected{
-    min-width: 300px;
-  }
+
   .selected-places.mobile-hidden{
     margin-left: 500px;
   }
+  .selected-place.place-card.selected{
+    max-width: 350px;
+    min-width: 350px;
+  }
+  
   .bottom-action-button.in-cart{
     background-color: #2c473a;
   }
@@ -780,12 +795,13 @@ import reviewIcon from '@/assets/icons/review.png';
   .selected-places{
     margin-left: 0px;
     min-width: 380px;
-    min-height: 773px;
+    min-height: 573px;
     left: 0;
     z-index: 20000;
   }
   .selected-place.place-card.selected{
-    min-width: 300px;
+    max-width: 350px;
+    min-width: 350px;
   }
   .selected-places.mobile-hidden{
     margin-left: 500px;
@@ -805,13 +821,11 @@ import reviewIcon from '@/assets/icons/review.png';
   .selected-places{
     margin-left: 0px;
     min-width: 380px;
-    min-height: 700px;
+    min-height: 550px;
     left: 0;
     z-index: 20000;
   }
-  .selected-place.place-card.selected{
-    min-width: 250px;
-  }
+
   .selected-places.mobile-hidden{
     margin-left: 500px;
   }
@@ -821,6 +835,11 @@ import reviewIcon from '@/assets/icons/review.png';
   .place-card.selected{
     max-width: 350px;
   }
+  .selected-place.place-card.selected{
+    max-width: 330px;
+    min-width: 330px;
+  }
+
 }
 
 @media (max-width: 375px) { 
@@ -834,6 +853,9 @@ import reviewIcon from '@/assets/icons/review.png';
     min-height: 523px;
     left: 0;
     z-index: 20000;
+  }
+  .selected-place.place-card.selected{
+    max-width: 320px;
   }
   .bottom-action-button.in-cart{
     background-color: #2c473a;
@@ -852,15 +874,19 @@ import reviewIcon from '@/assets/icons/review.png';
     min-width: 350px;
     left: 0;
   }
-    .selected-places{
+  .selected-places{
     margin-left: 0px;
     min-width: 350px;
-    min-height: 600px;
+    min-height: 500px;
     left: 0;
     z-index: 20000;
   }
   .bottom-action-button.in-cart{
     background-color: #2c473a;
+  }
+  .selected-place.place-card.selected{
+    max-width: 310px;
+    min-width: 310px;
   }
   .place-card.selected{
     max-width: 320px;
@@ -873,12 +899,13 @@ import reviewIcon from '@/assets/icons/review.png';
     height: 150px;
   }
   .selected-place.place-card.selected{
-    min-width: 200px;
+    max-width: 290px;
+    min-width: 290px;
   }
   .selected-places{
     margin-left: 0px;
     min-width: 330px;
-    min-height: 800px;
+    min-height: 520px;
     left: 0;
     z-index: 20000;
   }
