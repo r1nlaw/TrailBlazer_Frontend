@@ -657,8 +657,9 @@ html, body, #app {
 
 .map-button {
   position: absolute;
-  bottom: 16px;
+  bottom: 250px;
   right: 16px;
+
   padding: 8px 16px;
   background: white;
   border-radius: 12px;

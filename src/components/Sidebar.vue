@@ -22,6 +22,7 @@
 
         <h2>Фильтры</h2>
         <div class="filters">
+          <button class="apply-button" @click="applyFilters">Применить фильтры</button>
           <div class="filter-row">
             <div
               class="filter-item filter-gray"
@@ -42,7 +43,7 @@
           </div>
           <div class="filter-row">
             <div
-              class="filter-item filter-blue"
+              class="filter-item filter-museam"
               :class="{ active: isActiveCategory('Музей') }"
               @click="toggleCategory('Музей')"
             >
@@ -51,21 +52,21 @@
             </div>
             <div
               class="filter-item filter-gray"
-              :class="{ active: isActiveCategory('Склепы') }"
-              @click="toggleCategory('Склепы')"
+              :class="{ active: isActiveCategory('Архитектура') }"
+              @click="toggleCategory('Архитектура')"
             >
-              <img :src="cryptIcon" class="filter-icon" />
-              <span>Склепы</span>
+              <img :src="architectureIcon" class="filter-icon" />
+              <span>Архитектура</span>
             </div>
           </div>
           <div class="filter-row">
             <div
-              class="filter-item filter-pink"
-              :class="{ active: isActiveCategory('Зоопарк') }"
-              @click="toggleCategory('Зоопарк')"
+              class="filter-item filter-gold"
+              :class="{ active: isActiveCategory('Памятник') }"
+              @click="toggleCategory('Памятник')"
             >
-              <img :src="zooIcon" class="filter-icon" />
-              <span>Зоопарк</span>
+              <img :src="monumentIcon" class="filter-icon" />
+              <span>Памятники</span>
             </div>
             <div
               class="filter-item filter-green"
@@ -75,8 +76,74 @@
               <img :src="parkIcon" class="filter-icon" />
               <span>Парки</span>
             </div>
+
+             <div
+              class="filter-item filter-green-nature"
+              :class="{ active: isActiveCategory('Природа') }"
+              @click="toggleCategory('Природа')"
+            >
+              <img :src="natureIcon" class="filter-icon" />
+              <span>Природа</span>
+            </div>
+             <div
+              class="filter-item filter-brown"
+              :class="{ active: isActiveCategory('Театр') }"
+              @click="toggleCategory('Театр')"
+            >
+              <img :src="theatreIcon" class="filter-icon" />
+              <span>Театр</span>
+            </div>
+             <div
+              class="filter-item filter-brown-cons"
+              :class="{ active: isActiveCategory('Концертный зал') }"
+              @click="toggleCategory('Концертный зал')"
+            >
+              <img :src="concerthallIcon" class="filter-icon" />
+              <span>Концертный зал</span>
+            </div>
+             <div
+              class="filter-item filter-blue"
+              :class="{ active: isActiveCategory('Необычное') }"
+              @click="toggleCategory('Необычное')"
+            >
+              <img :src="unusualIcon" class="filter-icon" />
+              <span>Необычное</span>
+            </div>
+             <div
+              class="filter-item filter-beige"
+              :class="{ active: isActiveCategory('Археология') }"
+              @click="toggleCategory('Археология')"
+            >
+              <img :src="archaeologyIcon" class="filter-icon" />
+              <span>Археология</span>
+            </div>
+             <div
+              class="filter-item filter-orange"
+              :class="{ active: isActiveCategory('Арт-объект') }"
+              @click="toggleCategory('Арт-объект')"
+            >
+              <img :src="artobjectIcon" class="filter-icon" />
+              <span>Арт-объект</span>
+            </div>
+             <div
+              class="filter-item filter-blue-fountain"
+              :class="{ active: isActiveCategory('Фонтан') }"
+              @click="toggleCategory('Фонтан')"
+            >
+              <img :src="fountainIcon" class="filter-icon" />
+              <span>Фонтан</span>
+            </div>
+             <div
+              class="filter-item filter-white"
+              :class="{ active: isActiveCategory('Наука') }"
+              @click="toggleCategory('Наука')"
+            >
+              <img :src="scienceIcon" class="filter-icon" />
+              <span>Наука</span>
+            </div>
+           
           </div>
-          <button class="apply-button" @click="applyFilters">Применить фильтры</button>
+          
         </div>
       </div>
     </aside>
@@ -94,6 +161,18 @@ import museumIcon from '@/assets/emoji/museum.png'
 import cryptIcon from '@/assets/emoji/crypt.png'
 import zooIcon from '@/assets/emoji/zoo.png'
 import parkIcon from '@/assets/emoji/park.png'
+import natureIcon from '@/assets/emoji/nature.png'
+
+import archaeologyIcon from '@/assets/emoji/archaeology.png'
+import architectureIcon from '@/assets/emoji/architecture.png'
+import artobjectIcon from '@/assets/emoji/art-object.png'
+import concerthallIcon from '@/assets/emoji/concerthall.png'
+import fountainIcon from '@/assets/emoji/fountain.png'
+import monumentIcon from '@/assets/emoji/monument.png'
+import scienceIcon from '@/assets/emoji/science.png'
+import theatreIcon from '@/assets/emoji/theatre.png'
+import unusualIcon from '@/assets/emoji/unusual.png'
+
 
 const props = defineProps({
   selectedCategories: {
@@ -189,7 +268,7 @@ function applyFilters() {
 
 
 .sidebar-content {
-    margin-top: 10%;
+    margin-top: 20%;
 }
 .region {
   display: flex;
@@ -283,6 +362,37 @@ function applyFilters() {
   background: #fddcdc;
 }
 
+.filter-museam {
+  background: #8dc7c485;
+}
+.filter-orange {
+  background: #dba20693;
+}
+.filter-gold {
+  background: #d7d8a0b9;
+}
+.filter-brown {
+  background: #b370327e;
+}
+.filter-brown-cons {
+  background: #5e44cf7e;
+}
+.filter-green-nature {
+  background: #54886f81;
+}
+.filter-beige {
+  background: #fae6a3cc;
+}
+.filter-blue {
+  background: #67b0ec73;
+}
+.filter-blue-fountain {
+  background: #2576e073;
+}
+.filter-white{
+  background: #eee8e8bb;
+}
+
 .fade-slide-enter-active {
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
@@ -299,8 +409,8 @@ function applyFilters() {
   align-items: center;
   justify-content: center;
   position: fixed;
-  top: 2%;
-  left: 2%;
+  top: 3%;
+  left: 1.5%;
   z-index: 2001;
   background: rgba(51, 51, 51, 0.85);
   color: white;
@@ -448,7 +558,7 @@ function applyFilters() {
   }
 
   .sidebar-content{
-    margin-top: 35%;
+    margin-top: 0%;
   }
 
   .sidebar.open {
