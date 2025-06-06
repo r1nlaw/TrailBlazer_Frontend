@@ -394,8 +394,8 @@ function applyFilters() {
     margin-top: 80px;
     display: flex;
   }
-  .sidebar-content {
-    margin-top: 10%;
+  .sidebar-content{
+    margin-top: 35%;
   }
 }
 
@@ -409,6 +409,9 @@ function applyFilters() {
 
   .sidebar.open {
     transform: translateX(0);
+  }
+  .sidebar-content{
+    margin-top: 35%;
   }
 
   .sidebar-toggle {
@@ -427,6 +430,9 @@ function applyFilters() {
   .sidebar.open {
     transform: translateX(0);
   }
+  .sidebar-content{
+    margin-top: 35%;
+  }
 
   .sidebar-toggle {
     margin-top: 100px;
@@ -439,6 +445,10 @@ function applyFilters() {
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
     top: 70px;
+  }
+
+  .sidebar-content{
+    margin-top: 35%;
   }
 
   .sidebar.open {

@@ -295,15 +295,16 @@ import reviewIcon from '@/assets/icons/review.png';
 
 <style scoped>
 @keyframes fadeInUp {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
-  to {
+  100% {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 .selected-place,
 .selected-places .place-card {
   height: auto !important;
@@ -311,18 +312,20 @@ import reviewIcon from '@/assets/icons/review.png';
   max-width: 100%;
   min-width: 0;
   white-space: normal;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 .selected-places{
-  max-height:45%
+  max-height:45%;
+  animation: fadeInUp 0.4s ease both;
 }
 .selected-places.mobile-hidden {
-  display: none;
+  transition: transform 0.4s ease;
+  transform: translateX(100%);
 }
 .selected-places.mobile-visible {
-  display: flex;
-  flex-direction: column;
+  transition: transform 0.4s ease;
+  transform: translateX(0);
 }
-
 .travel-list-wrapper {
   display: flex;
   flex: 1;
@@ -502,6 +505,43 @@ import reviewIcon from '@/assets/icons/review.png';
   z-index: 1000;
   cursor: pointer;
 }
+@media (max-width: 2880px){
+  .travel-list-wrapper {
+    width: 100%;
+    gap: 16px; 
+  }
+  .selected-places {
+    min-width: 30%;
+  }
+  .selected-place.place-card.selected{
+    max-width: 95%;
+  }
+}
+@media (max-width: 2560px){
+  .travel-list-wrapper {
+    width: 100%;
+    gap: 16px; 
+  }
+  .selected-places {
+    min-width: 30%;
+  }
+  .selected-place.place-card.selected{
+    max-width: 95%;
+  }
+}
+
+@media (max-width: 1920px){
+  .travel-list-wrapper {
+    width: 100%;
+    gap: 16px; 
+  }
+  .selected-places {
+    min-width: 30%;
+  }
+  .selected-place.place-card.selected{
+    max-width: 95%;
+  }
+}
 
 @media (max-width: 1024px) {
   .mobile-cart-button {
@@ -542,123 +582,312 @@ import reviewIcon from '@/assets/icons/review.png';
 
 @media (max-width: 1024px) { 
   .place-card{
-    width: 1000px;
+    width: 920px;
   }
   .selected-places{
-    margin-left: 568px;
-    min-width: 410px;
+    margin-left: 0px;
+    min-width: 1000px;
+    min-height: 1230px;
     left: 0;
+    z-index: 20000;
+  }
+  .selected-places.mobile-hidden{
+    margin-left: 500px;
+  }
+
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 920px;
   }
 
 }
 @media (max-width: 912px) { 
   .place-card{
-    width: 880px;
+    width: 820px;
   }
   .selected-places{
-    margin-left: 450px;
-    min-width: 410px;
+    margin-left: 0px;
+    min-width: 880px;
+    min-height: 1230px;
     left: 0;
+    z-index: 20000;
+  }
+
+  .selected-places.mobile-hidden{
+    margin-left: 500px;
+  }
+
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 920px;
   }
 
 }
 @media (max-width: 853px) { 
   .place-card{
-    width: 820px;
+    width: 750px;
   }
   .selected-places{
-    margin-left: 405px;
-    min-width: 396px;
+    margin-left: 0px;
+    min-width: 820px;
+    min-height: 1130px;
     left: 0;
+    z-index: 20000;
   }
+  .selected-places.mobile-hidden{
+    margin-left: 500px;
+  }
+
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 790px;
+  }
+
 
 }
 @media (max-width: 820px) { 
   .place-card{
-    width: 790px;
+    width: 720px;
   }
   .selected-places{
-    margin-left: 363px;
-    min-width: 410px;
+    margin-left: 0px;
+    min-width: 785px;
+    min-height: 1030px;
     left: 0;
+    z-index: 20000;
+  }
+  .selected-places.mobile-hidden{
+    margin-left: 500px;
+  }
+
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 720px;
   }
 
 }
 
 @media (max-width: 768px) { 
   .place-card{
-    width: 710px;
+    width: 690px;
   }
   .selected-places{
-    margin-left: 300px;
-    min-width: 410px;
+    margin-left: 0px;
+    min-width: 745px;
+    min-height: 877px;
     left: 0;
+    z-index: 20000;
+  }
+  .selected-places.mobile-hidden{
+    margin-left: 500px;
+  }
+
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 700px;
   }
 
 }
 @media (max-width: 540px) { 
   .place-card{
-    width: 495px;
+    width: 450px;
+  }
+  .selected-place.place-card.selected{
+    min-width: 490px;
   }
   .selected-places{
-    margin-left: 87px;
-    min-width: 396px;
+    margin-left: 0px;
+    min-width: 525px;
+    min-height: 573px;
     left: 0;
+    z-index: 20000;
+  }
+  .selected-places.mobile-hidden{
+    margin-left: 500px;
+  }
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 470px;
   }
 }
 @media (max-width: 430px) { 
   .place-card{
-    width: 385px;
+    width: 355px;
   }
   .selected-places{
     margin-left: 0px;
-    min-width: 396px;
+    min-width: 400px;
+    min-height: 793px;
     left: 0;
+    z-index: 20000;
+  }
+  .selected-place.place-card.selected{
+    min-width: 300px;
+  }
+  .selected-places.mobile-hidden{
+    margin-left: 500px;
+  }
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 370px;
   }
 }
 
 @media (max-width: 414px) { 
   .place-card{
-    width: 370px;
+    width: 335px;
+    height: 130px;
   }
   .selected-places{
     margin-left: 0px;
     min-width: 380px;
+    min-height: 753px;
     left: 0;
+    z-index: 20000;
+  }
+  .selected-place.place-card.selected{
+    min-width: 300px;
+  }
+  .selected-places.mobile-hidden{
+    margin-left: 500px;
+  }
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 350px;
+  }
+}
+@media (max-width: 412px) { 
+  .place-card{
+    width: 335px;
+    height: 130px;
+  }
+  .selected-places{
+    margin-left: 0px;
+    min-width: 380px;
+    min-height: 773px;
+    left: 0;
+    z-index: 20000;
+  }
+  .selected-place.place-card.selected{
+    min-width: 300px;
+  }
+  .selected-places.mobile-hidden{
+    margin-left: 500px;
+  }
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 350px;
   }
 }
 @media (max-width: 390px) { 
   .place-card{
-    width: 350px;
-    height: 160px;
+    width: 315px;
+    height: 130px;
   }
   .selected-places{
     margin-left: 0px;
-    min-width: 350px;
+    min-width: 380px;
+    min-height: 700px;
     left: 0;
+    z-index: 20000;
+  }
+  .selected-place.place-card.selected{
+    min-width: 250px;
+  }
+  .selected-places.mobile-hidden{
+    margin-left: 500px;
+  }
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 350px;
   }
 }
 
 @media (max-width: 375px) { 
   .place-card{
     width: 305px;
-    height: 120px;
+    height: 130px;
   }
   .selected-places{
     margin-left: 0px;
     min-width: 350px;
+    min-height: 523px;
     left: 0;
+    z-index: 20000;
+  }
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 320px;
   }
 }
 @media (max-width: 360px) { 
   .place-card{
-    width: 310px;
+    width: 280px;
     height: 150px;
   }
   .selected-places{
     margin-left: 0px;
     min-width: 350px;
     left: 0;
+  }
+    .selected-places{
+    margin-left: 0px;
+    min-width: 350px;
+    min-height: 600px;
+    left: 0;
+    z-index: 20000;
+  }
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 344px) { 
+  .place-card{
+    width: 275px;
+    height: 150px;
+  }
+  .selected-place.place-card.selected{
+    min-width: 200px;
+  }
+  .selected-places{
+    margin-left: 0px;
+    min-width: 330px;
+    min-height: 800px;
+    left: 0;
+    z-index: 20000;
+  }
+
+  .bottom-action-button.in-cart{
+    background-color: #2c473a;
+  }
+  .place-card.selected{
+    max-width: 320px;
   }
 }
 
