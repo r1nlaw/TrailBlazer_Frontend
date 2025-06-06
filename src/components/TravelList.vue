@@ -23,6 +23,13 @@
           </div>
           <p class="location">{{ place.location }}</p>
           <p class="time">{{ place.time }}</p>
+          <div v-if="getCurrentWeather(place)" class="weather-info">
+            <img :src="`https://openweathermap.org/img/wn/${getCurrentWeather(place).icon}@2x.png`" 
+                 :alt="getCurrentWeather(place).description"
+                 class="weather-icon" />
+            <span class="temperature">{{ Math.round(getCurrentWeather(place).temperature) }}°C</span>
+            <span class="weather-description">{{ getCurrentWeather(place).description }}</span>
+          </div>
           <div class="rating">
             <span class="price">{{ place.price }}</span>
             <img :src="starIcon" alt="star" class="icon" />
@@ -218,7 +225,8 @@ async function loadLandmark(categories = selectedCategories.value) {
       price: element.price ?? '',
       rating: element.rating ?? '',
       reviews: element.reviews ?? '',
-      image: `${domain}/images/${element.image_path}`
+      image: `${domain}/images/${element.image_path}`,
+      weathers: element.weathers
     }));
 
     if (currentPage.value === 1) {
@@ -296,6 +304,23 @@ onBeforeUnmount(() => {
 import infoIcon from '@/assets/icons/info.png';
 import starIcon from '@/assets/icons/star.png';
 import reviewIcon from '@/assets/icons/review.png';
+
+// Добавляем функцию для получения текущей погоды
+function getCurrentWeather(place) {
+  if (!place.weathers || !place.weathers.length) return null;
+  
+  const now = new Date();
+  const currentHour = now.getUTCHours();
+  
+  // Находим ближайший прогноз погоды
+  return place.weathers.reduce((closest, current) => {
+    const currentDate = new Date(current.date);
+    const currentHourDiff = Math.abs(currentDate.getUTCHours() - currentHour);
+    const closestHourDiff = Math.abs(new Date(closest.date).getUTCHours() - currentHour);
+    
+    return currentHourDiff < closestHourDiff ? current : closest;
+  });
+}
 </script>
 
 
@@ -930,6 +955,29 @@ import reviewIcon from '@/assets/icons/review.png';
     min-width: 350px;
     left: 0;
   }
+}
+
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.weather-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.temperature {
+  font-weight: 600;
+  color: #2c473a;
+}
+
+.weather-description {
+  text-transform: capitalize;
 }
 
 </style>
