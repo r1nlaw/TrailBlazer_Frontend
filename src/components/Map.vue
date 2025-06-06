@@ -797,81 +797,14 @@ html, body, #app {
   text-align: center;
   color: #666;
 }
-/*
+
 @media (max-width: 3840px) {
-    .map-container {
-    width: 2000px;
-  }
-}
-@media (max-width: 2560px) {
-    .map-container {
-    width: 1520px;
-  }
-}
-@media (max-width: 1366px) {
-    .map-container {
-    width: 1080px;
+  .modal-overlay{
+    z-index: 5000;
   }
 }
 
-@media (max-width: 1024px) {
-    .map-container {
-    width: 1000px;
-  }
-}
-@media (max-width: 912px) {
-    .map-container {
-    width: 900px;
-  }
-}
-@media (max-width: 853px) {
-    .map-container {
-    width: 830px;
-  }
-}
-@media (max-width: 820px) {
-    .map-container {
-    width: 785px;
-  }
-}
-@media (max-width: 768px) {
-    .map-container {
-    width: 710px;
-  }
-}
-@media (max-width: 540px) {
-    .map-container {
-    width: 500px;
-  }
-}
-@media (max-width: 430px) {
-    .map-container {
-    width: 380px;
-  }
-}
-@media (max-width: 414px) {
-    .map-container {
-    width: 370px;
-  }
-}
-@media (max-width: 412px) {
-    .map-container {
-    width: 365px;
-  }
-}
-@media (max-width: 390px) {
-    .map-container {
-    width: 340px;
-  }
-}
 
-@media (max-width: 375px) {
-    .map-container {
-    width: 325px;
-  }
-}
-
-*/
 
 
 </style>

@@ -14,14 +14,18 @@ import MainMapAndList from '@/components/MainMapAndList.vue'
 
 <style scoped>
 .home-container {
+  width: 100%;
   display: flex;
   flex-direction: column;
   height: 100vh;
+  margin: 0 auto;
 }
 
 .main-content {
   display: flex;
+  width: 100%;
   flex: 1;
   overflow: hidden;
+  margin: 0 auto;
 }
 </style>
