@@ -323,7 +323,6 @@ import reviewIcon from '@/assets/icons/review.png';
 .selected-places{
   max-height:45%;
   animation: fadeInUp 0.4s ease both;
-  overflow: auto;
 }
 .selected-places.mobile-hidden {
   transition: transform 0.4s ease;
