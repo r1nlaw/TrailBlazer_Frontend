@@ -78,9 +78,9 @@
         </div>
 
 
-        <router-link to="/profile" class="avatar">
-          <img :src="avatarImage" class="avatar" />
-        </router-link>
+      <span class="avatar" @click="handleProfileClick">
+        <img :src="avatarImage" class="avatar" />
+      </span>
 
         <div class="settings" @click.stop="toggleDropdown">
           <img :src="settingsIcon" class="icon-circle" />
@@ -202,7 +202,7 @@ function handleImageError(event) {
 const visible = ref(false)
 
 function handleProfileClick() {
-  const token = localStorage.getItem('authToken')
+  const token = localStorage.getItem('token')
   if (token) {
     router.push('/profile')
   } else {
