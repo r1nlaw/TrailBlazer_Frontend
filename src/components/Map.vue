@@ -310,8 +310,18 @@ onMounted(async () => {
       type: 'line',
       source: routeSourceId,
       paint: {
-        'line-color': '#3b9ddd',
-        'line-width': 4
+        'line-color': '#ff0090',
+        'line-width': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          10, 3,
+          15, 5,
+          20, 8
+        ],
+        'line-opacity': 0.8,
+        'line-blur': 0.5,
+        'line-dasharray': [2, 2]
       }
     });
 
@@ -398,8 +408,18 @@ const initModalMap = () => {
         type: 'line',
         source: routeSourceId,
         paint: {
-          'line-color': '#3b9ddd',
-          'line-width': 4
+          'line-color': '#ff0090',
+          'line-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            10, 3,
+            15, 5,
+            20, 8
+          ],
+          'line-opacity': 0.8,
+          'line-blur': 0.5,
+          'line-dasharray': [2, 2]
         }
       });
     }
