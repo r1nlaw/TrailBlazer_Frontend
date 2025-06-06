@@ -40,11 +40,38 @@
             </li>
           </ul>
         </div>
+        <div v-if="landmark.weathers && landmark.weathers.length" class="landmark-section">
+          <h3>🌤 Прогноз погоды</h3>
+          <WeatherChart :weathers="landmark.weathers" />
+        </div>
 
         <div class="landmark-section">
           <h3>🌍 Местоположение</h3>
-          <p>Широта: {{ landmark.location.lat }}, Долгота: {{ landmark.location.lng }}</p>
+          <div class="coordinates-container">
+            <div class="coordinate-item">
+              <span class="coordinate-label">Широта:</span>
+              <div class="coordinate-value" @click="copyToClipboard(landmark.location.lat)">
+                {{ landmark.location.lat }}
+                <span class="copy-icon">📋</span>
+              </div>
+            </div>
+            <div class="coordinate-item">
+              <span class="coordinate-label">Долгота:</span>
+              <div class="coordinate-value" @click="copyToClipboard(landmark.location.lng)">
+                {{ landmark.location.lng }}
+                <span class="copy-icon">📋</span>
+              </div>
+            </div>
+            <div class="coordinate-item full-width">
+              <span class="coordinate-label">Координаты:</span>
+              <div class="coordinate-value" @click="copyToClipboard(`${landmark.location.lat}, ${landmark.location.lng}`)">
+                {{ landmark.location.lat }}, {{ landmark.location.lng }}
+                <span class="copy-icon">📋</span>
+              </div>
+            </div>
+          </div>
         </div>
+        
       </div>
     </transition>
   </div>
@@ -54,6 +81,7 @@
 import { ref, onMounted, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHead } from '@vueuse/head'
+import WeatherChart from './WeatherChart.vue'
 
 const route = useRoute()
 const domain = `${import.meta.env.VITE_BACKEND_URL}`
@@ -86,6 +114,15 @@ function formatDate(date) {
 
 function handleImageError(event) {
   event.target.src = '/placeholder-image.png'
+}
+
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text)
+    // Можно добавить уведомление об успешном копировании
+  } catch (err) {
+    console.error('Ошибка при копировании:', err)
+  }
 }
 
 watchEffect(() => {
@@ -234,5 +271,132 @@ watch(() => route.params.name, fetchLandmark)
   }
 }
 
+.weather-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.weather-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.weather-icon {
+  font-size: 2em;
+  margin-bottom: 8px;
+}
+
+.weather-info {
+  width: 100%;
+}
+
+.weather-date {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.weather-temp {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 8px 0;
+}
+
+.weather-desc {
+  color: #444;
+  margin-bottom: 8px;
+}
+
+.weather-wind {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.coordinates-container {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 12px;
+}
+
+.coordinate-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.coordinate-item:last-child {
+  margin-bottom: 0;
+}
+
+.coordinate-label {
+  font-weight: 600;
+  color: #2c3e50;
+  min-width: 100px;
+}
+
+.coordinate-value {
+  background: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.coordinate-value:hover {
+  border-color: #2196f3;
+  background: #e3f2fd;
+}
+
+.copy-icon {
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.coordinate-value:hover .copy-icon {
+  opacity: 1;
+}
+
+.full-width {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.full-width .coordinate-value {
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .coordinate-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .coordinate-label {
+    min-width: auto;
+  }
+
+  .coordinate-value {
+    width: 100%;
+  }
+}
 
 </style>
