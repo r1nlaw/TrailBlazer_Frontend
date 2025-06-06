@@ -18,6 +18,7 @@ provide('mapRef',mapRef)
 <style scoped>
 .main-layout {
   display: flex;
+  margin: 0;
   flex-direction: column;
   overflow-y: auto;
   gap: 24px;
@@ -31,7 +32,8 @@ provide('mapRef',mapRef)
   .main-layout {
     display: flex;
     flex-direction: column;
-    margin-left: -2%;
+    margin-left: 0%;
+    margin-right: 0%;
     overflow-y: auto;
     gap: 24px;
     padding: 32px 24px 24px;

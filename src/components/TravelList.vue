@@ -340,14 +340,40 @@ onBeforeUnmount(() => {
 }
 .selected-place,
 .selected-places .place-card {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
   height: auto !important;
   width: 100%;
   max-width: 100%;
   min-width: 0;
   white-space: normal;
+  gap: 12px;
 }
-.selected-places{
-  max-height:45%
+
+.selected-place .place-content,
+.selected-places .place-card .place-content {
+  min-width: 0;
+  word-break: break-word;
+  flex: 1 1 0%;
+}
+
+.selected-place .img,
+.selected-places .place-card .img {
+  flex: 0 0 auto;
+}
+
+.selected-place .place-image,
+.selected-places .place-card .place-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.selected-places {
+  max-height: 80vh;
+  overflow-y: auto;
 }
 .selected-places.mobile-hidden {
   display: none;
@@ -370,6 +396,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  max-width: 100%;
   overflow: visible;
 }
 
@@ -383,6 +410,8 @@ onBeforeUnmount(() => {
   position: relative;
   transition: all 0.3s ease;
   border: 1px solid #2c473a54;
+  width: 100%;
+  margin-right: 5%;
 }
 
 .place-card:hover {
@@ -501,6 +530,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-left: 1%;
   background: #f6fdf8;
   border-radius: 16px;
   padding: 26px;
@@ -576,9 +606,6 @@ onBeforeUnmount(() => {
 
 
 @media (max-width: 1024px) { 
-  .place-card{
-    width: 1000px;
-  }
   .selected-places{
     margin-left: 568px;
     min-width: 410px;
@@ -587,9 +614,6 @@ onBeforeUnmount(() => {
 
 }
 @media (max-width: 912px) { 
-  .place-card{
-    width: 880px;
-  }
   .selected-places{
     margin-left: 450px;
     min-width: 410px;
@@ -598,9 +622,6 @@ onBeforeUnmount(() => {
 
 }
 @media (max-width: 853px) { 
-  .place-card{
-    width: 820px;
-  }
   .selected-places{
     margin-left: 405px;
     min-width: 396px;
@@ -609,9 +630,6 @@ onBeforeUnmount(() => {
 
 }
 @media (max-width: 820px) { 
-  .place-card{
-    width: 790px;
-  }
   .selected-places{
     margin-left: 363px;
     min-width: 410px;
@@ -621,9 +639,6 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 768px) { 
-  .place-card{
-    width: 710px;
-  }
   .selected-places{
     margin-left: 300px;
     min-width: 410px;
@@ -632,9 +647,6 @@ onBeforeUnmount(() => {
 
 }
 @media (max-width: 540px) { 
-  .place-card{
-    width: 495px;
-  }
   .selected-places{
     margin-left: 87px;
     min-width: 396px;
@@ -642,9 +654,6 @@ onBeforeUnmount(() => {
   }
 }
 @media (max-width: 430px) { 
-  .place-card{
-    width: 385px;
-  }
   .selected-places{
     margin-left: 0px;
     min-width: 396px;
@@ -653,9 +662,6 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 414px) { 
-  .place-card{
-    width: 370px;
-  }
   .selected-places{
     margin-left: 0px;
     min-width: 380px;
@@ -664,7 +670,6 @@ onBeforeUnmount(() => {
 }
 @media (max-width: 390px) { 
   .place-card{
-    width: 350px;
     height: 160px;
   }
   .selected-places{
@@ -676,7 +681,6 @@ onBeforeUnmount(() => {
 
 @media (max-width: 375px) { 
   .place-card{
-    width: 335px;
     height: 160px;
   }
   .selected-places{
@@ -687,7 +691,6 @@ onBeforeUnmount(() => {
 }
 @media (max-width: 360px) { 
   .place-card{
-    width: 310px;
     height: 150px;
   }
   .selected-places{
@@ -699,7 +702,6 @@ onBeforeUnmount(() => {
 
 @media (max-width: 320px) { 
   .place-card{
-    width: 280px;
     height: 200px;
   }
   .selected-places{
