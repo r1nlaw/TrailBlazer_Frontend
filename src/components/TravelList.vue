@@ -321,8 +321,9 @@ import reviewIcon from '@/assets/icons/review.png';
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 .selected-places{
-  max-height:25%;
+  max-height:45%;
   animation: fadeInUp 0.4s ease both;
+  overflow: auto;
 }
 .selected-places.mobile-hidden {
   transition: transform 0.4s ease;
