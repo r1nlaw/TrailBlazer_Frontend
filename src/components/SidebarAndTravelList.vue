@@ -14,7 +14,6 @@ function toggleCategory(category) {
   if (selectedCategories.value.includes(category)) {
     selectedCategories.value = selectedCategories.value.filter(c => c !== category)
   } else {
-    // Чтобы Vue среагировал, создаём новый массив
     selectedCategories.value = [...selectedCategories.value, category]
   }
 }

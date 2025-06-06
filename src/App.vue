@@ -15,7 +15,6 @@ import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 import Header from './components/Header.vue'
-import Sidebar from './components/Sidebar.vue'
 import MainMapAndList from './components/MainMapAndList.vue'
 import RegisterModal from './components/RegisterModal.vue'
 

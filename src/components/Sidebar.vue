@@ -26,7 +26,7 @@
             <div
               class="filter-item filter-gray"
               :class="{ active: isActiveCategory('Замки') }"
-              @click="toggleCategory('Храм')"
+              @click="toggleCategory('Замки')"
             >
               <img :src="zamkiIcon" class="filter-icon" />
               <span>Храм</span>
@@ -70,12 +70,13 @@
             <div
               class="filter-item filter-green"
               :class="{ active: isActiveCategory('Парк') }"
-              @click="toggleCategory('Парки')"
+              @click="toggleCategory('Парк')"
             >
               <img :src="parkIcon" class="filter-icon" />
               <span>Парки</span>
             </div>
           </div>
+          <button class="apply-button" @click="applyFilters">Применить фильтры</button>
         </div>
       </div>
     </aside>
@@ -83,7 +84,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import russiaFlag from '@/assets/icons/russia_flag.png'
 import zamkiIcon from '@/assets/emoji/zamki.png'
@@ -109,13 +111,41 @@ const emit = defineEmits(['toggle-category'])
 const visible = ref(false)
 const activeRoute = ref(null)
 
+const router = useRouter()
+const route = useRoute()
+
 function toggleCategory(category) {
+  const current = [...props.selectedCategories]
+
+  const index = current.indexOf(category)
+  if (index !== -1) {
+    current.splice(index, 1)
+  } else {
+    current.push(category)
+  }
+
+  // Обновляем query параметр в URL
+  router.replace({
+    query: {
+      ...route.query,
+      categories: current.join(',')
+    }
+  })
+
   emit('toggle-category', category)
 }
 
 function isActiveCategory(category) {
   return props.selectedCategories.includes(category)
 }
+
+function applyFilters() {
+  emit('apply-filters', props.selectedCategories)
+  visible.value = false
+  location.reload() // Полная перезагрузка страницы
+}
+
+
 </script>
 
 <style scoped>
@@ -140,6 +170,23 @@ function isActiveCategory(category) {
 .sidebar.open {
   transform: translateX(0);
 }
+
+.apply-button {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background-color: #3478f6;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.apply-button:hover {
+  background-color: #245dc1;
+}
+
 
 .sidebar-content {
     margin-top: 10%;

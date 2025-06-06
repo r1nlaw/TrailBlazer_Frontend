@@ -4,7 +4,7 @@
     <div class="places">
       
       <div
-        v-for="(place, index) in allDisplayedPlaces"
+        v-for="(place, index) in sortedPlaces"
         :key="place.id"
         class="card place-card"
         :class="{ selected: selectedPlaces.includes(place.id) }"
@@ -92,119 +92,99 @@
 
 <script setup>
 import { ref, computed, inject, onMounted, onBeforeUnmount, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
+const route = useRoute(); 
 
 const selectedPlaces = ref([]);
 const places = ref([]);
 const currentPage = ref(1);
 const isLoading = ref(false);
 const noMoreData = ref(false);
-const filteredPlaces = ref([]);
 const mapRef = inject('mapRef');
 const isCartVisible = ref(true);
 const isMobileView = ref(false);
 
 let scrollContainer = null;
 
+// Категории приходят через props
 const props = defineProps({
   selectedCategories: {
     type: Array,
     default: () => []
   }
 });
+const selectedCategories = ref([...props.selectedCategories]);
 
+// Подписка на изменение props снаружи
+watch(() => props.selectedCategories, (newVal) => {
+  selectedCategories.value = [...newVal];
+});
 
-// Новая функция для построения URL с категориями в query
-function buildUrlWithCategories(baseUrl, categories) {
-  const params = new URLSearchParams();
-  categories.forEach(cat => params.append('category', cat));
-  return `${baseUrl}?${params.toString()}`;
-}
+// Следим за выбранными категориями, сбрасываем и перезагружаем места
+watch(selectedCategories, async (newVal) => {
+  const query = newVal.length > 0 ? { category: newVal } : {};
+  router.replace({ query });
 
-watch(() => props.selectedCategories, async (newVal) => {
-  console.log('selectedCategories changed:', newVal);
-
-  // Очистка и сброс
   places.value = [];
-  filteredPlaces.value = [];
   currentPage.value = 1;
   noMoreData.value = false;
 
-  if (newVal.length > 0) {
-    await loadFilteredPlaces(newVal); 
-    setTimeout(() => {
-      loadLandmark(); 
-    }, 200); 
-  } else {
-    loadLandmark(); 
-  }
-}, { immediate: true });
-
-
-
-
-async function loadFilteredPlaces(category) {
-  const domain = import.meta.env.VITE_BACKEND_URL;
-  const baseUrl = `${domain}/api/landmarks/filtersCategories`;
-  const url = buildUrlWithCategories(baseUrl, category);
-
-  try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-    const data = await response.json();
-
-    filteredPlaces.value = data.map(element => ({
-        id: element.id,
-        title: element.name,
-        location: element.address,
-        category: element.category,
-        translated_name: element.translated_name,
-        time: element.time ?? '',
-        price: element.price ?? '',
-        rating: element.rating ?? '',
-        reviews: element.reviews ?? '',
-        image: `${domain}/images/${element.image_path}`
-    }));
-
-    console.log('filteredPlaces updated:', filteredPlaces.value);
-
-
-
-  } catch (error) {
-    console.error('Ошибка при загрузке фильтрованных достопримечательностей:', error);
-    filteredPlaces.value = [];
-  }
-}
-
-//const allDisplayedPlaces = computed(() => filteredPlaces.value);
-
-
-const allDisplayedPlaces = computed(() => {
-  const filteredIds = new Set(filteredPlaces.value.map(place => place.id));
-  const remainingPlaces = places.value.filter(place => !filteredIds.has(place.id));
-  console.log("filteredPlaces.value", filteredPlaces.value);
-  console.log("filteredIds", filteredIds);
-
-  return [...filteredPlaces.value, ...remainingPlaces];
+  await loadLandmark();
 });
 
 
+const sortedPlaces = computed(() => {
+  // Если нет выбранных категорий, вернуть как есть
+  if (!selectedCategories.value.length) return places.value;
 
+  // Разделяем места по совпадению с выбранными категориями
+  const matching = [];
+  const others = [];
 
-async function loadLandmark() {
+  for (const place of places.value) {
+    if (selectedCategories.value.includes(place.category)) {
+      matching.push(place);
+    } else {
+      others.push(place);
+    }
+  }
+
+  return [...matching, ...others];
+});
+
+onMounted(async () => {
+  checkScreenSize();
+  window.addEventListener('resize', checkScreenSize);
+
+  scrollContainer = document.querySelector('.main-layout');
+  if (scrollContainer) {
+    scrollContainer.addEventListener('scroll', handleScroll);
+  }
+
+  // Инициализация из URL
+  const urlCategories = route.query.category;
+  if (Array.isArray(urlCategories)) {
+    selectedCategories.value = urlCategories;
+  } else if (typeof urlCategories === 'string') {
+    selectedCategories.value = [urlCategories];
+  }
+
+  await loadLandmark();
+});
+
+async function loadLandmark(categories = selectedCategories.value) {
   if (isLoading.value || noMoreData.value) return;
 
   isLoading.value = true;
 
   const domain = import.meta.env.VITE_BACKEND_URL;
-  const url = `${domain}/api/landmark?page=${currentPage.value}`;
+  let url = `${domain}/api/landmark?page=${currentPage.value}`;
+
+  if (categories.length > 0) {
+    url += `&${categories.map(cat => `category=${encodeURIComponent(cat)}`).join('&')}`;
+  }
 
   try {
     const response = await fetch(url, {
@@ -221,25 +201,24 @@ async function loadLandmark() {
       return;
     }
 
-    const filteredIds = new Set(filteredPlaces.value.map(p => p.id));
+    const newPlaces = landmarks.map(element => ({
+      id: element.id,
+      title: element.name,
+      location: element.address,
+      translated_name: element.translated_name,
+      category: element.category,
+      time: element.time ?? '',
+      price: element.price ?? '',
+      rating: element.rating ?? '',
+      reviews: element.reviews ?? '',
+      image: `${domain}/images/${element.image_path}`
+    }));
 
-    const newPlaces = landmarks
-      .filter(element => !filteredIds.has(element.id)) 
-      .map(element => ({
-        id: element.id,
-        title: element.name,
-        location: element.address,
-        translated_name: element.translated_name,
-        category: element.category,
-        time: element.time ?? '',
-        price: element.price ?? '',
-        rating: element.rating ?? '',
-        reviews: element.reviews ?? '',
-        image: `${domain}/images/${element.image_path}`
-      }));
-
-    
-    places.value.push(...newPlaces);
+    if (currentPage.value === 1) {
+      places.value = newPlaces;
+    } else {
+      places.value.push(...newPlaces);
+    }
 
     currentPage.value++;
   } catch (error) {
@@ -247,11 +226,6 @@ async function loadLandmark() {
   } finally {
     isLoading.value = false;
   }
-}
-
-function goToLandmark(nameTranslate) {
-  if (!nameTranslate) return;
-  router.push(`/landmark/${encodeURIComponent(nameTranslate)}`);
 }
 
 function handleScroll() {
@@ -262,10 +236,32 @@ function handleScroll() {
   const clientHeight = scrollContainer.clientHeight;
 
   const buffer = 200;
-
   if (scrollTop + clientHeight + buffer >= scrollHeight) {
-    loadLandmark();
+    loadLandmark(); // загружает следующую страницу
   }
+}
+
+function toggleSelection(id) {
+  const index = selectedPlaces.value.indexOf(id);
+  if (index === -1) {
+    selectedPlaces.value.push(id);
+  } else {
+    selectedPlaces.value.splice(index, 1);
+  }
+}
+
+function handleSelection() {
+  if (mapRef?.value?.RouteMaker) {
+    mapRef.value.RouteMaker(selectedPlaces.value);
+    console.log('Выбранные ID:', selectedPlaces.value);
+  } else {
+    console.error('Map component or RouteMaker not available');
+  }
+}
+
+function goToLandmark(nameTranslate) {
+  if (!nameTranslate) return;
+  router.push(`/landmark/${encodeURIComponent(nameTranslate)}`);
 }
 
 function checkScreenSize() {
@@ -278,42 +274,8 @@ function toggleCart() {
   isCartVisible.value = !isCartVisible.value;
 }
 
-function toggleSelection(id) {
-  const index = selectedPlaces.value.indexOf(id);
-  if (index === -1) {
-    selectedPlaces.value.push(id);
-  } else {
-    selectedPlaces.value.splice(index, 1);
-  }
-}
-
-const selectedPlaceObjects = computed(() =>
-  allDisplayedPlaces.value.filter(place => selectedPlaces.value.includes(place.id))
-);
-
-function handleSelection() {
-  if (mapRef?.value?.RouteMaker) {
-    mapRef.value.RouteMaker(selectedPlaces.value);
-    console.log('Выбранные ID:', selectedPlaces.value);
-  } else {
-    console.error('Map component or RouteMaker not available');
-  }
-}
-
-import infoIcon from '@/assets/icons/info.png';
-import starIcon from '@/assets/icons/star.png';
-import reviewIcon from '@/assets/icons/review.png';
-
-onMounted(() => {
-  checkScreenSize();
-  window.addEventListener('resize', checkScreenSize);
-
-  scrollContainer = document.querySelector('.main-layout');
-  if (scrollContainer) {
-    scrollContainer.addEventListener('scroll', handleScroll);
-  }
-
-  loadLandmark();
+const selectedPlaceObjects = computed(() => {
+  return places.value.filter(place => selectedPlaces.value.includes(place.id));
 });
 
 onBeforeUnmount(() => {
@@ -323,6 +285,10 @@ onBeforeUnmount(() => {
     scrollContainer.removeEventListener('scroll', handleScroll);
   }
 });
+
+import infoIcon from '@/assets/icons/info.png';
+import starIcon from '@/assets/icons/star.png';
+import reviewIcon from '@/assets/icons/review.png';
 </script>
 
 
