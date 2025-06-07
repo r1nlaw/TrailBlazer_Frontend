@@ -346,6 +346,9 @@ function getCurrentWeather(place) {
   white-space: normal;
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
+.place-card{
+  width:90%;
+}
 .selected-places{
   max-height:45%;
   animation: fadeInUp 0.4s ease both;
@@ -380,14 +383,14 @@ function getCurrentWeather(place) {
 
 .place-card {
   background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
-  padding: 12px;
-  border-radius: 16px;
   align-items: center;
   gap: 16px;
-  position: relative;
-  transition: all 0.3s ease;
-  border: 1px solid #2c473a54;
+  width: 90%;
+  margin: 0 auto;
 }
 
 .place-card:hover {
@@ -580,51 +583,60 @@ function getCurrentWeather(place) {
 }
 
 @media (max-width: 1024px) {
-  .mobile-cart-button {
-    display: block;
-  }
-  .travel-list-wrapper {
-    flex-direction: column;
-    width: 100%;
-    gap: 16px; 
-  }
-  
-  .places {
-    flex: none;
-    width: 100%;
-  }
-  .place-card{
-    height: 120px;
-  }
-  
-
-
   .selected-places {
-    min-width: unset;
-    border-radius: 12px;
-    padding: 16px;
     position: fixed;
-    bottom: 120px;
-    right: 50px;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    max-width: 85vw;
+    max-height: 40vh;
+    z-index: 1001;
+    overflow-y: auto;
     background: #f6fdf8;
     box-shadow: 0 4px 12px rgba(44, 71, 58, 0.3);
-    width: 300px;
-    overflow-y: auto;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    z-index: 1001;
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .scroll-area {
+    max-height: calc(40vh - 80px);
   }
 }
 
+@media (max-width: 768px) {
+  .selected-places {
+    bottom: 70px;
+    padding: 14px;
+    width: 85%;
+    max-width: 85vw;
+  }
+  .place-card {
+    width: 90%;
+    padding: 12px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .selected-places {
+    bottom: 60px;
+    padding: 12px;
+    width: 85%;
+    max-width: 85vw;
+  }
+  .place-card {
+    width: 90%;
+    padding: 10px;
+    gap: 10px;
+  }
+}
 
 @media (max-width: 1024px) { 
   .place-card{
     width: 920px;
   }
   .selected-places{
-    margin-left: 0px;
-    min-width: 1000px;
-    min-height: 1230px;
-    left: 0;
     z-index: 20000;
   }
   .selected-places.mobile-hidden{
@@ -644,10 +656,6 @@ function getCurrentWeather(place) {
     width: 820px;
   }
   .selected-places{
-    margin-left: 0px;
-    min-width: 880px;
-    min-height: 1230px;
-    left: 0;
     z-index: 20000;
   }
 
@@ -668,10 +676,7 @@ function getCurrentWeather(place) {
     width: 750px;
   }
   .selected-places{
-    margin-left: 0px;
     min-width: 820px;
-    min-height: 570px;
-    left: 0;
     z-index: 20000;
   }
   .selected-places.mobile-hidden{
@@ -692,10 +697,7 @@ function getCurrentWeather(place) {
     width: 720px;
   }
   .selected-places{
-    margin-left: 0px;
     min-width: 785px;
-    min-height: 1030px;
-    left: 0;
     z-index: 20000;
   }
   .selected-places.mobile-hidden{
@@ -716,10 +718,7 @@ function getCurrentWeather(place) {
     width: 690px;
   }
   .selected-places{
-    margin-left: 0px;
     min-width: 745px;
-    min-height: 877px;
-    left: 0;
     z-index: 20000;
   }
   .selected-places.mobile-hidden{
@@ -743,10 +742,7 @@ function getCurrentWeather(place) {
     max-width: 470px;
   }
   .selected-places{
-    margin-left: 0px;
     min-width: 525px;
-    min-height: 573px;
-    left: 0;
     z-index: 20000;
   }
   .selected-places.mobile-hidden{
@@ -764,10 +760,7 @@ function getCurrentWeather(place) {
     width: 355px;
   }
   .selected-places{
-    margin-left: 0px;
     min-width: 400px;
-    min-height: 493px;
-    left: 0;
     z-index: 20000;
   }
   .selected-place.place-card.selected{
@@ -791,10 +784,7 @@ function getCurrentWeather(place) {
     height: 130px;
   }
   .selected-places{
-    margin-left: 0px;
-    min-width: 380px;
-    min-height: 553px;
-    left: 0;
+    max-height:25%;
     z-index: 20000;
   }
 
@@ -819,10 +809,8 @@ function getCurrentWeather(place) {
     height: 130px;
   }
   .selected-places{
-    margin-left: 0px;
     min-width: 380px;
-    min-height: 573px;
-    left: 0;
+    max-height:40%;
     z-index: 20000;
   }
   .selected-place.place-card.selected{
@@ -845,10 +833,8 @@ function getCurrentWeather(place) {
     height: 130px;
   }
   .selected-places{
-    margin-left: 0px;
     min-width: 380px;
     min-height: 550px;
-    left: 0;
     z-index: 20000;
   }
 
@@ -874,11 +860,8 @@ function getCurrentWeather(place) {
     height: 130px;
   }
   .selected-places{
-    margin-left: 0px;
     min-width: 350px;
     min-height: 523px;
-    left: 0;
-    z-index: 20000;
   }
   .selected-place.place-card.selected{
     max-width: 320px;
@@ -896,16 +879,11 @@ function getCurrentWeather(place) {
     height: 150px;
   }
   .selected-places{
-    margin-left: 0px;
     min-width: 350px;
-    left: 0;
   }
   .selected-places{
-    margin-left: 0px;
     min-width: 350px;
     min-height: 500px;
-    left: 0;
-    z-index: 20000;
   }
   .bottom-action-button.in-cart{
     background-color: #2c473a;
@@ -929,11 +907,8 @@ function getCurrentWeather(place) {
     min-width: 290px;
   }
   .selected-places{
-    margin-left: 0px;
     min-width: 330px;
     min-height: 520px;
-    left: 0;
-    z-index: 20000;
   }
 
   .bottom-action-button.in-cart{
@@ -950,9 +925,7 @@ function getCurrentWeather(place) {
     height: 200px;
   }
   .selected-places{
-    margin-left: 0px;
     min-width: 350px;
-    left: 0;
   }
 }
 
