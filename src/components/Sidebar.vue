@@ -205,6 +205,7 @@ function toggleCategory(category) {
 
   // Обновляем query параметр в URL
   router.replace({
+    path: route.path, 
     query: {
       ...route.query,
       categories: current.join(',')

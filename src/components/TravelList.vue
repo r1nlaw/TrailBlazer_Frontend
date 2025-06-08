@@ -65,6 +65,15 @@
         >
           Очистить выбранные
         </button>
+        <button
+          v-if="selectedPlaces.length > 0"
+          class="bottom-action-button copy-route"
+          @click="copyRouteLink"
+        >
+          Скопировать маршрут
+        </button>
+
+
         <div class="scroll-area">
           <div
             v-for="(place, index) in selectedPlaceObjects"
@@ -184,7 +193,6 @@ onMounted(async () => {
     scrollContainer.addEventListener('scroll', handleScroll);
   }
 
-  // Инициализация из URL
   const urlCategories = route.query.category;
   if (Array.isArray(urlCategories)) {
     selectedCategories.value = urlCategories;
@@ -192,8 +200,42 @@ onMounted(async () => {
     selectedCategories.value = [urlCategories];
   }
 
+  const urlSelected = route.query.landmark;
+
+  if (Array.isArray(urlSelected)) {
+    selectedPlaces.value = urlSelected.map(id => parseInt(id));
+  } else if (typeof urlSelected === 'string') {
+    selectedPlaces.value = [parseInt(urlSelected)];
+  }
+
+
   await loadLandmark();
 });
+
+watch(
+  () => route.query.landmark,
+  (newVal) => {
+    const landmarkIds = Array.isArray(newVal)
+      ? newVal.map(id => parseInt(id))
+      : newVal
+        ? [parseInt(newVal)]
+        : [];
+
+    // Добавляем только уникальные id
+    for (const id of landmarkIds) {
+      if (!selectedPlaces.value.includes(id)) {
+        selectedPlaces.value.push(id);
+      }
+    }
+
+    // Очищаем URL (удаляем query-параметры)
+    if (landmarkIds.length > 0) {
+      router.replace({ path: route.path, query: { ...route.query, landmark: undefined } });
+    }
+  },
+  { immediate: true }
+);
+
 
 async function loadLandmark(categories = selectedCategories.value) {
   if (isLoading.value || noMoreData.value) return;
@@ -292,6 +334,23 @@ function handleSelection() {
   }
 }
 
+function copyRouteLink() {
+  if (!selectedPlaces.value.length) return;
+
+  const params = selectedPlaces.value.map(id => `landmark=${encodeURIComponent(id)}`).join('&');
+  const routeUrl = `${window.location.origin}/route?${params}`;
+
+  navigator.clipboard.writeText(routeUrl)
+    .then(() => {
+      alert('Ссылка на маршрут скопирована!');
+    })
+    .catch(err => {
+      console.error('Ошибка копирования маршрута:', err);
+      alert('Не удалось скопировать ссылку');
+    });
+}
+
+
 function goToLandmark(nameTranslate) {
   if (!nameTranslate) return;
   router.push(`/landmark/${encodeURIComponent(nameTranslate)}`);
@@ -341,6 +400,7 @@ function getCurrentWeather(place) {
 }
 
 
+
 </script>
 
 
@@ -372,7 +432,7 @@ function getCurrentWeather(place) {
   width:90%;
 }
 .selected-places{
-  max-height:45%;
+  max-height:48%;
   animation: fadeInUp 0.4s ease both;
 }
 .selected-places.mobile-hidden {
