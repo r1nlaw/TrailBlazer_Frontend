@@ -13,6 +13,8 @@ import SidebarAndTravelList from "./SidebarAndTravelList.vue";
 
 const mapRef = ref(null);
 provide('mapRef',mapRef)
+
+
 </script>
 
 <style scoped>

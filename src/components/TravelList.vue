@@ -58,6 +58,13 @@
     >
       <div class="card h-100 p-3">
         <h2>Выбранные места</h2>
+        <button
+          v-if="selectedPlaces.length > 0"
+          class="bottom-action-button clear-selection"
+          @click="clearSelection"
+        >
+          Очистить выбранные
+        </button>
         <div class="scroll-area">
           <div
             v-for="(place, index) in selectedPlaceObjects"
@@ -265,6 +272,17 @@ function toggleSelection(id) {
   }
 }
 
+function clearSelection() {
+  selectedPlaces.value = [];
+
+  if (mapRef?.value?.resetRoute) {
+    mapRef.value.resetRoute();
+  } else {
+    console.warn('clearRoute не доступен через mapRef');
+  }
+}
+
+
 function handleSelection() {
   if (mapRef?.value?.RouteMaker) {
     mapRef.value.RouteMaker(selectedPlaces.value);
@@ -321,6 +339,8 @@ function getCurrentWeather(place) {
     return currentHourDiff < closestHourDiff ? current : closest;
   });
 }
+
+
 </script>
 
 
@@ -337,14 +357,16 @@ function getCurrentWeather(place) {
   }
 }
 
-.selected-place,
+
 .selected-places .place-card {
   height: auto !important;
   width: 100%;
   max-width: 100%;
-  min-width: 0;
   white-space: normal;
   transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.selected-place{
+  width: 50%;
 }
 .place-card{
   width:90%;
@@ -357,10 +379,7 @@ function getCurrentWeather(place) {
   transition: transform 0.4s ease;
   transform: translateX(100%);
 }
-.scroll-area {
-  max-height: 450px; 
-  overflow-y: auto;
-}
+
 .selected-places.mobile-visible {
   transition: transform 0.4s ease;
   transform: translateX(0);
@@ -516,9 +535,10 @@ function getCurrentWeather(place) {
 
 .scroll-area {
   flex: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
+  max-height: 450px;
+  overflow-y: scroll;
   gap: 16px;
 }
 
@@ -544,6 +564,24 @@ function getCurrentWeather(place) {
   z-index: 1000;
   cursor: pointer;
 }
+.bottom-action-button.clear-selection {
+  background-color: #2c473a;
+  color: white;
+  margin-top: 12px;
+  padding: 8px 16px;
+  margin-bottom: 20px;
+  border-radius: 15px;
+  max-width: 230px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.bottom-action-button.clear-selection:hover {
+  background-color: #456e5a;
+}
+
+
 @media (max-width: 2880px){
   .travel-list-wrapper {
     width: 100%;
@@ -578,7 +616,7 @@ function getCurrentWeather(place) {
     min-width: 30%;
   }
   .selected-place.place-card.selected{
-    max-width: 95%;
+    max-width: 90%;
   }
 }
 

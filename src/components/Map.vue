@@ -1,25 +1,24 @@
 <template>
-  <div class="map-container" :style="{ height: mapHeight + 'px' }">
-    <img v-if="!isMapVisible" src="@/assets/images/map_placeholder.png" alt="Карта" class="map-image" :class="{ blurred: isMapModalOpen }" />
+  <div class="map-container" :class="{ expanded: isMapExpanded }">
+    <img
+      v-if="!isMapVisible"
+      src="@/assets/images/map_placeholder.png"
+      alt="Карта"
+      class="map-image"
+    />
     <div v-show="isMapVisible" id="map" style="z-index: 0;"></div>
+
     <button class="map-button" @click="toggleMap">
       <img src="@/assets/icons/map-pin.png" alt="Pin" />
       {{ isMapExpanded ? 'Уменьшить карту' : isMapVisible ? 'Увеличить карту' : 'Раскрыть карту' }}
     </button>
-
-    <transition name="modal-fade">
-      <div v-if="isMapModalOpen" class="modal-overlay" @click.self="isMapModalOpen = false">
-        <div class="modal-content">
-          <button class="modal-close" @click="isMapModalOpen = false">✕</button>
-          <div id="map-modal" style="height: 100%; width: 100%"></div>
-        </div>
-      </div>
-    </transition>
   </div>
 </template>
 
+
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
+
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -31,8 +30,7 @@ const geojson = { type: 'FeatureCollection', features: [] };
 let map = null;
 const mapHeight = ref(400);
 const routeSourceId = 'route';
-const isMapModalOpen = ref(false);
-const modalMap = ref(null); // Храним модальную карту
+
 const markers = ref({});
 const isRouting = ref(false);
 const selectedRoutePoints = ref([]);
@@ -72,23 +70,36 @@ const loadFacilities = async (targetMap, selectedIds = selectedRoutePoints.value
     return;
   }
 
+  const isMobile = window.innerWidth <= 768;
+  const markerSize = isMobile ? 150 : 100;
+
+  let facilities = [];
+
   try {
-    const bounds = targetMap.getBounds().toArray();
-    const isMobile = window.innerWidth <= 768;
-    const markerSize = isMobile ? 150 : 100;
+    if (selectedIds.length > 0) {
+      // Загружаем достопримечательности по ID
+      const response = await fetch(`${domain}/api/getLandmarks`, {
+        method: 'POST',
+        body: JSON.stringify(selectedIds),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+      facilities = await response.json();
+    } else {
+      // Загружаем достопримечательности по bounds
+      const bounds = targetMap.getBounds().toArray();
+      const response = await fetch(`${domain}/api/facilities`, {
+        method: 'POST',
+        body: JSON.stringify({
+          sw: { lng: bounds[0][0], lat: bounds[0][1] },
+          ne: { lng: bounds[1][0], lat: bounds[1][1] }
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+      facilities = await response.json();
+    }
 
-    const response = await fetch(`${domain}/api/facilities`, {
-      method: 'POST',
-      body: JSON.stringify({
-        sw: { lng: bounds[0][0], lat: bounds[0][1] },
-        ne: { lng: bounds[1][0], lat: bounds[1][1] }
-      }),
-      headers: { 'Content-Type': 'application/json' }
-    });
-
-    if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-
-    const facilities = await response.json();
     if (!facilities?.length) return;
 
     const newFeatures = await Promise.all(facilities.map(async facility => {
@@ -210,18 +221,13 @@ const showPopup = (feature, targetMap) => {
         if (name) {
           router.push(`/landmark/${encodeURIComponent(name)}`);
           popup.remove();
-          if (targetMap === modalMap.value) {
-            isMapModalOpen.value = false;
-          }
         }
       });
     }
   }, 0);
 };
 
-function goToLandmark(nameTranslate) {
-  router.push(`/landmark/${encodeURIComponent(nameTranslate)}`);
-}
+
 
 onMounted(async () => {
   map = new maplibregl.Map({
@@ -348,103 +354,8 @@ onMounted(async () => {
   map.on('error', console.error);
 });
 
-const openMapModal = () => {
-  isMapModalOpen.value = true;
-  setTimeout(() => initModalMap(), 300);
-};
 
-const initModalMap = () => {
-  modalMap.value = new maplibregl.Map({
-    container: 'map-modal',
-    style: map_style,
-    center: map.getCenter(),
-    zoom: map.getZoom()
-  });
 
-  modalMap.value.on('load', async () => {
-    modalMap.value.addSource('markers', {
-      type: 'geojson',
-      data: geojson,
-      cluster: true,
-      clusterMaxZoom: 11,
-      clusterRadius: 30
-    });
-
-    modalMap.value.addLayer({
-      id: 'clusters',
-      type: 'circle',
-      source: 'markers',
-      filter: ['has', 'point_count'],
-      paint: {
-        'circle-color': ['step', ['get', 'point_count'], '#51bbd6', 10, '#f1f075', 750, '#f28cb1'],
-        'circle-radius': ['step', ['get', 'point_count'], 15, 100, 20, 750, 25]
-      }
-    });
-
-    modalMap.value.addLayer({
-      id: 'cluster-count',
-      type: 'symbol',
-      source: 'markers',
-      filter: ['has', 'point_count'],
-      layout: {
-        'text-field': '{point_count_abbreviated}',
-        'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
-        'text-size': 10
-      },
-      paint: {
-        'text-color': '#ffffff'
-      }
-    });
-
-    const routeData = map.getSource(routeSourceId)?._data;
-    if (routeData) {
-      modalMap.value.addSource(routeSourceId, {
-        type: 'geojson',
-        data: routeData
-      });
-
-      modalMap.value.addLayer({
-        id: 'route-line',
-        type: 'line',
-        source: routeSourceId,
-        paint: {
-          'line-color': '#ff0090',
-          'line-width': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            10, 3,
-            15, 5,
-            20, 8
-          ],
-          'line-opacity': 0.8,
-          'line-blur': 0.5,
-          'line-dasharray': [2, 2]
-        }
-      });
-    }
-
-    await loadFacilities(modalMap.value);
-
-    modalMap.value.on('click', 'unclustered-point', (e) => {
-      if (e.features?.[0]) showPopup(e.features[0], modalMap.value);
-    });
-
-    modalMap.value.on('mouseenter', ['clusters', 'unclustered-point'], () => {
-      modalMap.value.getCanvas().style.cursor = 'pointer';
-    });
-
-    modalMap.value.on('mouseleave', ['clusters', 'unclustered-point'], () => {
-      modalMap.value.getCanvas().style.cursor = '';
-    });
-  });
-
-  modalMap.value.on('moveend', () => {
-      if (!isRouting.value) {
-        loadFacilities(modalMap.value);
-      }
-    });
-};
 
 function resetRoute() {
   selectedRoutePoints.value = [];
@@ -456,30 +367,25 @@ function resetRoute() {
   }
   loadFacilities(map);
 }
-
-defineExpose({
-  RouteMaker,
-  hideAllPoints,
-  loadFacilities,
-  resetRoute
-});
-
 const toggleMap = () => {
   if (!isMapVisible.value) {
-    
     isMapVisible.value = true;
-    isMapExpanded.value = false;
-  } else if (!isMapExpanded.value) {
-    openMapModal();
+    isMapExpanded.value = true;
+    mapHeight.value = 800;
+    nextTick(() => {
+      map?.resize();
+    });
   } else {
-    isMapExpanded.value = false;
-  }
-  mapHeight.value = isMapExpanded.value ? 600 : 400;
-
-  if (isMapVisible.value && map) {
-    setTimeout(() => map.resize(), 0);
+    isMapExpanded.value = !isMapExpanded.value;
+    mapHeight.value = isMapExpanded.value ? 800 : 400;
+    nextTick(() => {
+      map?.resize();
+    });
   }
 };
+
+
+
 
 async function getLandmarksByIDs(points) {
   const url = `${domain}/api/getLandmarks`;
@@ -561,6 +467,14 @@ function getRoute(coords) {
     }
   });
 }
+
+defineExpose({
+  RouteMaker,
+  hideAllPoints,
+  loadFacilities,
+  resetRoute,
+});
+
 </script>
 <style scoped>
 html, body, #app {
@@ -570,14 +484,15 @@ html, body, #app {
 }
 
 #map {
-  position: absolute;
-  inset: 0;
-  width: 100%;
+  border-radius: 20px;
   height: 100%;
+  width: 100%;
 }
+
+
 .blurred {
-  filter: blur(8px);
-  transition: filter 0.3s ease;
+  filter: blur(15px);
+  transition: filter 1.5s ease;
 }
 
 :deep(.popup-card) {
@@ -636,15 +551,21 @@ html, body, #app {
 
 
 .map-container {
-  position: relative;
-  width: 100%;
-  margin-top: 0;
+  transition: min-height 0.0s ease; /*С анимацией карта лагает*/
   min-height: 300px;
-  border-radius: 24px;
-  transition: none;
-  overflow: hidden;
-  transition: height 0.3s ease;
+  position: relative;
 }
+
+.map-container.expanded {
+  min-height: 850px;
+}
+
+
+.maplibregl-canvas {
+  height: 100% !important;
+  width: 100% !important;
+}
+
 
 .map-image {
   position: absolute;
@@ -657,19 +578,22 @@ html, body, #app {
 
 .map-button {
   position: absolute;
-  bottom: 250px;
-  right: 16px;
-
-  padding: 8px 16px;
-  background: white;
-  border-radius: 12px;
+  top: 10px;
+  right: 10px;
+  z-index: 10; 
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  border-radius: 15px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.map-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .map-button img {
@@ -714,14 +638,6 @@ html, body, #app {
 }
 
 
-.modal-fade-enter-active,
-.modal-fade-leave-active {
-  transition: opacity 0.3s;
-}
-.modal-fade-enter-from,
-.modal-fade-leave-to {
-  opacity: 0;
-}
 
 :deep(.custom-popup) {
   width: 200px !important;
