@@ -2,34 +2,15 @@
   <transition name="fade-slide">
     <section v-if="visible" class="profile-section">
       <header class="profile-header">
-        <label v-if="isEditing" class="avatar-label" title="Нажмите, чтобы изменить аватар">
-          <img
-            :src="getAvatarSrc"
-            alt="Фото профиля"
-            class="avatar"
-          />
-          <input type="file" @change="onFileChange" class="file-input" />
-        </label>
         <img
-          v-else
           :src="getAvatarSrc"
           alt="Фото профиля"
           class="avatar"
-          :class="{ 'avatar-editing': isEditing }"
         />
-
         <div class="info">
-          <template v-if="isEditing">
-            <input v-model="edited.name" placeholder="Введите имя" class="edit-input" />
-            <textarea v-model="edited.bio" placeholder="Введите био" class="edit-textarea"></textarea>
-            <!-- Кнопка выбора файла убрана, теперь через клик по аватару -->
-          </template>
-          <template v-else>
-            <h2 class="name">{{ profile.name }}</h2>
-            <p class="bio">{{ profile.bio }}</p>
-          </template>
-
-          <div class="stars">
+          <h2 class="name">{{ profile.name || 'Гость' }}</h2>
+          <p class="bio">{{ profile.bio || 'Пожалуйста, зарегистрируйтесь, чтобы настроить профиль' }}</p>
+          <div class="stars" v-if="isAuthenticated">
             <span
               v-for="n in 5"
               :key="n"
@@ -41,14 +22,16 @@
             <span class="rating-number">{{ profile.rating.toFixed(1) }}</span>
           </div>
         </div>
-
-        <button class="edit-button" @click="toggleEdit">
+        <button v-if="isAuthenticated" class="edit-button" @click="toggleEdit">
           {{ isEditing ? ' Сохранить' : ' Редактировать' }}
+        </button>
+        <button v-else class="edit-button" @click="openRegisterModal">
+          Зарегистрироваться
         </button>
       </header>
 
       <!-- Routes -->
-      <section class="routes">
+      <section class="routes" v-if="isAuthenticated">
         <h3>Мои маршруты</h3>
         <ul>
           <li v-for="route in profile.routes" :key="route.id">
@@ -59,64 +42,78 @@
           </li>
         </ul>
       </section>
+
+      <!-- Modal -->
+      <RegisterModal ref="registerModalRef" @register="handleRegister" />
     </section>
   </transition>
 </template>
 
 <script setup>
 import { reactive, ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import avatarImage from '@/assets/images/user_avatar.png'
+import RegisterModal from '@/components/RegisterModal.vue'
 
 const visible = ref(false)
 const isEditing = ref(false)
-const username = localStorage.getItem("username")
+const registerModalRef = ref(null)
+const isAuthenticated = ref(false)
+const router = useRouter()
 
 const profile = reactive({
-  photo: '', // base64-строка
-  name: username,
-  bio: 'Люблю путешествовать и открывать новые маршруты!',
-  rating: 4.7,
-  routes: [
-    { id: 1, name: 'Крымская тропа' },
-    { id: 2, name: 'Пеший маршрут по горам' },
-    { id: 3, name: 'Велоэкскурсия по городу' },
-  ],
+  photo: '',
+  name: '',
+  bio: '',
+  rating: 0,
+  routes: [],
 })
 
 const edited = reactive({
   photo: '',
-  name: profile.name,
-  bio: profile.bio,
+  name: '',
+  bio: '',
 })
+
 const domain = `${import.meta.env.VITE_BACKEND_URL}`
 
 onMounted(async () => {
+  const token = localStorage.getItem("token")
+  isAuthenticated.value = !!token
 
-  try {
-    const token = localStorage.getItem("token")
-    const response = await fetch(`${domain}/user/profile`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    })
+  if (isAuthenticated.value) {
+    try {
+      const response = await fetch(`${domain}/user/profile`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`Ошибка загрузки профиля: ${errorText}`)
+      if (!response.ok) {
+        isAuthenticated.value=false;
+          visible.value = true
+        return;
+      }
+
+      const data = await response.json()
+      profile.name = data.username || localStorage.getItem("username") || ''
+      profile.bio = data.user_bio || 'Люблю путешествовать и открывать новые маршруты!'
+      profile.photo = data.avatar || ''
+      profile.rating = data.rating || 4.7
+      profile.routes = data.routes || [
+        { id: 1, name: 'Крымская тропа' },
+        { id: 2, name: 'Пеший маршрут по горам' },
+        { id: 3, name: 'Велоэкскурсия по городу' },
+      ]
+
+      edited.name = profile.name
+      edited.bio = profile.bio
+      edited.photo = profile.photo
+    } catch (err) {
+      console.error(err)
+      alert('Не удалось загрузить профиль: ' + err.message)
     }
-
-    const data = await response.json()
-
-    profile.name = data.username
-    profile.bio = data.user_bio
-    profile.photo = data.avatar 
-    profile.rating = data.rating || 4.7
-    profile.routes = data.routes || []
-
-  } catch (err) {
-    console.error(err)
-    alert('Не удалось загрузить профиль: ' + err.message)
   }
 
   visible.value = true
@@ -130,10 +127,14 @@ const getAvatarSrc = computed(() => {
 })
 
 async function toggleEdit() {
+  if (!isAuthenticated.value) {
+    showModal.value = true
+    return
+  }
+
   if (isEditing.value) {
     try {
       const token = localStorage.getItem("token")
-
       let avatarData = null
       if (edited.photo) {
         avatarData = edited.photo
@@ -162,7 +163,6 @@ async function toggleEdit() {
       profile.name = edited.name
       profile.bio = edited.bio
       if (edited.photo) profile.photo = edited.photo
-
     } catch (err) {
       console.error(err)
       alert(err.message)
@@ -177,6 +177,11 @@ async function toggleEdit() {
 }
 
 function onFileChange(e) {
+  if (!isAuthenticated.value) {
+    showModal.value = true
+    return
+  }
+
   const file = e.target.files[0]
   if (file) {
     const reader = new FileReader()
@@ -187,14 +192,13 @@ function onFileChange(e) {
     reader.readAsDataURL(file)
   }
 }
+function openRegisterModal() {
+  registerModalRef.value?.open()
+}
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
-
-.avatar-editing {
-  cursor: pointer; 
-}
 
 .profile-section {
   max-width: 780px;
@@ -230,8 +234,10 @@ function onFileChange(e) {
 
 .file-input {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   opacity: 0;
   cursor: pointer;
   z-index: 2;
@@ -351,7 +357,8 @@ function onFileChange(e) {
   transform: translateY(0);
 }
 
-.edit-input, .edit-textarea {
+.edit-input,
+.edit-textarea {
   width: 100%;
   font-family: 'Montserrat', sans-serif;
   font-size: 1rem;
@@ -359,5 +366,67 @@ function onFileChange(e) {
   margin-bottom: 0.75rem;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal h3 {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  color: #1e293b;
+}
+
+.modal p {
+  margin: 0 0 1.5rem;
+  color: #64748b;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.modal-button {
+  background: #0d3c2f;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.modal-button:hover {
+  background: #135845;
+}
+
+.modal-button.cancel {
+  background: #64748b;
+}
+
+.modal-button.cancel:hover {
+  background: #7f8c9e;
 }
 </style>
