@@ -28,4 +28,32 @@ import MainMapAndList from '@/components/MainMapAndList.vue'
   overflow: hidden;
   margin: 0 auto;
 }
+
+@media screen and (max-width: 768px) {
+  .home-container {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .main-content {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .home-container {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .main-content {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+}
 </style>

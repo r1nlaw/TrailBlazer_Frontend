@@ -269,7 +269,8 @@ function applyFilters() {
 
 
 .sidebar-content {
-    margin-top: 20%;
+  margin-top: 20%;
+  padding-bottom: 100px;
 }
 .region {
   display: flex;
@@ -505,8 +506,9 @@ function applyFilters() {
     margin-top: 80px;
     display: flex;
   }
-  .sidebar-content{
-    margin-top: 35%;
+  .sidebar-content {
+    margin-top: 50%;
+    padding-bottom: 150px;
   }
 }
 
@@ -521,8 +523,9 @@ function applyFilters() {
   .sidebar.open {
     transform: translateX(0);
   }
-  .sidebar-content{
-    margin-top: 35%;
+  .sidebar-content {
+    margin-top: 60%;
+    padding-bottom: 200px;
   }
 
   .sidebar-toggle {
@@ -541,8 +544,9 @@ function applyFilters() {
   .sidebar.open {
     transform: translateX(0);
   }
-  .sidebar-content{
-    margin-top: 35%;
+  .sidebar-content {
+    margin-top: 65%;
+    padding-bottom: 250px;
   }
 
   .sidebar-toggle {
@@ -558,8 +562,9 @@ function applyFilters() {
     top: 70px;
   }
 
-  .sidebar-content{
-    margin-top: 0%;
+  .sidebar-content {
+    margin-top: 70%;
+    padding-bottom: 300px;
   }
 
   .sidebar.open {

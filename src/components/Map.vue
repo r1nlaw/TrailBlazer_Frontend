@@ -17,7 +17,7 @@
 
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue';
 
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -30,6 +30,7 @@ const geojson = { type: 'FeatureCollection', features: [] };
 let map = null;
 const mapHeight = ref(400);
 const routeSourceId = 'route';
+const isMobile = ref(window.innerWidth <= 768);
 
 const markers = ref({});
 const isRouting = ref(false);
@@ -352,10 +353,18 @@ onMounted(async () => {
     loadFacilities(map);
   });
   map.on('error', console.error);
+
+  // Add resize listener
+  window.addEventListener('resize', () => {
+    isMobile.value = window.innerWidth <= 768;
+  });
 });
 
-
-
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', () => {
+    isMobile.value = window.innerWidth <= 768;
+  });
+});
 
 function resetRoute() {
   selectedRoutePoints.value = [];
@@ -371,13 +380,13 @@ const toggleMap = () => {
   if (!isMapVisible.value) {
     isMapVisible.value = true;
     isMapExpanded.value = true;
-    mapHeight.value = 800;
+    mapHeight.value = isMobile.value ? 600 : 800;
     nextTick(() => {
       map?.resize();
     });
   } else {
     isMapExpanded.value = !isMapExpanded.value;
-    mapHeight.value = isMapExpanded.value ? 800 : 400;
+    mapHeight.value = isMapExpanded.value ? (isMobile.value ? 600 : 800) : 400;
     nextTick(() => {
       map?.resize();
     });
@@ -543,21 +552,20 @@ html, body, #app {
   background-color: #0d3c2f;
 }
 
-:deep(.maplibregl-popup-content){
-
+:deep(.maplibregl-popup-content) {
   min-width: 270px;
   background-color: RGBA(0,0,0,0);
 }
 
 
 .map-container {
-  transition: min-height 0.0s ease; /*С анимацией карта лагает*/
+  transition: min-height 0.0s ease;
   min-height: 300px;
   position: relative;
 }
 
 .map-container.expanded {
-  min-height: 850px;
+  min-height: v-bind('isMobile ? "600px" : "850px"');
 }
 
 
@@ -740,6 +748,97 @@ html, body, #app {
     z-index: 5000;
   }
 }
+
+@media (max-width: 768px) {
+  .map-container.expanded {
+    min-height: 600px;
+  }
+  
+  .map-button {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 375px) {
+  .map-container.expanded {
+    min-height: 550px;
+  }
+  
+  .map-button {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  :deep(.maplibregl-popup-content) {
+    min-width: 220px;
+    padding: 8px;
+  }
+
+  :deep(.popup-card) {
+    width: 220px;
+  }
+
+  :deep(.popup-card-image) {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+
+  :deep(.popup-card-body) {
+    padding: 8px 12px;
+  }
+
+  :deep(.popup-card-title) {
+    font-size: 1rem;
+  }
+
+  :deep(.popup-card-address) {
+    font-size: 0.8rem;
+  }
+
+  :deep(.popup-card-link) {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  :deep(.maplibregl-popup-content) {
+    min-width: 180px;
+    padding: 6px;
+  }
+
+  :deep(.popup-card) {
+    width: 180px;
+  }
+
+  :deep(.popup-card-image) {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+
+  :deep(.popup-card-body) {
+    padding: 6px 10px;
+  }
+
+  :deep(.popup-card-title) {
+    font-size: 0.9rem;
+  }
+
+  :deep(.popup-card-address) {
+    font-size: 0.75rem;
+  }
+
+  :deep(.popup-card-link) {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+}
+
 
 
 
