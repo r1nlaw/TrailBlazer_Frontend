@@ -72,7 +72,7 @@
               <label>Оценка:</label>
               <div class="star-rating">
                 <span 
-                  v-for="star in 10" 
+                  v-for="star in 5"
                   :key="star"
                   class="star"
                   :class="{ 'active': star <= newReview.rating }"
@@ -83,7 +83,7 @@
                   {{ star <= (hoverRating || newReview.rating) ? '★' : '☆' }}
                 </span>
                 <span class="rating-value" v-if="newReview.rating">
-                  {{ newReview.rating }}/10
+                  {{ newReview.rating }}/5
                 </span>
               </div>
             </div>
@@ -321,7 +321,7 @@ function removePhoto(index) {
 
 const isReviewValid = computed(() => {
   return newReview.value.rating >= 1 && 
-         newReview.value.rating <= 10 && 
+         newReview.value.rating <= 5 && 
          newReview.value.text.trim().length > 0 && 
          newReview.value.text.length <= 1500
 })
@@ -692,8 +692,9 @@ watch(() => route.params.name, fetchLandmark)
 
 .review-textarea:focus,
 .review-textarea:active {
-  border-color: #2196f3;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  border-color: #e0e0e0;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  outline: none;
 }
 
 .char-count {
@@ -725,8 +726,8 @@ watch(() => route.params.name, fetchLandmark)
 }
 
 .file-upload-wrapper:focus-within {
-  border-color: #2196f3;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  border-color: #e0e0e0;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
 .custom-file-upload {
@@ -1089,22 +1090,31 @@ watch(() => route.params.name, fetchLandmark)
     padding: 8px;
     outline: none;
     border-radius: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
   }
 
   .custom-file-upload {
     padding: 6px 12px;
     font-size: 13px;
-    outline: none;
-  }
-
-  .upload-icon {
-    font-size: 14px;
+    flex-shrink: 0;
+    margin-bottom: 8px;
   }
 
   .selected-files-text {
     font-size: 13px;
-    flex-grow: 1;
-    flex-shrink: 1;
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .review-textarea {
+    outline: none;
+  }
+
+  .file-upload-wrapper:focus-within {
+    border-color: #e0e0e0;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
   }
 
   .photo-preview {
