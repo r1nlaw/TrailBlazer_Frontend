@@ -150,7 +150,7 @@
                   <h3 class="review-title">{{ review.username }}</h3>
                   <div class="rating">
                     <span class="star-icon">★</span>
-                    <span>{{ review.rating }}/10</span>
+                    <span>{{ review.rating }}/5</span>
                   </div>
                 </div>
                 <p class="review-text">{{ review.review }}</p>
