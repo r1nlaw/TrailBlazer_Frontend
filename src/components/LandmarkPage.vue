@@ -1,5 +1,14 @@
 <template>
   <div class="landmark-page">
+    <!-- Уведомление -->
+    <div v-if="notification.show" class="notification" :class="notification.type">
+      <div class="notification-content">
+        <span class="notification-icon">{{ notification.type === 'error' ? '❌' : '✅' }}</span>
+        <span class="notification-message">{{ notification.message }}</span>
+      </div>
+      <button class="notification-close" @click="notification.show = false">×</button>
+    </div>
+
     <div v-if="loading" class="status-message">Загрузка...</div>
     <div v-else-if="error" class="status-message error">{{ error }}</div>
 
@@ -71,7 +80,90 @@
             </div>
           </div>
         </div>
-        
+
+        <div class="landmark-section reviews-section">
+          <h3>⭐ Путевые заметки </h3>
+          
+          <!-- Форма для добавления отзыва -->
+          <div class="review-form">
+            <h4>Оставить отзыв</h4>
+            <div class="rating-input">
+              <label>Оценка (1-10):</label>
+              <input 
+                type="number" 
+                v-model.number="newReview.rating" 
+                min="1" 
+                max="10" 
+                required 
+                class="rating-field"
+              />
+            </div>
+            <div class="review-text-input">
+              <label>Ваш отзыв (до 1500 символов):</label>
+              <textarea 
+                v-model="newReview.text" 
+                maxlength="1500" 
+                placeholder="Напишите ваш отзыв здесь..." 
+                class="review-textarea"
+              ></textarea>
+              <p class="char-count">{{ newReview.text.length }}/1500</p>
+            </div>
+            <div class="review-photos-input">
+              <label>Фотографии (до 5):</label>
+              <input 
+                type="file" 
+                multiple 
+                accept="image/*" 
+                @change="handlePhotoUpload" 
+                class="photo-upload"
+              />
+              <div class="photo-preview">
+                <div v-for="(photo, index) in newReview.photos" :key="index" class="photo-preview-item">
+                  <img :src="photo.url" :alt="'Фото ' + (index + 1)" />
+                  <button @click="removePhoto(index)" class="remove-photo">✖</button>
+                </div>
+              </div>
+            </div>
+            <button 
+              @click="submitReview" 
+              :disabled="!isReviewValid || submitting" 
+              class="submit-review-button"
+            >
+              {{ submitting ? 'Отправка...' : 'Отправить отзыв' }}
+            </button>
+          </div>
+
+          <!-- Список отзывов -->
+          <div v-if="reviews && reviews.reviews && Object.keys(reviews.reviews).length" class="reviews-list">
+            <div v-for="(review, index) in Object.values(reviews.reviews)" :key="index" class="card review-card" :style="{ animationDelay: (index * 100) + 'ms' }">
+              <div class="review-content">
+                <div class="title-row">
+                  <h3 class="review-title">{{ review.username }}</h3>
+                  <div class="rating">
+                    <span class="star-icon">★</span>
+                    <span>{{ review.rating }}/10</span>
+                  </div>
+                </div>
+                <p class="review-text">{{ review.review }}</p>
+                <div v-if="review.images && Object.keys(review.images).length" class="review-photos">
+                  <img 
+                    v-for="(imageData, imageName) in review.images" 
+                    :key="imageName" 
+                    :src="'data:image/png;base64,' + imageData" 
+                    :alt="'Фото отзыва ' + imageName" 
+                    class="review-photo"
+                  />
+                </div>
+              </div>
+              <div class="img" v-if="review.avatar && review.avatar !== ''">
+                <img :src="review.avatar" class="avatar-image" :alt="review.username" />
+              </div>
+            </div>
+          </div>
+          <div v-else class="no-reviews">
+            Пока нет отзывов. Будьте первым!
+          </div>
+        </div>
       </div>
     </transition>
   </div>
@@ -82,12 +174,25 @@ import { ref, onMounted, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHead } from '@vueuse/head'
 import WeatherChart from './WeatherChart.vue'
+import {  computed } from 'vue'
 
 const route = useRoute()
 const domain = `${import.meta.env.VITE_BACKEND_URL}`
 const landmark = ref({})
 const loading = ref(true)
 const error = ref('')
+const reviews = ref([])
+const newReview = ref({
+  rating: null,
+  text: '',
+  photos: []
+})
+const submitting = ref(false)
+const notification = ref({
+  show: false,
+  message: '',
+  type: 'success'
+})
 
 async function fetchLandmark() {
   try {
@@ -98,12 +203,107 @@ async function fetchLandmark() {
     })
     if (!response.ok) throw new Error('Достопримечательность не найдена')
     landmark.value = await response.json()
+    await fetchReviews()
   } catch (err) {
     error.value = err.message
   } finally {
     loading.value = false
   }
 }
+
+async function fetchReviews() {
+  try {
+    const response = await fetch(`${domain}/user/review/get/${encodeURIComponent(route.params.name)}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!response.ok) throw new Error('Не удалось загрузить отзывы')
+    reviews.value = await response.json()
+  } catch (err) {
+    console.error('Ошибка загрузки отзывов:', err)
+  }
+}
+
+function showNotification(message, type = 'success') {
+  notification.value = {
+    show: true,
+    message,
+    type
+  }
+  setTimeout(() => {
+    notification.value.show = false
+  }, 5000)
+}
+
+async function submitReview() {
+  if (!isReviewValid.value) {
+    showNotification('Пожалуйста, заполните все поля корректно', 'error')
+    return
+  }
+
+  submitting.value = true
+  try {
+    const formData = new FormData()
+    formData.append("user_id", localStorage.getItem("user_id"))
+    formData.append("landmark_id", landmark.value.id)
+    formData.append('rating', newReview.value.rating)
+    formData.append('review', newReview.value.text)
+    newReview.value.photos.forEach((photo, index) => {
+      const filename = photo.file.name || `photo_${index}_${Date.now()}.jpg`
+      formData.append(`images[${filename}]`, photo.file)
+    })
+    const token = localStorage.getItem("token")
+
+    const response = await fetch(`${domain}/user/review/add/${encodeURIComponent(route.params.name)}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData,
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Не удалось отправить отзыв')
+    }
+
+    const newReviewData = await response.json()
+    reviews.value.reviews = {
+      ...reviews.value.reviews,
+      [Object.keys(reviews.value.reviews).length + 1]: newReviewData
+    }
+    newReview.value = { rating: null, text: '', photos: [] }
+    showNotification('Отзыв успешно добавлен!')
+  } catch (err) {
+    console.error('Ошибка при отправке отзыва:', err)
+    showNotification(err.message || 'Не удалось отправить отзыв. Попробуйте снова.', 'error')
+  } finally {
+    submitting.value = false
+  }
+}
+
+function handlePhotoUpload(event) {
+  const files = Array.from(event.target.files).slice(0, 5 - newReview.value.photos.length)
+  files.forEach(file => {
+    if (file.type.startsWith('image/')) {
+      newReview.value.photos.push({
+        file,
+        url: URL.createObjectURL(file)
+      })
+    }
+  })
+}
+
+function removePhoto(index) {
+  newReview.value.photos.splice(index, 1)
+}
+
+const isReviewValid = computed(() => {
+  return newReview.value.rating >= 1 && 
+         newReview.value.rating <= 10 && 
+         newReview.value.text.trim().length > 0 && 
+         newReview.value.text.length <= 1500
+})
 
 function formatDate(date) {
   return new Date(date).toLocaleString('ru-RU', {
@@ -271,58 +471,6 @@ watch(() => route.params.name, fetchLandmark)
   }
 }
 
-.weather-details {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.weather-card {
-  background: white;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.weather-icon {
-  font-size: 2em;
-  margin-bottom: 8px;
-}
-
-.weather-info {
-  width: 100%;
-}
-
-.weather-date {
-  font-size: 0.9em;
-  color: #666;
-  margin-bottom: 4px;
-}
-
-.weather-temp {
-  font-size: 1.5em;
-  font-weight: bold;
-  margin: 8px 0;
-}
-
-.weather-desc {
-  color: #444;
-  margin-bottom: 8px;
-}
-
-.weather-wind {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  font-size: 0.9em;
-  color: #666;
-}
-
 .coordinates-container {
   background: #f8f9fa;
   border-radius: 12px;
@@ -383,6 +531,229 @@ watch(() => route.params.name, fetchLandmark)
   flex: 1;
 }
 
+.reviews-section {
+  margin-top: 32px;
+}
+
+.review-form {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.review-form h4 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #2c3e50;
+}
+
+.rating-input, .review-text-input, .review-photos-input {
+  margin-bottom: 16px;
+}
+
+.rating-input label, .review-text-input label, .review-photos-input label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #34495e;
+}
+
+.rating-field {
+  width: 100px;
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.review-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  resize: vertical;
+}
+
+.char-count {
+  font-size: 14px;
+  color: #666;
+  text-align: right;
+  margin-top: 4px;
+}
+
+.photo-upload {
+  padding: 8px;
+}
+
+.photo-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.photo-preview-item {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.photo-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.remove-photo {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #c00;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.submit-review-button {
+  background: #2196f3;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+
+.submit-review-button:disabled {
+  background: #90caf9;
+  cursor: not-allowed;
+}
+
+.submit-review-button:hover:not(:disabled) {
+  background: #1976d2;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.review-card {
+  display: flex;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  animation: slideIn 0.5s ease forwards;
+  opacity: 0;
+}
+
+.review-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.review-content {
+  flex: 1;
+  padding: 16px;
+}
+
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.review-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.star-icon {
+  color: #FFD700; /* Золотой цвет для звезды */
+  font-size: 1.2em;
+  margin-right: 4px;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.review-text {
+  color: #34495e;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.review-photos {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.review-photo {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.img {
+  width: 120px;
+  min-width: 120px;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.no-reviews {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
 @media (max-width: 480px) {
   .coordinate-item {
     flex-direction: column;
@@ -397,6 +768,105 @@ watch(() => route.params.name, fetchLandmark)
   .coordinate-value {
     width: 100%;
   }
+
+  .review-form {
+    padding: 16px;
+  }
+
+  .rating-field {
+    width: 80px;
+  }
+
+  .photo-preview-item {
+    width: 80px;
+    height: 80px;
+  }
+
+  .review-card {
+    flex-direction: column;
+  }
+
+  .img {
+    width: 100%;
+    height: 120px;
+  }
+
+  .avatar-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .review-photo {
+    width: 80px;
+    height: 80px;
+  }
 }
 
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2000;
+  min-width: 300px;
+  max-width: 400px;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: slideIn 0.3s ease-out;
+}
+
+.notification.success {
+  background-color: #4caf50;
+  color: white;
+}
+
+.notification.error {
+  background-color: #f44336;
+  color: white;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification-icon {
+  font-size: 20px;
+}
+
+.notification-message {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 12px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.notification-close:hover {
+  opacity: 1;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
 </style>

@@ -92,7 +92,7 @@ onMounted(async () => {
 
       if (!response.ok) {
         isAuthenticated.value=false;
-          visible.value = true
+        visible.value = true
         return;
       }
 
@@ -106,6 +106,7 @@ onMounted(async () => {
         { id: 2, name: 'Пеший маршрут по горам' },
         { id: 3, name: 'Велоэкскурсия по городу' },
       ]
+      localStorage.setItem("user_id", data.user_id)
 
       edited.name = profile.name
       edited.bio = profile.bio

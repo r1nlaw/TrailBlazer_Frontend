@@ -165,6 +165,7 @@ async function handleSubmit() {
     const data = await response.json()
     if (data.user!=null){
       localStorage.setItem("username",data.user.username);
+      localStorage.setItem("user_id",data.user.id);
     }
     if (data.token) {
       localStorage.setItem("token", data.token);
