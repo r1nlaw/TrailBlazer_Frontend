@@ -1,5 +1,13 @@
 <template>
   <div class="landmark-page">
+    <!-- Модальное окно для просмотра изображений -->
+    <div v-if="selectedImage" class="image-modal" @click="closeImageModal">
+      <div class="modal-content">
+        <img :src="selectedImage" alt="Увеличенное изображение" />
+        <button class="modal-close" @click="closeImageModal">×</button>
+      </div>
+    </div>
+
     <!-- Уведомление -->
     <div v-if="notification.show" class="notification" :class="notification.type">
       <div class="notification-content">
@@ -133,6 +141,18 @@
             </button>
           </div>
 
+          <!-- Кнопка фильтрации -->
+          <div class="reviews-filter">
+            <button 
+              class="filter-button" 
+              :class="{ active: onlyPhotos }"
+              @click="togglePhotoFilter"
+            >
+              <span class="filter-icon">📸</span>
+              {{ onlyPhotos ? 'Показать все отзывы' : 'Только с фото' }}
+            </button>
+          </div>
+
           <!-- Список отзывов -->
           <div v-if="reviews && reviews.reviews && Object.keys(reviews.reviews).length" class="reviews-list">
             <div v-for="(review, index) in Object.values(reviews.reviews)" :key="index" class="card review-card" :style="{ animationDelay: (index * 100) + 'ms' }">
@@ -152,6 +172,7 @@
                     :src="'data:image/png;base64,' + imageData" 
                     :alt="'Фото отзыва ' + imageName" 
                     class="review-photo"
+                    @click="openImageModal('data:image/png;base64,' + imageData)"
                   />
                 </div>
               </div>
@@ -193,6 +214,8 @@ const notification = ref({
   message: '',
   type: 'success'
 })
+const selectedImage = ref(null)
+const onlyPhotos = ref(false)
 
 async function fetchLandmark() {
   try {
@@ -213,7 +236,7 @@ async function fetchLandmark() {
 
 async function fetchReviews() {
   try {
-    const response = await fetch(`${domain}/user/review/get/${encodeURIComponent(route.params.name)}`, {
+    const response = await fetch(`${domain}/user/review/get/${encodeURIComponent(route.params.name)}${onlyPhotos.value ? '?only_photo=true' : ''}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     })
@@ -268,11 +291,6 @@ async function submitReview() {
     }
 
     const newReviewData = await response.json()
-    reviews.value.reviews = {
-      ...reviews.value.reviews,
-      [Object.keys(reviews.value.reviews).length + 1]: newReviewData
-    }
-    newReview.value = { rating: null, text: '', photos: [] }
     showNotification('Отзыв успешно добавлен!')
   } catch (err) {
     console.error('Ошибка при отправке отзыва:', err)
@@ -325,6 +343,21 @@ async function copyToClipboard(text) {
   }
 }
 
+function openImageModal(imageSrc) {
+  selectedImage.value = imageSrc
+  document.body.style.overflow = 'hidden'
+}
+
+function closeImageModal() {
+  selectedImage.value = null
+  document.body.style.overflow = 'auto'
+}
+
+function togglePhotoFilter() {
+  onlyPhotos.value = !onlyPhotos.value
+  fetchReviews()
+}
+
 watchEffect(() => {
   if (!loading.value && landmark.value?.name) {
     const name = landmark.value.name
@@ -351,8 +384,8 @@ watch(() => route.params.name, fetchLandmark)
 
 <style scoped>
 .landmark-page {
-  max-width: 900px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 24px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
@@ -375,6 +408,8 @@ watch(() => route.params.name, fetchLandmark)
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .landmark-title {
@@ -649,98 +684,115 @@ watch(() => route.params.name, fetchLandmark)
 .reviews-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 24px;
+  gap: 24px;
+  margin-top: 32px;
 }
 
 .review-card {
   display: flex;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
   animation: slideIn 0.5s ease forwards;
   opacity: 0;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .review-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 .review-content {
   flex: 1;
-  padding: 16px;
+  padding: 24px;
 }
 
 .title-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .review-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
-  color: #2c3e50;
+  color: #1a1a1a;
   margin: 0;
-}
-
-.star-icon {
-  color: #FFD700; /* Золотой цвет для звезды */
-  font-size: 1.2em;
-  margin-right: 4px;
 }
 
 .rating {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  color: #ff9800;
+  font-weight: 600;
+  background: rgba(255, 152, 0, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.star-icon {
+  font-size: 18px;
 }
 
 .review-text {
-  color: #34495e;
-  line-height: 1.5;
-  margin-bottom: 12px;
+  color: #4a4a4a;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  font-size: 15px;
 }
 
 .review-photos {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
+  margin-top: 16px;
 }
 
 .review-photo {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.review-photo:hover {
+  transform: scale(1.05);
 }
 
 .img {
-  width: 120px;
-  min-width: 120px;
+  width: 140px;
+  min-width: 140px;
   background: #f8f9fa;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 20px;
+  border-left: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .avatar-image {
-  width: 100%;
-  height: 100%;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
   border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -754,51 +806,40 @@ watch(() => route.params.name, fetchLandmark)
   font-style: italic;
 }
 
-@media (max-width: 480px) {
-  .coordinate-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .coordinate-label {
-    min-width: auto;
-  }
-
-  .coordinate-value {
-    width: 100%;
-  }
-
-  .review-form {
-    padding: 16px;
-  }
-
-  .rating-field {
-    width: 80px;
-  }
-
-  .photo-preview-item {
-    width: 80px;
-    height: 80px;
-  }
-
+@media (max-width: 768px) {
   .review-card {
     flex-direction: column;
   }
 
   .img {
     width: 100%;
-    height: 120px;
+    height: 160px;
+    border-left: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
   }
 
   .avatar-image {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
   }
 
   .review-photo {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
+  }
+
+  .review-content {
+    padding: 20px;
+  }
+
+  .title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .rating {
+    align-self: flex-start;
   }
 }
 
@@ -868,5 +909,87 @@ watch(() => route.params.name, fetchLandmark)
     transform: translateX(0);
     opacity: 1;
   }
+}
+
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  cursor: pointer;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90vh;
+  margin: auto;
+}
+
+.modal-content img {
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 32px;
+  cursor: pointer;
+  padding: 8px;
+  line-height: 1;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.modal-close:hover {
+  opacity: 1;
+}
+
+.reviews-filter {
+  margin: 20px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 2px solid #2196f3;
+  border-radius: 25px;
+  background: transparent;
+  color: #2196f3;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-button:hover {
+  background: rgba(33, 150, 243, 0.1);
+}
+
+.filter-button.active {
+  background: #2196f3;
+  color: white;
+}
+
+.filter-icon {
+  font-size: 18px;
 }
 </style>
