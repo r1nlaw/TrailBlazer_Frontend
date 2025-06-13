@@ -31,6 +31,9 @@ let map = null;
 const mapHeight = ref(400);
 const routeSourceId = 'route';
 const isMobile = ref(window.innerWidth <= 768);
+const userMarker = ref(null);
+const userLocation = ref(null);
+const watchId = ref(null);
 
 const markers = ref({});
 const isRouting = ref(false);
@@ -228,7 +231,74 @@ const showPopup = (feature, targetMap) => {
   }, 0);
 };
 
+// Функция для получения геопозиции
+const getUserLocation = () => {
+  if ("geolocation" in navigator) {
+    watchId.value = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        userLocation.value = [longitude, latitude];
+        
+        // Обновляем или создаем маркер пользователя
+        if (userMarker.value) {
+          userMarker.value.setLngLat(userLocation.value);
+        } else {
+          userMarker.value = new maplibregl.Marker({
+            color: "#FF0000",
+            scale: 0.8
+          })
+            .setLngLat(userLocation.value)
+            .addTo(map);
+        }
 
+        // Если есть выбранные точки маршрута, обновляем маршрут
+        if (selectedRoutePoints.value.length > 0) {
+          updateRouteWithUserLocation();
+        }
+      },
+      (error) => {
+        console.error("Ошибка получения геопозиции:", error);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000
+      }
+    );
+  }
+};
+
+// Функция обновления маршрута с учетом позиции пользователя
+const updateRouteWithUserLocation = async () => {
+  if (!userLocation.value || selectedRoutePoints.value.length === 0) return;
+
+  try {
+    const landmarks = await getLandmarksByIDs(selectedRoutePoints.value);
+    if (!landmarks) return;
+
+    // Добавляем текущую позицию пользователя в начало маршрута
+    const routePoints = [
+      { location: { lng: userLocation.value[0], lat: userLocation.value[1] } },
+      ...landmarks
+    ];
+
+    await getRoute(routePoints);
+  } catch (error) {
+    console.error("Ошибка обновления маршрута:", error);
+  }
+};
+
+// Очистка отслеживания геопозиции
+const clearLocationWatch = () => {
+  if (watchId.value) {
+    navigator.geolocation.clearWatch(watchId.value);
+    watchId.value = null;
+  }
+  if (userMarker.value) {
+    userMarker.value.remove();
+    userMarker.value = null;
+  }
+};
 
 onMounted(async () => {
   map = new maplibregl.Map({
@@ -256,21 +326,27 @@ onMounted(async () => {
         'circle-color': [
           'step',
           ['get', 'point_count'],
-          '#51bbd6',
+          '#2E7D32',
           10,
-          '#f1f075',
+          '#1B5E20',
           750,
-          '#f28cb1'
+          '#0A3D0A'
         ],
         'circle-radius': [
           'step',
           ['get', 'point_count'],
-          35,
+          25,
+          50,
+          30,
           100,
-          20,
-          250,
-          25
-        ]
+          35,
+          750,
+          40
+        ],
+        'circle-opacity': 0.9,
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-opacity': 0.3
       }
     });
 
@@ -282,10 +358,13 @@ onMounted(async () => {
       layout: {
         'text-field': '{point_count_abbreviated}',
         'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
-        'text-size': 10
+        'text-size': 14,
+        'text-allow-overlap': true
       },
       paint: {
-        'text-color': '#ffffff'
+        'text-color': '#E8F5E9',
+        'text-halo-color': '#000000',
+        'text-halo-width': 1.5
       }
     });
 
@@ -346,6 +425,9 @@ onMounted(async () => {
     map.on('mouseleave', ['clusters', 'unclustered-point'], () => {
       map.getCanvas().style.cursor = '';
     });
+
+    // Запускаем отслеживание геопозиции
+    getUserLocation();
   });
 
   map.on('moveend', () => {
@@ -361,6 +443,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  clearLocationWatch();
   window.removeEventListener('resize', () => {
     isMobile.value = window.innerWidth <= 768;
   });
@@ -426,8 +509,7 @@ async function RouteMaker(points) {
     }
     
     await loadFacilities(map, points);
-    const landmarks = await getLandmarksByIDs(points);
-    if (landmarks) await getRoute(landmarks);
+    await updateRouteWithUserLocation();
   } catch (error) {
     console.error('Error in RouteMaker:', error);
   } finally {
@@ -457,12 +539,6 @@ function getRoute(coords) {
               type: 'Feature',
               geometry: route
             });
-            if (modalMap.value && modalMap.value.getSource(routeSourceId)) {
-              modalMap.value.getSource(routeSourceId).setData({
-                type: 'Feature',
-                geometry: route
-              });
-            }
             resolve();
           }
         })
